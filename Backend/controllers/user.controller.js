@@ -268,7 +268,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 // Send verification otp to users email
 const sendVerifyOtp = asyncHandler(async (req, res) => {
     try {
-        const { userId } = req.body;
+        const userId = req.user._id; // userId is coming from verifyJWT middleware
         const user = await User.findById(userId);
 
         if (!user) {
@@ -289,12 +289,20 @@ const sendVerifyOtp = asyncHandler(async (req, res) => {
             to: user.email,
             subject: "Account Verification - Verify your email",
             html: `
-                <p>Hi ${user.name},</p>
-                <p>Please use the following OTP to verify your email:</p>
-                <h2 style="background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px; text-align: center; font-size: 24px; font-weight: bold;">
-                    ${otp}
-                </h2>
-                <p>This OTP is valid for 10 minutes.</p>
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+                    <h2 style="color: #333; text-align: center;">Account Verification</h2>
+                    <p style="font-size: 16px; color: #555;">Hi <strong>${user.username}</strong>,</p>
+                    <p style="font-size: 16px; color: #555;">Please use the following OTP to verify your email:</p>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <span style="background-color: #4CAF50; color: white; padding: 12px 24px; border-radius: 5px; font-size: 24px; font-weight: bold; display: inline-block;">
+                            ${otp}
+                        </span>
+                    </div>
+                    <p style="font-size: 16px; color: #555;">This OTP is valid for <strong>10 minutes</strong>.</p>
+                    <p style="font-size: 16px; color: #555;">If you did not request this, please ignore this email.</p>
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                    <p style="text-align: center; font-size: 14px; color: #888;">&copy; ${new Date().getFullYear()} Surya. All rights reserved.</p>
+                </div>
             `,
         };
         await transporter.sendMail(mailOptions);
@@ -309,12 +317,14 @@ const sendVerifyOtp = asyncHandler(async (req, res) => {
                 )
             );
     } catch (error) {
-        throw new ApiError(500, "Something went wrong while sending otp");
+        throw new ApiError(500, error.message);
     }
 });
 
+// Verify user email
 const verifyEmail = asyncHandler(async (req, res) => {
-    const { userId, otp } = req.body;
+    const { otp } = req.body;
+    const userId = req.user._id; // userId is coming from verifyJWT middleware
 
     if (!userId || !otp) {
         throw new ApiError(400, "UserId and OTP are required");
@@ -352,6 +362,16 @@ const verifyEmail = asyncHandler(async (req, res) => {
     }
 });
 
+const isAuthenticated = asyncHandler(async (req, res) => {
+    try {
+        return res
+            .status(200)
+            .json(new ApiResponse(200, {}, "User is authenticated"));
+    } catch (error) {
+        throw new ApiError(400, error.message);
+    }
+});
+
 export {
     registerUser,
     loginUser,
@@ -360,4 +380,6 @@ export {
     changeCurrentPassword,
     getCurrentUser,
     sendVerifyOtp,
+    verifyEmail,
+    isAuthenticated,
 };
