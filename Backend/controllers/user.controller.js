@@ -3,8 +3,10 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import sendMail from "../utils/nodemailer.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import transporter from "../utils/nodemailer.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -80,6 +82,22 @@ const registerUser = asyncHandler(async (req, res) => {
             "Something went wrong while registering the user"
         );
     }
+
+    // Sending Welcome Email
+    const mailOptions = {
+        from: process.env.SENDER_EMAIL,
+        to: createdUser.email,
+        subject: "Welcome to our platform",
+        text: `Hello ${createdUser.username}, Welcome to our platform`,
+        html: `
+            <h1>Hello ${createdUser.username}, Welcome to our platform</h1>
+            <p>Thank you for joining our platform. We are excited to have you here</p>
+            <p>Feel free to reach out to us for any queries</p>
+            <p>Regards, <br> Surya</p>
+        `,
+    };
+
+    await transporter.sendMail(mailOptions);
 
     return res
         .status(201)
@@ -247,6 +265,93 @@ const getCurrentUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, req.user, "User fetched successfully"));
 });
 
+// Send verification otp to users email
+const sendVerifyOtp = asyncHandler(async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+
+        if (user.isVerified) {
+            throw new ApiError(400, "User is already verified");
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        user.verifyOtp = otp;
+        user.verifyOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+        await user.save({ validateBeforeSave: false });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: "Account Verification - Verify your email",
+            html: `
+                <p>Hi ${user.name},</p>
+                <p>Please use the following OTP to verify your email:</p>
+                <h2 style="background-color: #4CAF50; color: white; padding: 10px; border-radius: 5px; text-align: center; font-size: 24px; font-weight: bold;">
+                    ${otp}
+                </h2>
+                <p>This OTP is valid for 10 minutes.</p>
+            `,
+        };
+        await transporter.sendMail(mailOptions);
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    {},
+                    "Verification OTP sent to your email successfully"
+                )
+            );
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while sending otp");
+    }
+});
+
+const verifyEmail = asyncHandler(async (req, res) => {
+    const { userId, otp } = req.body;
+
+    if (!userId || !otp) {
+        throw new ApiError(400, "UserId and OTP are required");
+    }
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+
+        if (user.isVerified) {
+            throw new ApiError(400, "User is already verified");
+        }
+
+        if (user.verifyOtp !== otp || user.verifyOtp === "") {
+            throw new ApiError(400, "Invalid OTP");
+        }
+
+        if (user.verifyOtpExpiry < Date.now()) {
+            throw new ApiError(400, "OTP expired");
+        }
+
+        user.isVerified = true;
+        user.verifyOtp = "";
+        user.verifyOtpExpiry = 0;
+        await user.save({ validateBeforeSave: false });
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, {}, "User verified successfully"));
+    } catch (error) {
+        throw new ApiError(400, "Invalid OTP or User");
+    }
+});
+
 export {
     registerUser,
     loginUser,
@@ -254,4 +359,5 @@ export {
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
+    sendVerifyOtp,
 };
