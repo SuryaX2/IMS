@@ -5,15 +5,17 @@ import Login from "./pages/Login";
 import EmailVerify from "./pages/EmailVerify";
 import ResetPassword from "./pages/ResetPassword";
 import Signup from "./pages/Signup";
+import toast, { Toaster } from "react-hot-toast";
 
 function App() {
-    return (
-        <BrowserRouter>
+  return (
+    <BrowserRouter>
+      <Toaster />
             <div>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="/login" element={<Signup />} />
+                    <Route path="/signup" element={<Signup />} />
                     <Route path="/email-verify" element={<EmailVerify />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                 </Routes>

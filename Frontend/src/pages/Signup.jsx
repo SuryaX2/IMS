@@ -39,7 +39,7 @@ const Signup = () => {
 
       // Using the register API endpoint from your controller
       const response = await axios.post(
-        'http://localhost:3000/api/v1/users/register', 
+        'http://localhost:3001/api/v1/users/register', 
         formData,
         {
           headers: {
@@ -97,8 +97,8 @@ const Signup = () => {
   return (
     <Row className="min-h-screen">
       {/* Left side - Form */}
-      <Col xs={24} sm={24} md={12} className="flex items-center justify-center p-8">
-        <Card bordered={false} className="w-full max-w-md shadow-md">
+      <Col xs={24} sm={24} md={12} className="flex items-center justify-center p-4">
+        <Card variant={false} className="w-full max-w-md shadow-md">
           <div className="text-center mb-6">
             <Title level={2}>Create Account</Title>
             <Text type="secondary">Sign up to start managing your inventory</Text>
@@ -136,28 +136,10 @@ const Signup = () => {
               name="password"
               rules={[
                 { required: true, message: "Please enter your password" },
-                { min: 8, message: "Password must be at least 8 characters" }
+                { min: 6, message: "Password must be at least 6 characters" }
               ]}
             >
               <Input.Password prefix={<LockOutlined />} placeholder="Password" />
-            </Form.Item>
-
-            <Form.Item
-              name="confirmPassword"
-              dependencies={["password"]}
-              rules={[
-                { required: true, message: "Please confirm your password" },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue("password") === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error("The two passwords do not match"));
-                  },
-                }),
-              ]}
-            >
-              <Input.Password prefix={<LockOutlined />} placeholder="Confirm Password" />
             </Form.Item>
 
             <Form.Item
@@ -178,7 +160,7 @@ const Signup = () => {
             <Form.Item>
               <div className="flex justify-center mb-4">
                 <ReCAPTCHA
-                  sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" // Replace with your actual sitekey
+                  sitekey="6Lcvp-MqAAAAAFKl_skUAXiKIGK_si0uSDyqJsGX" // Replace with your actual sitekey
                   onChange={handleCaptchaChange}
                 />
               </div>
@@ -213,7 +195,7 @@ const Signup = () => {
       <Col xs={0} sm={0} md={12} className="bg-blue-50">
         <div className="h-full flex items-center justify-center">
           <img 
-            src="/inventory-signup.svg" 
+            src="/Inventory-management-system.webp" 
             alt="Inventory Management" 
             className="max-w-full max-h-full p-8"
             onError={(e) => {
