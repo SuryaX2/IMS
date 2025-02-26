@@ -90,10 +90,26 @@ const registerUser = asyncHandler(async (req, res) => {
         subject: "Welcome to our platform",
         text: `Hello ${createdUser.username}, Welcome to our platform`,
         html: `
-            <h1>Hello ${createdUser.username}, Welcome to our platform</h1>
-            <p>Thank you for joining our platform. We are excited to have you here</p>
-            <p>Feel free to reach out to us for any queries</p>
-            <p>Regards, <br> Surya</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+            <h1 style="color: #333; text-align: center;">Welcome, ${createdUser.username}!</h1>
+            <p style="font-size: 16px; color: #555; text-align: center;">
+                Thank you for joining our platform. We are excited to have you here!
+            </p>
+            <p style="font-size: 16px; color: #555; text-align: center;">
+                Explore our features and make the most of our platform.
+            </p>
+            <p style="font-size: 16px; color: #555; text-align: center;">
+                If you have any questions, feel free to reach out to our support team at 
+                <a href="mailto:sekharsurya111@gmail.com" style="color: #4CAF50; text-decoration: none;">sekharsurya111@gmail.com</a>.
+            </p>
+            <p style="font-size: 16px; color: #555; text-align: center; margin-top: 20px;">
+                Regards, <strong> Surya</strong>
+            </p>
+            <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+            <p style="text-align: center; font-size: 14px; color: #888;">
+                &copy; ${new Date().getFullYear()} Surya. All rights reserved.
+            </p>
+        </div>
         `,
     };
 
