@@ -51,16 +51,18 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User with email or username already exists");
     }
 
-    console.log(req.files);
+    // console.log(req.files);
     const avatarLocalPath = req.files?.avatar[0]?.path;
 
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is required");
     }
-    console.log(avatarLocalPath);
+    // console.log(avatarLocalPath);
+
     const avatar = await uploadOnCloudinary(avatarLocalPath);
-    console.log(avatar);
-    console.log(avatar.url);
+
+    // console.log(avatar);
+    // console.log(avatar.url);
     if (!avatar) {
         throw new ApiError(400, "Avatar file is required");
     }
@@ -378,6 +380,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
     }
 });
 
+// Check if user is authenticated
 const isAuthenticated = asyncHandler(async (req, res) => {
     try {
         return res
@@ -385,6 +388,97 @@ const isAuthenticated = asyncHandler(async (req, res) => {
             .json(new ApiResponse(200, {}, "User is authenticated"));
     } catch (error) {
         throw new ApiError(400, error.message);
+    }
+});
+
+// Send reset otp to users email
+const sendResetOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        throw new ApiError(400, "Email is required");
+    }
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        user.resetOtp = otp;
+        user.resetOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+        await user.save({ validateBeforeSave: false });
+
+        const mailOptions = {
+            to: email,
+            subject: "Password Reset OTP",
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h2 style="color: #333; text-align: center;">Password Reset OTP</h2>
+                    <p style="font-size: 16px; color: #555;">Hi <strong>${user.username}</strong>,</p>
+                    <p style="font-size: 16px; color: #555;">Please use the following OTP to reset your password:</p>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <span style="font-size: 24px; font-weight: bold; color: #007BFF;">${otp}</span>
+                    </div>
+                    <p style="font-size: 16px; color: #555;">This OTP is valid for <strong>10 minutes</strong>.</p>
+                    <p style="font-size: 16px; color: #555;">If you did not request this, please ignore this email.</p>
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                    <p style="text-align: center; font-size: 14px; color: #888;">&copy; ${new Date().getFullYear()} Surya. All rights reserved.</p>
+                </div>
+            `,
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    {},
+                    "Password reset OTP sent to your email successfully"
+                )
+            );
+    } catch (error) {
+        throw new ApiError(500, error.message);
+    }
+});
+
+// Reset user password
+const resetPassword = asyncHandler(async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+
+    if (!email || !otp || !newPassword) {
+        throw new ApiError(400, "Email, OTP and New Password are required");
+    }
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+
+        if (user.resetOtp !== otp || user.resetOtp === "") {
+            throw new ApiError(400, "Invalid OTP");
+        }
+
+        if (user.resetOtpExpiry < Date.now()) {
+            throw new ApiError(400, "OTP expired");
+        }
+
+        user.password = newPassword;
+        user.resetOtp = "";
+        user.resetOtpExpiry = 0;
+        await user.save({ validateBeforeSave: false });
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, {}, "Password reset successfully"));
+    } catch (error) {
+        throw new ApiError(500, error.message);
     }
 });
 
@@ -398,4 +492,6 @@ export {
     sendVerifyOtp,
     verifyEmail,
     isAuthenticated,
+    sendResetOtp,
+    resetPassword,
 };
