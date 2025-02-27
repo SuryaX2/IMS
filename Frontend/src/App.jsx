@@ -8,12 +8,12 @@ import Signup from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Toaster />
+    return (
+        <BrowserRouter>
+            <Toaster />
             <div>
                 <Routes>
-                    <Route path="/" element={<Home />} />
+                    <Route path="/home" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/email-verify" element={<EmailVerify />} />
