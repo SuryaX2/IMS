@@ -45,19 +45,18 @@ const Signup = () => {
                 }
             );
 
-            console.log(response);
+            // console.log(response);
 
-            if (response.success) {
-                toast.success(
-                    "Your account has been created successfully. Please check your email for confirmation."
-                );
+            if (response.data.success) {
+                toast.success("Your account has been created successfully.");
                 navigate("/login");
             }
         } catch (error) {
             console.log(error);
 
             const errorMessage =
-                error.message || "Something went wrong during signup";
+                error.response?.data?.message ||
+                "Something went wrong during signup";
             toast.error(errorMessage);
         } finally {
             setLoading(false);
@@ -77,9 +76,9 @@ const Signup = () => {
 
             {/* Right half - Signup Form */}
             <div className="w-full md:w-1/2 flex items-center justify-center p-4">
-                <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-sm">
+                <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-sm">
                     <div className="text-center mb-6">
-                        <h2 className="text-3xl font-bold text-gray-800">
+                        <h2 className="text-3xl font-bold text-gray-800 tracking-wider">
                             Create Your Account
                         </h2>
                         <p className="text-gray-500 mt-1">
