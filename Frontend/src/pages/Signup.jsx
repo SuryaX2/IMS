@@ -44,19 +44,20 @@ const Signup = () => {
                     },
                 }
             );
-            
+
+            console.log(response);
+
             if (response.success) {
                 toast.success(
                     "Your account has been created successfully. Please check your email for confirmation."
-              );
-              navigate("/login");
+                );
+                navigate("/login");
             }
         } catch (error) {
             console.log(error);
 
             const errorMessage =
-                error.response?.message ||
-                "Something went wrong during signup";
+                error.message || "Something went wrong during signup";
             toast.error(errorMessage);
         } finally {
             setLoading(false);
