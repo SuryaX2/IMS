@@ -36,11 +36,9 @@ const Login = () => {
                 toast.error(data.message || "Login failed");
             }
         } catch (error) {
-            console.log(error.response); // Check full response structure
-            console.log(error.response.data); // Check data field
-            console.log(error.response.data?.message || "No message found");
-
-            const errorMessage = error.response.data.message || "Something went wrong during login";
+            const errorMessage =
+                error.response?.data?.message ||
+                "Something went wrong during login";
             toast.error(errorMessage);
         } finally {
             setLoading(false);

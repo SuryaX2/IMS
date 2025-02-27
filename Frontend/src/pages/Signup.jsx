@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Button ,Divider} from "antd";
+import { Form, Input, Button, Divider } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -52,8 +52,6 @@ const Signup = () => {
                 navigate("/login");
             }
         } catch (error) {
-            console.log(error);
-
             const errorMessage =
                 error.response?.data?.message ||
                 "Something went wrong during signup";
@@ -115,7 +113,9 @@ const Signup = () => {
                             ]}
                         >
                             <Input
-                                prefix={<UserOutlined className="text-gray-400"/>}
+                                prefix={
+                                    <UserOutlined className="text-gray-400" />
+                                }
                                 placeholder="Username"
                                 size="large"
                                 className="rounded-md py-2 bg-gray-100"
@@ -137,7 +137,9 @@ const Signup = () => {
                             ]}
                         >
                             <Input
-                                prefix={<MailOutlined className="text-gray-400"/>}
+                                prefix={
+                                    <MailOutlined className="text-gray-400" />
+                                }
                                 placeholder="Email"
                                 size="large"
                                 className="rounded-md py-2 bg-gray-100"
@@ -161,7 +163,9 @@ const Signup = () => {
                             hasFeedback
                         >
                             <Input.Password
-                                prefix={<LockOutlined className="text-gray-400"/>}
+                                prefix={
+                                    <LockOutlined className="text-gray-400" />
+                                }
                                 placeholder="Password"
                                 size="large"
                                 className="rounded-md py-2 bg-gray-100"
