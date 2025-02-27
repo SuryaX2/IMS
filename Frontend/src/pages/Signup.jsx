@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button ,Divider} from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -64,21 +64,22 @@ const Signup = () => {
     };
 
     return (
-        <div className="flex min-h-screen w-full bg-gray-50">
+        <div className="flex min-h-screen w-full bg-gray-100">
             {/* Left half - Signup Image */}
             <div
                 className="hidden md:block md:w-1/2 bg-cover bg-center"
                 style={{
                     backgroundImage: 'url("/Inventory-management-system.webp")',
                     backgroundSize: "contain",
+                    backgroundRepeat: "no-repeat",
                 }}
             ></div>
 
             {/* Right half - Signup Form */}
             <div className="w-full md:w-1/2 flex items-center justify-center p-4">
-                <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-sm">
+                <div className="w-full max-w-md bg-gray-100 p-6 rounded-xl">
                     <div className="text-center mb-6">
-                        <h2 className="text-3xl font-bold text-gray-800 tracking-wider">
+                        <h2 className="text-3xl font-extrabold text-gray-800 tracking-wider">
                             Create Your Account
                         </h2>
                         <p className="text-gray-500 mt-1">
@@ -114,9 +115,10 @@ const Signup = () => {
                             ]}
                         >
                             <Input
-                                prefix={<UserOutlined />}
+                                prefix={<UserOutlined className="text-gray-400"/>}
                                 placeholder="Username"
                                 size="large"
+                                className="rounded-md py-2 bg-gray-100"
                             />
                         </Form.Item>
 
@@ -135,9 +137,10 @@ const Signup = () => {
                             ]}
                         >
                             <Input
-                                prefix={<MailOutlined />}
+                                prefix={<MailOutlined className="text-gray-400"/>}
                                 placeholder="Email"
                                 size="large"
+                                className="rounded-md py-2 bg-gray-100"
                             />
                         </Form.Item>
 
@@ -158,9 +161,10 @@ const Signup = () => {
                             hasFeedback
                         >
                             <Input.Password
-                                prefix={<LockOutlined />}
+                                prefix={<LockOutlined className="text-gray-400"/>}
                                 placeholder="Password"
                                 size="large"
+                                className="rounded-md py-2 bg-gray-100"
                             />
                         </Form.Item>
 
@@ -178,16 +182,7 @@ const Signup = () => {
                         </Form.Item>
                     </Form>
 
-                    <div className="relative my-4">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200"></div>
-                        </div>
-                        <div className="relative flex justify-center">
-                            <span className="px-3 bg-white text-gray-500 text-sm">
-                                Or
-                            </span>
-                        </div>
-                    </div>
+                    <Divider plain>Or</Divider>
 
                     <div className="text-center mt-4">
                         <span className="text-gray-600">
