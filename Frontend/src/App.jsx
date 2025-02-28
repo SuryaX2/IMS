@@ -6,21 +6,47 @@ import EmailVerify from "./pages/EmailVerify";
 import ResetPassword from "./pages/ResetPassword";
 import Signup from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
     return (
-        <BrowserRouter>
-            <Toaster />
-            <div>
-                <Routes>
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/email-verify" element={<EmailVerify />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                </Routes>
-            </div>
-        </BrowserRouter>
+        <AuthProvider>
+            <BrowserRouter>
+                <Toaster />
+                <div>
+                    <Routes>
+                        {/* Public routes */}
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
+                        <Route
+                            path="/reset-password"
+                            element={<ResetPassword />}
+                        />
+
+                        {/* Protected routes (require verification) */}
+                        <Route
+                            path="/"
+                            element={
+                                <ProtectedRoute requireVerified={true}>
+                                    <Home />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        {/* Email verification route (protected, but doesn't require verification) */}
+                        <Route
+                            path="/email-verify"
+                            element={
+                                <ProtectedRoute requireVerified={false}>
+                                    <EmailVerify />
+                                </ProtectedRoute>
+                            }
+                        />
+                    </Routes>
+                </div>
+            </BrowserRouter>
+        </AuthProvider>
     );
 }
 

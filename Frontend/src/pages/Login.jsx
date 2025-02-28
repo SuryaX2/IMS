@@ -1,48 +1,57 @@
-import { useState } from "react";
-import { Form, Input, Button, Divider, Row, Col, Typography } from "antd";
+import { useState, useContext } from "react";
+import { Form, Input, Button, Divider, Row, Col } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import loginImage from "/Inventory-management-system.webp";
 import axios from "axios";
-
-const { Title, Text } = Typography;
+import AuthContext from "../context/AuthContext";
 
 const Login = () => {
     const [loading, setLoading] = useState(false);
+    const { login } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    // const onFinish = async (values) => {
+    //     setLoading(true);
+    //     const { email, password } = values;
+    //     try {
+    //         const response = await axios.post(
+    //             `${import.meta.env.VITE_BACKEND_URL}/users/login`,
+    //             { email, password },
+    //             {
+    //                 withCredentials: true,
+    //                 headers: {
+    //                     "Content-Type": "application/json",
+    //                 },
+    //             }
+    //         );
+
+    //         const data = await response.data;
+
+    //         if (data.success) {
+    //             toast.success(data.message || "Login successful!");
+    //             navigate("/email-verify");
+    //         } else {
+    //             toast.error(data.message || "Login failed");
+    //         }
+    //     } catch (error) {
+    //         const errorMessage =
+    //             error.response?.data?.message ||
+    //             "Something went wrong during login";
+    //         toast.error(errorMessage);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const onFinish = async (values) => {
         setLoading(true);
-        const { email, password } = values;
-        try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/users/login`,
-                values,
-                {
-                    withCredentials: true,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            const data = await response.data;
-
-            if (data.success) {
-                toast.success(data.message || "Login successful!");
-                navigate("/email-verify");
-            } else {
-                toast.error(data.message || "Login failed");
-            }
-        } catch (error) {
-            const errorMessage =
-                error.response?.data?.message ||
-                "Something went wrong during login";
-            toast.error(errorMessage);
-        } finally {
-            setLoading(false);
+        const result = await login(values);
+        if (result.success) {
+            navigate("/email-verify");
         }
+        setLoading(false);
     };
 
     return (
