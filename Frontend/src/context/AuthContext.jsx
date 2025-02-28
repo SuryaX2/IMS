@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import axios from "axios";
+import { api } from "../api/api.js";
 
 const AuthContext = createContext();
 
@@ -8,15 +8,6 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [authenticated, setAuthenticated] = useState(false);
-
-    // Create axios instance with default config
-    const api = axios.create({
-        baseURL: import.meta.env.VITE_BACKEND_URL,
-        withCredentials: true,
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
 
     // Check authentication status on mount
     useEffect(() => {

@@ -233,7 +233,7 @@ const EmailVerify = () => {
                     )}
 
                     <div className="mt-6 text-center">
-                        <span type="secondary" className="text-sm">
+                        <span className="text-sm">
                             Having trouble?{" "}
                             <a
                                 href="mailto:sekharsurya111@gmail.com"
