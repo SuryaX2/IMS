@@ -452,7 +452,7 @@ const sendResetOtp = asyncHandler(async (req, res, next) => {
 });
 
 // Reset user password
-const resetPassword = asyncHandler(async (req, res) => {
+const resetPassword = asyncHandler(async (req, res,next) => {
     const { email, otp, newPassword } = req.body;
 
     if (!email || !otp || !newPassword) {
