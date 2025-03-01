@@ -26,7 +26,7 @@ function App() {
 
                         {/* Protected routes (require verification) */}
                         <Route
-                            path="/"
+                            path="/home"
                             element={
                                 <ProtectedRoute requireVerified={true}>
                                     <Home />
