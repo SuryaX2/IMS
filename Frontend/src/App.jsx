@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorPage from "./components/ErrorPage";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
     return (
@@ -18,6 +19,7 @@ function App() {
                 <div>
                     <Routes>
                         {/* Public routes */}
+                        <Route path="/" element={<LandingPage />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/signup" element={<Signup />} />
                         <Route

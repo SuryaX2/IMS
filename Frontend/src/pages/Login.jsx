@@ -2,9 +2,7 @@ import { useState, useContext } from "react";
 import { Form, Input, Button, Divider, Row, Col } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import loginImage from "/Inventory-management-system.webp";
-import axios from "axios";
 import AuthContext from "../context/AuthContext";
 
 const Login = () => {
