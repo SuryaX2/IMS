@@ -8,6 +8,7 @@ import Signup from "./pages/Signup";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ErrorPage from "./components/ErrorPage";
 
 function App() {
     return (
@@ -43,6 +44,9 @@ function App() {
                                 </ProtectedRoute>
                             }
                         />
+
+                        {/* catch all */}
+                        <Route path="/*" element={<ErrorPage />} />
                     </Routes>
                 </div>
             </BrowserRouter>
