@@ -3,9 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import sendMail from "../utils/nodemailer.js";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import transporter from "../utils/nodemailer.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -312,7 +310,7 @@ const updateUserAvatar = asyncHandler(async (req, res, next) => {
     if (!avatarLocalPath) {
         return next(new ApiError(400, "Avatar file is missing"));
     }
-    
+
     const avatar = await uploadOnCloudinary(avatarLocalPath);
 
     if (!avatar.url) {
