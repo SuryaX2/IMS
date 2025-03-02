@@ -24,9 +24,6 @@ const Navbar = () => {
             <Menu.Item key="profile" icon={<UserOutlined />}>
                 <Link to="/profile">View Profile</Link>
             </Menu.Item>
-            <Menu.Item key="settings" icon={<SettingOutlined />}>
-                <Link to="/settings">Settings</Link>
-            </Menu.Item>
             <Menu.Divider />
             <Menu.Item
                 key="logout"
@@ -54,9 +51,6 @@ const Navbar = () => {
                     placement="bottomRight"
                 >
                     <div className="flex items-center cursor-pointer">
-                        <span className="mr-2 hidden sm:inline">
-                            {user?.username}
-                        </span>
                         <Avatar
                             src={user?.avatar}
                             icon={!user?.avatar && <UserOutlined />}

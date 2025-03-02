@@ -10,6 +10,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorPage from "./components/error/ErrorPage";
 import LandingPage from "./pages/LandingPage";
+import ProfilePage from "./components/ProfilePage";
 
 function App() {
     return (
@@ -43,6 +44,15 @@ function App() {
                             element={
                                 <ProtectedRoute requireVerified={false}>
                                     <EmailVerify />
+                                </ProtectedRoute>
+                            }
+                        />
+                        {/* Profile page (protected) */}
+                        <Route
+                            path="/profile"
+                            element={
+                                <ProtectedRoute>
+                                    <ProfilePage />
                                 </ProtectedRoute>
                             }
                         />
