@@ -5,9 +5,9 @@ import {
 } from "@ant-design/icons";
 
 export const navLinks = [
-    { name: "Features", path: "#features" },
-    { name: "Process", path: "#process" },
-    { name: "Testimonials", path: "#testimonials" },
+    { name: "Features", path: "features" },
+    { name: "Process", path: "process" },
+    { name: "Testimonials", path: "testimonials" },
 ];
 
 export const features = [

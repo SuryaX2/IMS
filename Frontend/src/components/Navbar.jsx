@@ -64,9 +64,10 @@ const Navbar = () => {
                             {navLinks.map((link) => (
                                 <li key={link.name}>
                                     <a
+                                        href="#"
                                         onClick={(e) => {
                                             const anchor =
-                                                document.querySelector(
+                                                document.getElementById(
                                                     link.path
                                                 );
                                             e.preventDefault();
@@ -142,13 +143,25 @@ const Navbar = () => {
                             key={link.name}
                             className="py-2 border-b border-gray-100"
                         >
-                            <Link
-                                to={link.path}
+                            <a
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    const anchor = document.getElementById(
+                                        link.path
+                                    );
+                                    if (anchor) {
+                                        anchor.scrollIntoView({
+                                            behavior: "smooth",
+                                            block: "start",
+                                        });
+                                        setTimeout(() => closeDrawer(), 100);
+                                    }
+                                }}
                                 className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
-                                onClick={closeDrawer}
                             >
                                 {link.name}
-                            </Link>
+                            </a>
                         </div>
                     ))}
                     <Button
