@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 import Login from "./pages/auth/Login";
 import EmailVerify from "./pages/auth/EmailVerify";
 import ResetPassword from "./pages/auth/ResetPassword";
@@ -32,7 +32,7 @@ function App() {
                             path="/home"
                             element={
                                 <ProtectedRoute requireVerified={true}>
-                                    <Home />
+                                    <Dashboard />
                                 </ProtectedRoute>
                             }
                         />
