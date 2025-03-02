@@ -282,6 +282,60 @@ const changeCurrentPassword = asyncHandler(async (req, res, next) => {
         .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
+const updateAccountDetails = asyncHandler(async (req, res, next) => {
+    const { username } = req.body;
+
+    if (!username) {
+        return next(new ApiError(400, "All fields are required"));
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                username: username.toLowerCase(),
+            },
+        },
+        { new: true }
+    ).select("-password -refreshToken");
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, user, "Account details updated successfully")
+        );
+});
+
+const updateUserAvatar = asyncHandler(async (req, res, next) => {
+    const avatarLocalPath = req.files?.avatar[0]?.path;
+
+    if (!avatarLocalPath) {
+        return next(new ApiError(400, "Avatar file is missing"));
+    }
+
+    //TODO: delete old image - assignment
+
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+    if (!avatar.url) {
+        return next(new ApiError(400, "Error while uploading on avatar"));
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                avatar: avatar.url,
+            },
+        },
+        { new: true }
+    ).select("-password");
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "Avatar image updated successfully"));
+});
+
 const getCurrentUser = asyncHandler(async (req, res, next) => {
     return res
         .status(200)
@@ -452,7 +506,7 @@ const sendResetOtp = asyncHandler(async (req, res, next) => {
 });
 
 // Reset user password
-const resetPassword = asyncHandler(async (req, res,next) => {
+const resetPassword = asyncHandler(async (req, res, next) => {
     const { email, otp, newPassword } = req.body;
 
     if (!email || !otp || !newPassword) {
@@ -495,6 +549,8 @@ export {
     logoutUser,
     refreshAccessToken,
     changeCurrentPassword,
+    updateAccountDetails,
+    updateUserAvatar,
     getCurrentUser,
     sendVerifyOtp,
     verifyEmail,
