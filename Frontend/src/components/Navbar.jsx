@@ -42,9 +42,9 @@ const Navbar = () => {
             className={`px-4 flex items-center justify-between h-16 fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
                 scrolled
                     ? "bg-white shadow-md"
-                    : "bg-gradient-to-r from-blue-700 to-indigo-800"
-            }`}
-            style={{ padding: 0 }}
+                    : "bg-transparent"
+                }`}
+            style={{borderBottom: "none"}}
         >
             <div className="container mx-auto px-4 flex items-center justify-between">
                 <div className="flex items-center">

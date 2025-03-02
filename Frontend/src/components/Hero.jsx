@@ -16,7 +16,7 @@ const Hero = ({ onGetStarted }) => {
                 <Row gutter={[32, 40]} align="middle">
                     <Col xs={24} md={12}>
                         <div className="text-white">
-                            <h1 className="text-4xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight">
+                            <h1 className="text-4xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight mt-10 md:mt-0">
                                 Smart Inventory Management for Modern Businesses
                             </h1>
                             <p className="text-lg md:text-xl opacity-90 mb-6 md:mb-10 max-w-lg">
@@ -46,7 +46,7 @@ const Hero = ({ onGetStarted }) => {
                         </div>
                     </Col>
                     <Col xs={24} md={12}>
-                        <div className="relative mt-6 md:mt-0">
+                        <div className="relative mt-6 md:mt-0 mb-6">
                             {/* Image frame with shadow and border */}
                             <div className="absolute inset-0 bg-white/10 rounded-xl transform rotate-3"></div>
                             <img

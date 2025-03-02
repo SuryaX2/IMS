@@ -23,7 +23,7 @@ const LandingPage = () => {
             <Navbar />
 
             {/* Content with top padding to account for fixed navbar */}
-            <Content className="pt-16">
+            <Content>
                 <Hero onGetStarted={handleGetStarted} />
 
                 {/* Features Section */}
