@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Layout, Button, Drawer } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import { useNavigate, Link } from "react-router-dom";
-import { navLinks } from "../data";
+import { navLinks } from "../../data";
 
 const { Header } = Layout;
 

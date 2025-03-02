@@ -51,3 +51,24 @@ export const testimonials = [
         rating: 4,
     },
 ];
+
+export const steps = [
+    {
+        number: "1",
+        title: "Sign Up for an Account",
+        description:
+            "Create your account in minutes and set up your inventory profiles.",
+    },
+    {
+        number: "2",
+        title: "Import Your Inventory",
+        description:
+            "Easily import your existing inventory data or start fresh.",
+    },
+    {
+        number: "3",
+        title: "Start Managing Efficiently",
+        description:
+            "Track, analyze, and optimize your inventory in real-time.",
+    },
+];
