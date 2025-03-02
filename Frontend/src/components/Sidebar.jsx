@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Layout, Menu,Avatar } from "antd";
+import { Layout, Menu, Avatar } from "antd";
 import {
     DashboardOutlined,
     ShoppingCartOutlined,
