@@ -1,10 +1,10 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import EmailVerify from "./pages/EmailVerify";
-import ResetPassword from "./pages/ResetPassword";
-import Signup from "./pages/Signup";
+import Login from "./pages/auth/Login";
+import EmailVerify from "./pages/auth/EmailVerify";
+import ResetPassword from "./pages/auth/ResetPassword";
+import Signup from "./pages/auth/Signup";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
