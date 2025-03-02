@@ -65,7 +65,7 @@ const Signup = () => {
     return (
         <AuthLayout>
             <AuthCard
-                title="Create an account"
+                title="Create an Account"
                 subtitle="Join our platform and get started"
             >
                 <Form

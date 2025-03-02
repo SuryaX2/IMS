@@ -8,7 +8,7 @@ import Signup from "./pages/auth/Signup";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ErrorPage from "./components/ErrorPage";
+import ErrorPage from "./components/error/ErrorPage";
 import LandingPage from "./pages/LandingPage";
 
 function App() {
