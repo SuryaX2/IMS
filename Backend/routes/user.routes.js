@@ -13,6 +13,8 @@ import {
     resetPassword,
     updateAccountDetails,
     updateUserAvatar,
+    sendChangePasswordOtp,
+    verifyChangePasswordOtp,
 } from "../controllers/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
@@ -50,5 +52,12 @@ router.route("/is-auth").post(verifyJWT, isAuthenticated);
 
 router.route("/send-reset-otp").post(sendResetOtp);
 router.route("/reset-password").post(resetPassword);
+
+router
+    .route("/send-change-password-otp")
+    .post(verifyJWT, sendChangePasswordOtp);
+router
+    .route("/verify-change-password-otp")
+    .post(verifyJWT, verifyChangePasswordOtp);
 
 export default router;

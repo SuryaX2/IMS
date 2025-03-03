@@ -287,6 +287,13 @@ const updateAccountDetails = asyncHandler(async (req, res, next) => {
         return next(new ApiError(400, "All fields are required"));
     }
 
+    // username must be unique
+    const existed = await User.findOne({ username: username.toLowerCase() });
+
+    if (existed) {
+        return next(new ApiError(409, "Username already exists"));
+    }
+
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
@@ -391,6 +398,92 @@ const sendVerifyOtp = asyncHandler(async (req, res, next) => {
             );
     } catch (error) {
         return next(new ApiError(500, error.message));
+    }
+});
+
+// Send verification otp to users email for changing password
+const sendChangePasswordOtp = asyncHandler(async (req, res, next) => {
+    try {
+        const userId = req.user._id; // userId is coming from verifyJWT middleware
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return next(new ApiError(404, "User not found"));
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        user.verifyOtp = otp;
+        user.verifyOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+        await user.save({ validateBeforeSave: false });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: "Change Password - Verify your email",
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+                    <h2 style="color: #333; text-align: center;">Change Password</h2>
+                    <p style="font-size: 16px; color: #555;">Hi <strong>${user.username}</strong>,</p>
+                    <p style="font-size: 16px; color: #555;">Please use the following OTP to change your password:</p>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <span style="background-color: #4CAF50; color: white; padding: 12px 24px; border-radius: 5px; font-size: 24px; font-weight: bold; display: inline-block;">
+                            ${otp}
+                        </span>
+                    </div>
+                    <p style="font-size: 16px; color: #555;">This OTP is valid for <strong>10 minutes</strong>.</p>
+                    <p style="font-size: 16px; color: #555;">If you did not request this, please ignore this email.</p>
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                    <p style="text-align: center; font-size: 14px; color: #888;">&copy; ${new Date().getFullYear()} Surya. All rights reserved.</p>
+                </div>
+            `,
+        };
+        await transporter.sendMail(mailOptions);
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    {},
+                    "Verification OTP sent to your email successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+// Verify user email for changing password
+const verifyChangePasswordOtp = asyncHandler(async (req, res, next) => {
+    const { otp } = req.body;
+    const userId = req.user._id; // userId is coming from verifyJWT middleware
+
+    if (!userId || !otp) {
+        return next(new ApiError(400, "UserId and OTP are required"));
+    }
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return next(new ApiError(404, "User not found"));
+        }
+
+        if (user.verifyOtp !== otp || user.verifyOtp === "") {
+            return next(new ApiError(400, "Invalid OTP"));
+        }
+
+        if (user.verifyOtpExpiry < Date.now()) {
+            return next(new ApiError(400, "OTP expired"));
+        }
+
+        user.verifyOtp = "";
+        user.verifyOtpExpiry = 0;
+        await user.save({ validateBeforeSave: false });
+
+        return res.status(200).json(new ApiResponse(200, {}, "OTP verified"));
+    } catch (error) {
+        return next(new ApiError(400, "Invalid OTP or User"));
     }
 });
 
@@ -553,4 +646,6 @@ export {
     isAuthenticated,
     sendResetOtp,
     resetPassword,
+    sendChangePasswordOtp,
+    verifyChangePasswordOtp,
 };
