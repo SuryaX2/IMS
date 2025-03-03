@@ -30,8 +30,13 @@ const ProfileHeader = ({
     setEditMode,
 }) => {
     return (
-        <Card className="shadow-xl rounded-xl overflow-hidden mb-8 border-0 bg-gradient-to-r from-indigo-100 via-purple-100 to-blue-100 hover:shadow-2xl transition-all duration-300">
-            <div className="flex flex-col md:flex-row items-center p-8 gap-8">
+        <Card 
+            className="overflow-hidden mb-8 border-0 shadow-2xl transition-all duration-300 rounded-3xl"
+            style={{
+                background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #3B82F6 100%)',
+            }}
+        >
+            <div className="flex flex-col md:flex-row items-center p-6 md:p-10 gap-8">
                 <div className="relative">
                     <Badge
                         dot={isVerified}
@@ -44,10 +49,10 @@ const ProfileHeader = ({
                                 : "Unverified Account"
                         }
                     >
-                        <div className="rounded-full p-1.5 bg-gradient-to-r from-indigo-500 to-purple-500">
+                        <div className="rounded-full p-2 bg-white/30 backdrop-blur-sm">
                             <Spin spinning={avatarLoading}>
                                 <Avatar
-                                    size={150}
+                                    size={120}
                                     src={user?.avatar}
                                     icon={!user?.avatar && <UserOutlined />}
                                     className="border-4 border-white shadow-xl"
@@ -66,7 +71,7 @@ const ProfileHeader = ({
                             shape="circle"
                             icon={<CameraOutlined />}
                             size="large"
-                            className="absolute bottom-2 right-2 bg-indigo-600 hover:bg-indigo-700 shadow-md hover:scale-110 transition-transform duration-300"
+                            className="absolute bottom-0 right-0 bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:scale-110 transition-transform duration-300"
                         />
                     </Upload>
                 </div>
@@ -74,25 +79,25 @@ const ProfileHeader = ({
                 <div className="text-center md:text-left flex-1">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
-                            <h1 className="text-4xl font-bold mb-1 text-gray-800">
+                            <h1 className="text-3xl md:text-4xl font-bold mb-1 text-white">
                                 {user?.username}
                             </h1>
-                            <div className="flex items-center gap-2 mb-3 justify-center md:justify-start">
-                                <MailOutlined className="text-indigo-600" />
-                                <p className="text-gray-700">{user?.email}</p>
+                            <div className="flex items-center gap-2 mb-4 justify-center md:justify-start text-white/90">
+                                <MailOutlined className="text-white" />
+                                <p>{user?.email}</p>
                                 {isVerified && (
                                     <Tooltip title="Email Verified">
-                                        <CheckCircleOutlined className="text-green-500" />
+                                        <CheckCircleOutlined className="text-green-400" />
                                     </Tooltip>
                                 )}
                             </div>
                         </div>
                         <div className="mt-4 md:mt-0">
                             <Button
-                                type="primary"
+                                type="default"
                                 icon={<EditOutlined />}
                                 onClick={() => setEditMode(true)}
-                                className="bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg shadow-md px-6 hover:scale-105 transition-all duration-300"
+                                className="border-white text-indigo-700 hover:text-indigo-800 bg-white hover:bg-white/90 rounded-full shadow-md px-6 hover:scale-105 transition-all duration-300"
                                 size="large"
                             >
                                 Edit Profile
@@ -100,15 +105,15 @@ const ProfileHeader = ({
                         </div>
                     </div>
 
-                    <Row gutter={16} className="mt-6">
-                        <Col span={12} md={8}>
-                            <div className="flex items-center gap-3 mb-2 bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 hover:border-indigo-200">
-                                <CalendarOutlined className="text-indigo-500 text-2xl" />
+                    <Row gutter={[16, 16]} className="mt-6">
+                        <Col xs={24} sm={12} md={8}>
+                            <div className="flex items-center gap-3 mb-2 bg-white/20 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-white/30 hover:bg-white/30 transition-all duration-300">
+                                <CalendarOutlined className="text-white text-2xl" />
                                 <div>
-                                    <p className="text-gray-500 text-xs block">
+                                    <p className="text-white/70 text-xs block">
                                         Member Since
                                     </p>
-                                    <p className="text-gray-800 font-medium">
+                                    <p className="text-white font-medium">
                                         {user?.createdAt
                                             ? new Date(
                                                   user.createdAt
@@ -118,28 +123,28 @@ const ProfileHeader = ({
                                 </div>
                             </div>
                         </Col>
-                        <Col span={12} md={8}>
-                            <div className="flex items-center gap-3 mb-2 bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 hover:border-indigo-200">
-                                <IdcardOutlined className="text-indigo-500 text-2xl" />
+                        <Col xs={24} sm={12} md={8}>
+                            <div className="flex items-center gap-3 mb-2 bg-white/20 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-white/30 hover:bg-white/30 transition-all duration-300">
+                                <IdcardOutlined className="text-white text-2xl" />
                                 <div>
-                                    <p className="text-gray-500 text-xs block">
+                                    <p className="text-white/70 text-xs block">
                                         Account Type
                                     </p>
-                                    <p className="text-gray-800 font-medium">
+                                    <p className="text-white font-medium">
                                         {user?.role || "Standard User"}
                                     </p>
                                 </div>
                             </div>
                         </Col>
-                        <Col span={12} md={8}>
-                            <div className="flex items-center gap-3 mb-2 bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 hover:border-indigo-200">
-                                <SecurityScanOutlined className="text-indigo-500 text-2xl" />
+                        <Col xs={24} sm={12} md={8}>
+                            <div className="flex items-center gap-3 mb-2 bg-white/20 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-white/30 hover:bg-white/30 transition-all duration-300">
+                                <SecurityScanOutlined className="text-white text-2xl" />
                                 <div>
-                                    <p className="text-gray-500 text-xs block">
+                                    <p className="text-white/70 text-xs block">
                                         Account Status
                                     </p>
                                     <p
-                                        className={`font-medium ${isVerified ? "text-green-600" : "text-red-600"}`}
+                                        className={`font-medium ${isVerified ? "text-green-300" : "text-red-300"}`}
                                     >
                                         {isVerified ? "Verified" : "Unverified"}
                                     </p>

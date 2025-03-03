@@ -1,6 +1,12 @@
 import React from "react";
-import { Form, Input, Button, Divider, Typography } from "antd";
-import { LockOutlined } from "@ant-design/icons";
+import { Form, Typography } from "antd";
+import {
+    LockOutlined,
+    KeyOutlined,
+    SafetyCertificateTwoTone,
+} from "@ant-design/icons";
+import { FormDivider, PrimaryButton, GradientCard } from "../common/UI";
+import { ConfirmPasswordFormItem, PasswordFormItem } from "../common/FormItems";
 
 const { Text } = Typography;
 
@@ -10,118 +16,56 @@ const PasswordChangeTab = ({
     loading,
 }) => {
     return (
-        <div className="p-6">
-            <h1 className="mb-4 text-3xl font-bold text-indigo-800">
-                Change Your Password
+        <div className="p-4 md:p-8 animate-fadeIn">
+            <h1 className="mb-2 text-2xl md:text-3xl font-bold text-indigo-800 flex items-center">
+                <KeyOutlined className="mr-2 text-indigo-600" />
+                <span>Change Your Password</span>
             </h1>
             <p className="mb-6 text-gray-600">
                 A secure password helps protect your account. You'll need to
                 verify with an OTP sent to your email.
             </p>
 
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 max-w-lg">
+            <GradientCard className="max-w-lg">
+                <div className="bg-indigo-100 p-4 rounded-xl mb-6 border-l-4 border-indigo-500 flex items-start gap-3">
+                    <SafetyCertificateTwoTone className="text-indigo-600 text-xl mt-1" />
+                    <Text className="text-indigo-700">
+                        For security reasons, you'll need to enter your current
+                        password and verify with a one-time code sent to your
+                        email.
+                    </Text>
+                </div>
+
                 <Form
                     form={passwordForm}
                     layout="vertical"
                     onFinish={handlePasswordRequest}
                 >
-                    <Form.Item
-                        label="Current Password"
+                    <PasswordFormItem
                         name="oldPassword"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Please input your current password!",
-                            },
-                        ]}
-                    >
-                        <Input.Password
-                            prefix={
-                                <LockOutlined className="text-indigo-400" />
-                            }
-                            placeholder="Current Password"
-                            size="large"
-                            className="rounded-lg"
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        label="New Password"
+                        label="Current Password"
+                        placeholder="Current Password"
+                    />
+                    <PasswordFormItem
                         name="password"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Please input your new password!",
-                            },
-                            {
-                                min: 6,
-                                message:
-                                    "Password must be at least 6 characters",
-                            },
-                        ]}
-                    >
-                        <Input.Password
-                            prefix={
-                                <LockOutlined className="text-indigo-400" />
-                            }
-                            placeholder="New Password"
-                            size="large"
-                            className="rounded-lg"
-                        />
-                    </Form.Item>
+                        label="New Password"
+                        placeholder="New Password"
+                    />
+                    <ConfirmPasswordFormItem />
 
-                    <Form.Item
-                        label="Confirm New Password"
-                        name="confirmPassword"
-                        dependencies={["password"]}
-                        rules={[
-                            {
-                                required: true,
-                                message: "Please confirm your new password!",
-                            },
-                            ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                    if (
-                                        !value ||
-                                        getFieldValue("password") === value
-                                    ) {
-                                        return Promise.resolve();
-                                    }
-                                    return Promise.reject(
-                                        new Error(
-                                            "The two passwords do not match!"
-                                        )
-                                    );
-                                },
-                            }),
-                        ]}
-                    >
-                        <Input.Password
-                            prefix={
-                                <LockOutlined className="text-indigo-400" />
-                            }
-                            placeholder="Confirm New Password"
-                            size="large"
-                            className="rounded-lg"
-                        />
-                    </Form.Item>
-
-                    <Divider />
+                    <FormDivider />
 
                     <Form.Item>
-                        <Button
-                            type="primary"
+                        <PrimaryButton
                             htmlType="submit"
                             loading={loading}
                             icon={<LockOutlined />}
-                            className="bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg shadow"
-                            size="large"
                         >
                             Update Password
-                        </Button>
+                        </PrimaryButton>
                     </Form.Item>
                 </Form>
-            </div>
+            </GradientCard>
         </div>
     );
 };

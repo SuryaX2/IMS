@@ -1,13 +1,11 @@
+// src/pages/ProfilePage.jsx
 import React, { useState, useContext, useEffect } from "react";
-import {
-    Layout,
-    Card,
-    Form,
-    Tabs,
-} from "antd";
+import { Layout, Card, Form, Tabs } from "antd";
 import { toast } from "react-hot-toast";
-import { api } from "../api/api";
 import AuthContext from "../context/AuthContext";
+import { userService } from "../services/userService";
+
+// Components
 import ProfileHeader from "../components/profile/ProfileHeader";
 import EditProfileForm from "../components/profile/EditProfileForm";
 import AccountInfoTab from "../components/profile/AccountInfoTab";
@@ -18,17 +16,24 @@ const { Content } = Layout;
 
 const ProfilePage = () => {
     const { user, refreshUser } = useContext(AuthContext);
+
+    // Form instances
     const [profileForm] = Form.useForm();
     const [passwordForm] = Form.useForm();
     const [otpForm] = Form.useForm();
+
+    // UI state
     const [loading, setLoading] = useState(false);
     const [avatarLoading, setAvatarLoading] = useState(false);
     const [showOtpModal, setShowOtpModal] = useState(false);
-    const [newPasswordData, setNewPasswordData] = useState(null);
     const [activeTab, setActiveTab] = useState("1");
-    const [isVerified, setIsVerified] = useState(user?.isVerified || false);
     const [editMode, setEditMode] = useState(false);
 
+    // Data state
+    const [isVerified, setIsVerified] = useState(user?.isVerified || false);
+    const [newPasswordData, setNewPasswordData] = useState(null);
+
+    // Initialize form data from user
     useEffect(() => {
         if (user) {
             profileForm.setFieldsValue({
@@ -38,101 +43,21 @@ const ProfilePage = () => {
         }
     }, [user, profileForm]);
 
+    // Profile management
     const handleProfileUpdate = async (values) => {
         try {
             setLoading(true);
-            const response = await api.patch("/users/update-account", {
-                username: values.username,
-            });
-
-            if (response.data.success) {
-                toast.success("Profile updated successfully", {
-                    position: "top-right",
-                    duration: 3000,
-                });
-                refreshUser();
-                setEditMode(false);
-            }
+            await userService.updateProfile(values.username);
+            refreshUser();
+            setEditMode(false);
         } catch (error) {
-            toast.error(
-                error.response?.data?.message || "Failed to update profile",
-                {
-                    position: "top-right",
-                    duration: 4000,
-                }
-            );
+            console.error("Profile update error:", error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handlePasswordRequest = (values) => {
-        setNewPasswordData({
-            oldPassword: values.oldPassword,
-            newPassword: values.password,
-        });
-        setShowOtpModal(true);
-        handleSendOtp();
-    };
-
-    const handleSendOtp = async () => {
-        try {
-            setLoading(true);
-            await api.post("/users/send-change-password-otp");
-            toast.success("OTP has been sent to your email");
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to send OTP");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleVerifyOtp = async (values) => {
-        try {
-            setLoading(true);
-            const verifyResponse = await api.post(
-                "/users/verify-change-password-otp",
-                {
-                    otp: values.otp,
-                }
-            );
-
-            if (verifyResponse.data.success) {
-                if (newPasswordData) {
-                    const response = await api.post("/users/change-password", {
-                        oldPassword: newPasswordData.oldPassword,
-                        newPassword: newPasswordData.newPassword,
-                    });
-
-                    if (response.data.success) {
-                        toast.success(
-                            "Your password has been changed successfully"
-                        );
-                        passwordForm.resetFields();
-                        setShowOtpModal(false);
-                        setNewPasswordData(null);
-                        refreshUser();
-                    }
-                } else {
-                    toast.success("Your email has been verified successfully", {
-                        position: "top-right",
-                        duration: 3000,
-                    });
-                    setIsVerified(true);
-                    refreshUser();
-                    setShowOtpModal(false);
-                }
-            }
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Invalid OTP", {
-                position: "top-right",
-                duration: 4000,
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
-
+    // Avatar management
     const handleAvatarUpload = async (info) => {
         if (info.file.status === "uploading") {
             setAvatarLoading(true);
@@ -140,28 +65,11 @@ const ProfilePage = () => {
         }
 
         if (info.file.originFileObj) {
-            const formData = new FormData();
-            formData.append("avatar", info.file.originFileObj);
-
             try {
-                const response = await api.patch("/users/avatar", formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                });
-
-                if (response.data.success) {
-                    toast.success("Your avatar has been updated successfully");
-                    refreshUser();
-                }
+                await userService.updateAvatar(info.file.originFileObj);
+                refreshUser();
             } catch (error) {
-                toast.error(
-                    error.response?.data?.message || "Failed to update avatar",
-                    {
-                        position: "top-right",
-                        duration: 4000,
-                    }
-                );
+                console.error("Avatar upload error:", error);
             } finally {
                 setAvatarLoading(false);
             }
@@ -174,12 +82,72 @@ const ProfilePage = () => {
         }, 0);
     };
 
+    // Password management
+    const handlePasswordRequest = (values) => {
+        setNewPasswordData({
+            oldPassword: values.oldPassword,
+            newPassword: values.password,
+        });
+        setShowOtpModal(true);
+        handleSendOtp();
+    };
+
+    const handleSendOtp = async () => {
+        try {
+            setLoading(true);
+            await userService.sendChangePasswordOtp();
+        } catch (error) {
+            console.error("Send OTP error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerifyOtp = async (values) => {
+        try {
+            setLoading(true);
+            const verifyResponse = await userService.verifyOtp(values.otp);
+
+            if (verifyResponse.success) {
+                if (newPasswordData) {
+                    await userService.changePassword(
+                        newPasswordData.oldPassword,
+                        newPasswordData.newPassword
+                    );
+                    passwordForm.resetFields();
+                    setShowOtpModal(false);
+                    setNewPasswordData(null);
+                    refreshUser();
+                } else {
+                    toast.success("Your email has been verified successfully", {
+                        position: "top-right",
+                        duration: 3000,
+                    });
+                    setIsVerified(true);
+                    refreshUser();
+                    setShowOtpModal(false);
+                }
+            }
+        } catch (error) {
+            console.error("Verify OTP error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // UI handlers
     const handleTabChange = (key) => {
         setActiveTab(key);
     };
 
     return (
-        <Content className="p-6 min-h-screen bg-gradient-to-b from-indigo-50 via-blue-50 to-purple-50">
+        <Content
+            className="p-4 md:p-8 min-h-screen"
+            style={{
+                background:
+                    "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 50%, #DBEAFE 100%)",
+            }}
+        >
             <div className="max-w-5xl mx-auto">
                 {/* Profile Header Component */}
                 <ProfileHeader
@@ -192,7 +160,7 @@ const ProfilePage = () => {
                 />
 
                 {/* Profile Content */}
-                <Card className="shadow-xl rounded-xl border-0 overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+                <Card className="shadow-xl rounded-3xl border-0 overflow-hidden hover:shadow-2xl transition-shadow duration-300 mb-8">
                     {editMode ? (
                         <EditProfileForm
                             profileForm={profileForm}

@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Form, Input, Button, Typography } from "antd";
-import { SecurityScanOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, SafetyOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -16,10 +16,10 @@ const OtpVerificationModal = ({
     return (
         <Modal
             title={
-                <div className="flex items-center gap-2">
-                    <SecurityScanOutlined className="text-indigo-500 text-xl" />
-                    <span className="text-indigo-800 font-semibold">
-                        OTP Verification
+                <div className="flex items-center gap-2 p-2">
+                    <SafetyOutlined className="text-indigo-500 text-2xl" />
+                    <span className="text-indigo-800 font-bold text-xl">
+                        Security Verification
                     </span>
                 </div>
             }
@@ -27,17 +27,23 @@ const OtpVerificationModal = ({
             onCancel={() => setShowOtpModal(false)}
             footer={null}
             centered
-            className="rounded-lg overflow-hidden"
-            width={400}
+            className="rounded-2xl overflow-hidden"
+            width={420}
+            styles={{
+                padding: "24px",
+            }}
         >
             <Form form={otpForm} layout="vertical" onFinish={handleVerifyOtp}>
-                <div className="bg-indigo-50 p-4 rounded-lg mb-6 border-l-4 border-indigo-500">
+                <div className="bg-white p-4 rounded-xl mb-6 border-l-4 border-indigo-500 shadow-md">
                     <div className="flex items-start gap-3">
                         <ClockCircleOutlined className="text-indigo-500 text-xl mt-1" />
                         <div>
-                            <Text strong className="text-indigo-700 block mb-1">
+                            <Text
+                                strong
+                                className="text-indigo-700 block mb-1 text-lg"
+                            >
                                 {newPasswordData
-                                    ? "Security Verification Required"
+                                    ? "Verify Password Change"
                                     : "Email Verification"}
                             </Text>
                             <Text className="text-gray-600">
@@ -60,16 +66,16 @@ const OtpVerificationModal = ({
                 >
                     <Input
                         placeholder="Enter 6-digit OTP"
-                        className="text-center text-lg rounded-lg"
+                        className="text-center text-xl rounded-lg h-14 font-mono"
                         maxLength={6}
                         size="large"
                     />
                 </Form.Item>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between mt-6">
                     <Button
                         onClick={() => handleSendOtp()}
-                        className="text-indigo-600 hover:text-indigo-700 hover:border-indigo-500"
+                        className="text-indigo-600 hover:text-indigo-700 hover:border-indigo-500 rounded-lg"
                     >
                         Resend OTP
                     </Button>
@@ -77,7 +83,7 @@ const OtpVerificationModal = ({
                         type="primary"
                         htmlType="submit"
                         loading={loading}
-                        className="bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg shadow"
+                        className="bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg shadow-md h-10 px-6"
                     >
                         Verify
                     </Button>
