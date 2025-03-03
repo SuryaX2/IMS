@@ -114,4 +114,3 @@ const AccountInfoTab = ({ user, isVerified, handleTabChange }) => {
 };
 
 export default AccountInfoTab;
-    
