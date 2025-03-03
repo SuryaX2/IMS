@@ -1,4 +1,3 @@
-// src/pages/ProfilePage.jsx
 import React, { useState, useContext, useEffect } from "react";
 import { Layout, Card, Form, Tabs } from "antd";
 import { toast } from "react-hot-toast";

@@ -1,17 +1,13 @@
 import React from "react";
-import { Row, Col, Button, Divider, Badge, Typography, Tooltip } from "antd";
-import {
-    CheckCircleOutlined,
-    ExclamationCircleOutlined,
-    LockOutlined,
-} from "@ant-design/icons";
+import { Row, Col, Button, Divider, Badge, Typography } from "antd";
+import { LockOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
 const AccountInfoTab = ({ user, isVerified, handleTabChange }) => {
     return (
-        <div className="p-4 md:p-8 animate-fadeIn">
-            <div className="max-w-xl mb-8">
+        <div className="md:p-8 animate-fadeIn">
+            <div className="md:max-w-xl w-full mb-8">
                 <h1 className="mb-4 text-2xl md:text-3xl font-bold text-indigo-800 flex items-center">
                     <span className="mr-2">Account Details</span>
                     <Badge
@@ -41,15 +37,6 @@ const AccountInfoTab = ({ user, isVerified, handleTabChange }) => {
                                 <p className="text-lg font-medium text-gray-800">
                                     {user?.email}
                                 </p>
-                                {isVerified ? (
-                                    <Tooltip title="Email Verified">
-                                        <CheckCircleOutlined className="text-green-500" />
-                                    </Tooltip>
-                                ) : (
-                                    <Tooltip title="Email Not Verified">
-                                        <ExclamationCircleOutlined className="text-red-500" />
-                                    </Tooltip>
-                                )}
                             </div>
                         </Col>
                         <Col span={24} md={12}>
