@@ -48,11 +48,7 @@ export const userService = {
             return response.data;
         } catch (error) {
             toast.error(
-                error.response?.data?.message || "Failed to update avatar",
-                {
-                    position: "top-right",
-                    duration: 4000,
-                }
+                error.response?.data?.message || "Failed to update avatar"
             );
             throw error;
         }
