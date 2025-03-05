@@ -9,15 +9,10 @@ import { verifyJWT } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-// Secure all category routes with JWT verification
-router
-    .route("/")
-    .post(verifyJWT, createCategory)
-    .get(verifyJWT, getAllCategories);
+router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
-router
-    .route("/:id")
-    .patch(verifyJWT, updateCategory)
-    .delete(verifyJWT, deleteCategory);
+router.route("/").post(createCategory).get(getAllCategories);
+
+router.route("/:id").patch(updateCategory).delete(deleteCategory);
 
 export default router;
