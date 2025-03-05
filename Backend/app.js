@@ -21,11 +21,13 @@ app.use(cookieParser());
 import userRouter from "./routes/user.routes.js";
 import categoryRouter from "./routes/category.routes.js";
 import customerRouter from "./routes/customer.routes.js";
+import supplierRouter from "./routes/supplier.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/customers", customerRouter);
+app.use("/api/v1/suppliers", supplierRouter);
 
 // API : http://localhost:3001/api/v1/users - GET, POST, PATCH
 
@@ -34,6 +36,9 @@ app.use("/api/v1/customers", customerRouter);
 
 // API : http://localhost:3001/api/v1/customers - GET, POST
 // API : http://localhost:3001/api/v1/customers/:id - PATCH, DELETE
+
+// API : http://localhost:3001/api/v1/suppliers - GET, POST
+// API : http://localhost:3001/api/v1/suppliers/:id - PATCH, DELETE
 
 app.use(errorHandler);
 export { app };

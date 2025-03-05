@@ -53,6 +53,7 @@ const supplierSchema = mongoose.Schema(
         },
         photo: {
             type: String,
+            required: true,
             default: "default-supplier.png",
         },
     },
