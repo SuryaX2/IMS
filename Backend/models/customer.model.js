@@ -48,6 +48,7 @@ const customerSchema = mongoose.Schema(
         },
         photo: {
             type: String,
+            required: true,
             default: "default-customer.png",
         },
     },
