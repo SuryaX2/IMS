@@ -30,7 +30,5 @@ app.use("/api/v1/categories", categoryRouter);
 // API : http://localhost:3001/api/v1/categories - GET, POST
 // API : http://localhost:3001/api/v1/categories/:id - PATCH, DELETE
 
-
-
 app.use(errorHandler);
 export { app };
