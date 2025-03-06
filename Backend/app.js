@@ -26,6 +26,7 @@ import unitRouter from "./routes/unit.routes.js";
 import productRouter from "./routes/product.routes.js";
 import purchaseRouter from "./routes/purchase.routes.js";
 import orderRouter from "./routes/order.routes.js";
+import reportRouter from "./routes/report.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
@@ -36,6 +37,7 @@ app.use("/api/v1/units", unitRouter);
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/purchases", purchaseRouter);
 app.use("/api/v1/orders", orderRouter);
+app.use("/api/v1/reports", reportRouter);
 
 // API : http://localhost:3001/api/v1/users - GET, POST, PATCH
 
@@ -59,6 +61,10 @@ app.use("/api/v1/orders", orderRouter);
 
 // API : http://localhost:3001/api/v1/orders - GET, POST
 // API : http://localhost:3001/api/v1/orders/:id - GET, PATCH
+
+// API : http://localhost:3001/api/v1/reports/stock - GET
+// API : http://localhost:3001/api/v1/reports/sales - GET
+// API : http://localhost:3001/api/v1/reports/top-products - GET
 
 app.use(errorHandler);
 export { app };
