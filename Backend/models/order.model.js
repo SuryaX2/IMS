@@ -66,4 +66,86 @@ orderSchema.statics.getAllOrders = async function () {
     }
 };
 
+// Get order with customer details and order items
+orderSchema.statics.getOrderWithDetails = async function (orderId) {
+    try {
+        const order = await this.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(orderId) },
+            },
+            {
+                $lookup: {
+                    from: "customers",
+                    localField: "customer_id",
+                    foreignField: "_id",
+                    as: "customer",
+                },
+            },
+            {
+                $unwind: "$customer",
+            },
+            {
+                $lookup: {
+                    from: "orderdetails",
+                    localField: "_id",
+                    foreignField: "order_id",
+                    as: "orderItems",
+                },
+            },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "orderItems.product_id",
+                    foreignField: "_id",
+                    as: "products",
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    invoice_no: 1,
+                    order_date: 1,
+                    order_status: 1,
+                    total_products: 1,
+                    sub_total: 1,
+                    vat: 1,
+                    total: 1,
+                    customer_name: "$customer.name",
+                    customer_phone: "$customer.phone",
+                    customer_address: "$customer.address",
+                    orderItems: {
+                        $map: {
+                            input: "$orderItems",
+                            as: "item",
+                            in: {
+                                product_id: "$$item.product_id",
+                                quantity: "$$item.quantity",
+                                unitcost: "$$item.unitcost",
+                                total: "$$item.total",
+                                product_name: {
+                                    $arrayElemAt: [
+                                        "$products.product_name",
+                                        {
+                                            $indexOfArray: [
+                                                "$products._id",
+                                                "$$item.product_id",
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    createdAt: 1,
+                    updatedAt: 1,
+                },
+            },
+        ]);
+
+        return order[0];
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 export const Order = mongoose.model("Order", orderSchema);

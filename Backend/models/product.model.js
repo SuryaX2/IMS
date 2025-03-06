@@ -97,6 +97,7 @@ productSchema.statics.updateStock = async function (
     }
 };
 
+// Get products with categories and units
 productSchema.statics.getProductsWithDetails = async function () {
     try {
         const products = await this.aggregate([
