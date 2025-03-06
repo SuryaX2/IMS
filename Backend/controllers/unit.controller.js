@@ -18,6 +18,10 @@ const createUnit = asyncHandler(async (req, res, next) => {
 
         const unit = await Unit.createUnit({ unit_name });
 
+        if (!unit) {
+            return next(new ApiError(500, "Failed to create unit"));
+        }
+
         return res
             .status(201)
             .json(new ApiResponse(201, unit, "Unit created successfully"));
