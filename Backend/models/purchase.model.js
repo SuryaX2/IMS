@@ -61,4 +61,94 @@ purchaseSchema.statics.getAllPurchases = async function () {
     }
 };
 
+// Get purchase with supplier details and purchase items
+purchaseSchema.statics.getPurchaseWithDetails = async function (purchaseId) {
+    try {
+        const purchase = await this.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(purchaseId) },
+            },
+            {
+                $lookup: {
+                    from: "suppliers",
+                    localField: "supplier_id",
+                    foreignField: "_id",
+                    as: "supplier",
+                },
+            },
+            {
+                $unwind: "$supplier",
+            },
+            {
+                $lookup: {
+                    from: "purchasedetails",
+                    localField: "_id",
+                    foreignField: "purchase_id",
+                    as: "purchaseItems",
+                },
+            },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "purchaseItems.product_id",
+                    foreignField: "_id",
+                    as: "products",
+                },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "created_by",
+                    foreignField: "_id",
+                    as: "creator",
+                },
+            },
+            {
+                $unwind: "$creator",
+            },
+            {
+                $project: {
+                    _id: 1,
+                    purchase_no: 1,
+                    purchase_date: 1,
+                    purchase_status: 1,
+                    supplier_name: "$supplier.name",
+                    supplier_shopname: "$supplier.shopname",
+                    supplier_phone: "$supplier.phone",
+                    created_by: "$creator.username",
+                    purchaseItems: {
+                        $map: {
+                            input: "$purchaseItems",
+                            as: "item",
+                            in: {
+                                product_id: "$$item.product_id",
+                                quantity: "$$item.quantity",
+                                unitcost: "$$item.unitcost",
+                                total: "$$item.total",
+                                product_name: {
+                                    $arrayElemAt: [
+                                        "$products.product_name",
+                                        {
+                                            $indexOfArray: [
+                                                "$products._id",
+                                                "$$item.product_id",
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                    createdAt: 1,
+                    updatedAt: 1,
+                },
+            },
+        ]);
+
+        return purchase[0];
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 export const Purchase = mongoose.model("Purchase", purchaseSchema);
