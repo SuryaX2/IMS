@@ -34,7 +34,6 @@ const createCustomer = asyncHandler(async (req, res, next) => {
             );
         }
 
-        // Handle photo upload
         let photoUrl = "default-customer.png";
         if (req.file) {
             const photoLocalPath = req.file.path;

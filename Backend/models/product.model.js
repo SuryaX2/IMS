@@ -1,7 +1,7 @@
 // models/product.model.js
 import mongoose from "mongoose";
-import { Category } from "./category.model";
-import { Unit } from "./unit.model";
+import { Category } from "./category.model.js";
+import { Unit } from "./unit.model.js";
 
 const productSchema = mongoose.Schema(
     {
@@ -41,6 +41,7 @@ const productSchema = mongoose.Schema(
         },
         product_image: {
             type: String,
+            required: true,
             default: "default-product.png",
         },
     },

@@ -1,0 +1,147 @@
+import { Purchase } from "../models/purchase.model.js";
+import { PurchaseDetail } from "../models/purchase-detail.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+
+const createPurchase = asyncHandler(async (req, res, next) => {
+    const { supplier_id, purchase_no, purchase_status, details } = req.body;
+
+    // Validate required fields
+    if (!supplier_id || !purchase_no || !details || !Array.isArray(details)) {
+        return next(new ApiError(400, "Invalid purchase data"));
+    }
+
+    const session = await Purchase.startSession();
+    session.startTransaction();
+
+    try {
+        // Check if purchase number is unique
+        const existingPurchase = await Purchase.findOne({ purchase_no });
+        if (existingPurchase) {
+            return next(new ApiError(409, "Purchase number already exists"));
+        }
+
+        // Create purchase
+        const purchase = await Purchase.create(
+            [
+                {
+                    supplier_id,
+                    purchase_no,
+                    purchase_status: purchase_status || "pending",
+                    created_by: req.user._id,
+                },
+            ],
+            { session }
+        );
+
+        // Create purchase details
+        const purchaseDetails = details.map((detail) => ({
+            purchase_id: purchase[0]._id,
+            product_id: detail.product_id,
+            quantity: detail.quantity,
+            unitcost: detail.unitcost,
+            total: detail.quantity * detail.unitcost,
+        }));
+
+        await PurchaseDetail.create(purchaseDetails, { session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return res
+            .status(201)
+            .json(
+                new ApiResponse(
+                    201,
+                    purchase[0],
+                    "Purchase created successfully"
+                )
+            );
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return next(new ApiError(500, error.message));
+    }
+});
+
+const getAllPurchases = asyncHandler(async (req, res, next) => {
+    try {
+        const purchases = await Purchase.getAllPurchases();
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    purchases,
+                    "Purchases fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+const getPurchaseDetails = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const details = await PurchaseDetail.getDetailsByPurchaseId(id);
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    details,
+                    "Purchase details fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+const updatePurchaseStatus = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+    const { purchase_status } = req.body;
+
+    if (!purchase_status) {
+        return next(new ApiError(400, "Purchase status is required"));
+    }
+
+    try {
+        const purchase = await Purchase.findByIdAndUpdate(
+            id,
+            {
+                purchase_status,
+                updated_by: req.user._id,
+            },
+            { new: true }
+        );
+
+        if (!purchase) {
+            return next(new ApiError(404, "Purchase not found"));
+        }
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    purchase,
+                    "Purchase status updated successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+export {
+    createPurchase,
+    getAllPurchases,
+    getPurchaseDetails,
+    updatePurchaseStatus,
+};

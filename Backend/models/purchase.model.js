@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { Supplier } from "./supplier.model";
-import { User } from "./user.model";
+import { Supplier } from "./supplier.model.js";
+import { User } from "./user.model.js";
 
 const purchaseSchema = mongoose.Schema(
     {

@@ -23,6 +23,8 @@ import categoryRouter from "./routes/category.routes.js";
 import customerRouter from "./routes/customer.routes.js";
 import supplierRouter from "./routes/supplier.routes.js";
 import unitRouter from "./routes/unit.routes.js";
+import productRouter from "./routes/product.routes.js";
+import purchaseRouter from "./routes/purchase.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
@@ -30,6 +32,8 @@ app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/customers", customerRouter);
 app.use("/api/v1/suppliers", supplierRouter);
 app.use("/api/v1/units", unitRouter);
+app.use("/api/v1/products", productRouter);
+app.use("/api/v1/purchases", purchaseRouter);
 
 // API : http://localhost:3001/api/v1/users - GET, POST, PATCH
 
@@ -44,6 +48,12 @@ app.use("/api/v1/units", unitRouter);
 
 // API : http://localhost:3001/api/v1/units - GET, POST
 // API : http://localhost:3001/api/v1/units/:id - PATCH, DELETE
+
+// API : http://localhost:3001/api/v1/products - GET, POST
+// API : http://localhost:3001/api/v1/products/:id - PATCH, DELETE
+
+// API : http://localhost:3001/api/v1/purchases - GET, POST
+// API : http://localhost:3001/api/v1/purchases/:id - GET
 
 app.use(errorHandler);
 export { app };
