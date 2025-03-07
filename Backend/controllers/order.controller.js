@@ -77,12 +77,84 @@ const createOrder = asyncHandler(async (req, res, next) => {
 });
 
 const getAllOrders = asyncHandler(async (req, res, next) => {
-    try {
-        const orders = await Order.getAllOrders();
+    const {
+        search,
+        customer_id,
+        start_date,
+        end_date,
+        order_status,
+        min_total,
+        max_total,
+        sort_by,
+        sort_order,
+        page = 1,
+        limit = 10,
+    } = req.query;
 
-        return res
-            .status(200)
-            .json(new ApiResponse(200, orders, "Orders fetched successfully"));
+    // Build filter object
+    let filter = {};
+
+    if (search) {
+        filter.$or = [{ invoice_no: { $regex: search, $options: "i" } }];
+    }
+
+    if (customer_id) {
+        filter.customer_id = customer_id;
+    }
+
+    if (order_status) {
+        filter.order_status = order_status;
+    }
+
+    // Date range filter
+    if (start_date || end_date) {
+        filter.order_date = {};
+        if (start_date) filter.order_date.$gte = new Date(start_date);
+        if (end_date) filter.order_date.$lte = new Date(end_date);
+    }
+
+    // Total amount range filter
+    if (min_total || max_total) {
+        filter.total = {};
+        if (min_total) filter.total.$gte = parseFloat(min_total);
+        if (max_total) filter.total.$lte = parseFloat(max_total);
+    }
+
+    // Build sort options
+    let sortOptions = {};
+    if (sort_by) {
+        sortOptions[sort_by] = sort_order === "desc" ? -1 : 1;
+    } else {
+        sortOptions = { createdAt: -1 };
+    }
+
+    // Pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    try {
+        const orders = await Order.find(filter)
+            .populate("customer_id", "name")
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const total = await Order.countDocuments(filter);
+
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    orders,
+                    pagination: {
+                        total,
+                        page: parseInt(page),
+                        limit: parseInt(limit),
+                        pages: Math.ceil(total / parseInt(limit)),
+                    },
+                },
+                "Orders fetched successfully"
+            )
+        );
     } catch (error) {
         return next(new ApiError(500, error.message));
     }
