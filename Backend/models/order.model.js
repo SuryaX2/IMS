@@ -26,7 +26,7 @@ const orderSchema = mongoose.Schema(
             type: Number,
             required: true,
         },
-        vat: {
+        gst: {
             type: Number,
             default: 0,
         },
@@ -108,7 +108,7 @@ orderSchema.statics.getOrderWithDetails = async function (orderId) {
                     order_status: 1,
                     total_products: 1,
                     sub_total: 1,
-                    vat: 1,
+                    gst: 1,
                     total: 1,
                     customer_name: "$customer.name",
                     customer_phone: "$customer.phone",

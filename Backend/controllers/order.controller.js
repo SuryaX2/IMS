@@ -12,7 +12,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
         customer_id,
         total_products,
         sub_total,
-        vat,
+        gst,
         total,
         invoice_no,
         order_status,
@@ -47,7 +47,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
                     order_status: order_status || "pending",
                     total_products,
                     sub_total,
-                    vat,
+                    gst,
                     total,
                     invoice_no,
                 },
@@ -309,7 +309,7 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
                 align: "right",
             })
             .text(
-                `VAT (${order.vat}%): $${(order.total - order.sub_total).toFixed(2)}`,
+                `gst (${order.gst}%): $${(order.total - order.sub_total).toFixed(2)}`,
                 { align: "right" }
             )
             .fontSize(12)
