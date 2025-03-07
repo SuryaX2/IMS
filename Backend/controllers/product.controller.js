@@ -76,8 +76,43 @@ const createProduct = asyncHandler(async (req, res, next) => {
 });
 
 const getAllProducts = asyncHandler(async (req, res, next) => {
+    const { search, category, min_stock, max_stock, sort_by, sort_order } =
+        req.query;
+
+    // Build filter object
+    let filter = {};
+
+    if (search) {
+        filter.$or = [
+            { product_name: { $regex: search, $options: "i" } },
+            { product_code: { $regex: search, $options: "i" } },
+        ];
+    }
+
+    if (category) {
+        filter.category_id = category;
+    }
+
+    // Stock range filter
+    if (min_stock || max_stock) {
+        filter.stock = {};
+        if (min_stock) filter.stock.$gte = parseInt(min_stock);
+        if (max_stock) filter.stock.$lte = parseInt(max_stock);
+    }
+
+    // Build sort options
+    let sortOptions = {};
+    if (sort_by) {
+        sortOptions[sort_by] = sort_order === "desc" ? -1 : 1;
+    } else {
+        sortOptions = { createdAt: -1 };
+    }
+
     try {
-        const products = await Product.getAllProducts();
+        const products = await Product.find(filter)
+            .populate("category_id", "category_name")
+            .populate("unit_id", "unit_name")
+            .sort(sortOptions);
 
         return res
             .status(200)
