@@ -3,6 +3,9 @@ import { OrderDetail } from "../models/order-detail.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import PDFDocument from "pdfkit";
+import fs from "fs";
+import path from "path";
 
 const createOrder = asyncHandler(async (req, res, next) => {
     const {
@@ -209,4 +212,125 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
     }
 });
 
-export { createOrder, getAllOrders, getOrderDetails, updateOrderStatus };
+// Generate PDF invoice
+const generateInvoice = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const order = await Order.getOrderWithDetails(id);
+
+        if (!order) {
+            return next(new ApiError(404, "Order not found"));
+        }
+
+        // Create a PDF document
+        const doc = new PDFDocument({ margin: 50 });
+
+        // Set response headers for downloading the PDF
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename=invoice-${order.invoice_no}.pdf`
+        );
+
+        // Pipe the PDF to the response
+        doc.pipe(res);
+
+        // Add content to the PDF
+        // Header
+        doc.fontSize(25).text("INVOICE", { align: "center" });
+        doc.moveDown();
+
+        // Company and Invoice Information
+        doc.fontSize(10)
+            .text(`Invoice Number: ${order.invoice_no}`, { align: "right" })
+            .text(`Date: ${new Date(order.order_date).toLocaleDateString()}`, {
+                align: "right",
+            })
+            .moveDown();
+
+        // Customer Information
+        doc.fontSize(12)
+            .text("Customer Information:")
+            .fontSize(10)
+            .text(`Name: ${order.customer_name}`)
+            .text(`Phone: ${order.customer_phone}`)
+            .text(`Address: ${order.customer_address}`)
+            .moveDown();
+
+        // Items Table
+        doc.fontSize(12).text("Order Items:").moveDown();
+
+        // Table headers
+        let startX = 50;
+        let startY = doc.y;
+        let headerHeight = 20;
+
+        doc.rect(startX, startY, 500, headerHeight).stroke();
+
+        doc.fontSize(10)
+            .text("Product", startX + 10, startY + 5, { width: 200 })
+            .text("Quantity", startX + 210, startY + 5, { width: 90 })
+            .text("Unit Price", startX + 300, startY + 5, { width: 100 })
+            .text("Total", startX + 400, startY + 5, { width: 90 });
+
+        startY += headerHeight;
+
+        // Table rows
+        order.orderItems.forEach((item) => {
+            const rowHeight = 20;
+
+            doc.rect(startX, startY, 500, rowHeight).stroke();
+
+            doc.fontSize(10)
+                .text(item.product_name, startX + 10, startY + 5, {
+                    width: 200,
+                })
+                .text(item.quantity.toString(), startX + 210, startY + 5, {
+                    width: 90,
+                })
+                .text(
+                    `$${item.unitcost.toFixed(2)}`,
+                    startX + 300,
+                    startY + 5,
+                    { width: 100 }
+                )
+                .text(`$${item.total.toFixed(2)}`, startX + 400, startY + 5, {
+                    width: 90,
+                });
+
+            startY += rowHeight;
+        });
+
+        // Summary
+        doc.moveDown()
+            .fontSize(10)
+            .text(`Subtotal: $${order.sub_total.toFixed(2)}`, {
+                align: "right",
+            })
+            .text(
+                `VAT (${order.vat}%): $${(order.total - order.sub_total).toFixed(2)}`,
+                { align: "right" }
+            )
+            .fontSize(12)
+            .text(`Total: $${order.total.toFixed(2)}`, { align: "right" });
+
+        // Footer
+        doc.fontSize(10)
+            .moveDown(3)
+            .text("Thank you for your business!", { align: "center" });
+
+        // Finalize PDF
+        doc.end();
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+export {
+    createOrder,
+    getAllOrders,
+    getOrderDetails,
+    updateOrderStatus,
+    generateInvoice,
+};

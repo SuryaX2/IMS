@@ -1,6 +1,7 @@
 import express from "express";
 import {
     createOrder,
+    generateInvoice,
     getAllOrders,
     getOrderDetails,
     updateOrderStatus,
@@ -15,5 +16,6 @@ router.post("/", createOrder);
 router.get("/", getAllOrders);
 router.get("/:id/details", getOrderDetails);
 router.patch("/:id/status", updateOrderStatus);
+router.route("/:id/invoice").get(verifyJWT, generateInvoice);
 
 export default router;

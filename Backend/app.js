@@ -43,7 +43,21 @@ app.use("/api/v1/reports", reportRouter);
  * API Documentation
 
  * users
-    API : http://localhost:3001/api/v1/users - GET, POST, PATCH
+    API : http://localhost:3001/api/v1/users/register - POST
+    API : http://localhost:3001/api/v1/users/login - POST
+    API : http://localhost:3001/api/v1/users/logout - POST
+    API : http://localhost:3001/api/v1/users/refresh-token - POST
+    API : http://localhost:3001/api/v1/users/change-password - POST
+    API : http://localhost:3001/api/v1/users/update-account - PATCH
+    API : http://localhost:3001/api/v1/users/avatar - PATCH
+    API : http://localhost:3001/api/v1/users/current-user - GET
+    API : http://localhost:3001/api/v1/users/send-verify-otp - POST
+    API : http://localhost:3001/api/v1/users/verify-email - POST
+    API : http://localhost:3001/api/v1/users/is-auth - POST
+    API : http://localhost:3001/api/v1/users/send-reset-otp - POST
+    API : http://localhost:3001/api/v1/users/reset-password - POST
+    API : http://localhost:3001/api/v1/users/send-change-password-otp - POST
+    API : http://localhost:3001/api/v1/users/verify-change-password-otp - POST
  
  * categories
     API : http://localhost:3001/api/v1/categories - GET, POST
@@ -71,7 +85,9 @@ app.use("/api/v1/reports", reportRouter);
  
  * orders
     API : http://localhost:3001/api/v1/orders - GET, POST
-    API : http://localhost:3001/api/v1/orders/:id - GET, PATCH
+    API : http://localhost:3001/api/v1/orders/:id/details - GET
+    API : http://localhost:3001/api/v1/orders/:id/status - PATCH
+    API : http://localhost:3001/api/v1/orders/:id/invoice - GET
  
  * reports
     API : http://localhost:3001/api/v1/reports/stock - GET
