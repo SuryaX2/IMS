@@ -210,8 +210,12 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
             return next(new ApiError(404, "Order not found"));
         }
 
-        // Create a PDF document
-        const doc = new PDFDocument({ margin: 50 });
+        // Create a PDF document with better margins
+        const doc = new PDFDocument({ 
+            margin: 50,
+            size: 'A4',
+            bufferPages: true
+        });
 
         // Set response headers for downloading the PDF
         res.setHeader("Content-Type", "application/pdf");
@@ -223,89 +227,196 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
         // Pipe the PDF to the response
         doc.pipe(res);
 
-        // Add content to the PDF
-        // Header
-        doc.fontSize(25).text("INVOICE", { align: "center" });
-        doc.moveDown();
+        // Define colors - using a more subtle, modern palette
+        const primaryColor = '#34495e';
+        const accentColor = '#3498db';
+        const subtleColor = '#95a5a6';
+        const highlightColor = '#2980b9';
 
-        // Company and Invoice Information
+        // Add InventoryPro logo
+        doc.fontSize(32)
+           .fillColor(primaryColor)
+           .font('Helvetica-Bold')
+           .text('Inventory', 50, 50, { continued: true })
+           .fillColor(accentColor)
+           .text('Pro', { align: 'left' });
+
+        // Add a thin subtle line beneath the logo
+        doc.moveTo(50, 90)
+           .lineTo(550, 90)
+           .strokeColor(subtleColor)
+           .lineWidth(0.5)
+           .stroke();
+
+        // Document title
+        doc.fontSize(11)
+           .fillColor(subtleColor)
+           .font('Helvetica')
+           .text('INVOICE', 50, 105);
+           
+        // Invoice number and date with clean styling
+        doc.fontSize(20)
+           .fillColor(primaryColor)
+           .font('Helvetica-Bold')
+           .text(`#${order.invoice_no}`, 50, 125);
+           
         doc.fontSize(10)
-            .text(`Invoice Number: ${order.invoice_no}`, { align: "right" })
-            .text(`Date: ${new Date(order.order_date).toLocaleDateString()}`, {
-                align: "right",
-            })
-            .moveDown();
+           .fillColor(subtleColor)
+           .font('Helvetica')
+           .text(`Issued: ${new Date(order.order_date).toLocaleDateString()}`, 50, 150);
 
-        // Customer Information
-        doc.fontSize(12)
-            .text("Customer Information:")
-            .fontSize(10)
-            .text(`Name: ${order.customer_name}`)
-            .text(`Phone: ${order.customer_phone}`)
-            .text(`Address: ${order.customer_address}`)
-            .moveDown();
+        // Add a gradient separator
+        doc.moveTo(50, 170)
+           .lineTo(550, 170)
+           .stroke(accentColor);
 
-        // Items Table
-        doc.fontSize(12).text("Order Items:").moveDown();
+        // Customer Information with clean styling
+        const billingY = 190;
+        doc.fontSize(11)
+           .fillColor(subtleColor)
+           .font('Helvetica')
+           .text('BILL TO', 50, billingY);
 
-        // Table headers
-        let startX = 50;
-        let startY = doc.y;
-        let headerHeight = 20;
-
-        doc.rect(startX, startY, 500, headerHeight).stroke();
-
+        doc.fontSize(14)
+           .fillColor(primaryColor)
+           .font('Helvetica-Bold')
+           .text(order.customer_name, 50, billingY + 20);
+           
         doc.fontSize(10)
-            .text("Product", startX + 10, startY + 5, { width: 200 })
-            .text("Quantity", startX + 210, startY + 5, { width: 90 })
-            .text("Unit Price", startX + 300, startY + 5, { width: 100 })
-            .text("Total", startX + 400, startY + 5, { width: 90 });
+           .fillColor(primaryColor)
+           .font('Helvetica')
+           .text(order.customer_address, 50, billingY + 40, { width: 200 })
+           .text(`Phone: ${order.customer_phone}`, 50, doc.y + 10);
 
-        startY += headerHeight;
+        // Add table headers with subtle styling
+        const tableTop = 290;
+        
+        // Subtle header background
+        doc.rect(50, tableTop, 500, 30)
+           .fill('#f8f9fa');
+           
+        // Header text
+        doc.fillColor(primaryColor)
+           .fontSize(10)
+           .font('Helvetica-Bold')
+           .text('ITEM', 70, tableTop + 10)
+           .text('QTY', 300, tableTop + 10)
+           .text('PRICE', 370, tableTop + 10)
+           .text('AMOUNT', 470, tableTop + 10);
 
-        // Table rows
-        order.orderItems.forEach((item) => {
-            const rowHeight = 20;
+        // Add a thin line below headers
+        doc.moveTo(50, tableTop + 30)
+           .lineTo(550, tableTop + 30)
+           .stroke(subtleColor);
 
-            doc.rect(startX, startY, 500, rowHeight).stroke();
+        // Table rows with clean styling
+        let tableRowY = tableTop + 40;
 
-            doc.fontSize(10)
-                .text(item.product_name, startX + 10, startY + 5, {
-                    width: 200,
-                })
-                .text(item.quantity.toString(), startX + 210, startY + 5, {
-                    width: 90,
-                })
-                .text(
-                    `$${item.unitcost.toFixed(2)}`,
-                    startX + 300,
-                    startY + 5,
-                    { width: 100 }
-                )
-                .text(`$${item.total.toFixed(2)}`, startX + 400, startY + 5, {
-                    width: 90,
-                });
+        // Line height for item rows
+        const lineHeight = 25;
 
-            startY += rowHeight;
+        order.orderItems.forEach((item, index) => {
+            doc.fillColor(primaryColor)
+               .font('Helvetica')
+               .fontSize(10)
+               .text(item.product_name, 70, tableRowY, { width: 200 })
+               .text(item.quantity.toString(), 300, tableRowY)
+               .text(`$${item.unitcost.toFixed(2)}`, 370, tableRowY)
+               .font('Helvetica-Bold')
+               .text(`$${item.total.toFixed(2)}`, 470, tableRowY);
+
+            tableRowY += lineHeight;
+            
+            // Add subtle separator between items (except after the last item)
+            if (index < order.orderItems.length - 1) {
+                doc.moveTo(70, tableRowY - 5)
+                   .lineTo(530, tableRowY - 5)
+                   .strokeColor(subtleColor)
+                   .opacity(0.3)
+                   .lineWidth(0.5)
+                   .stroke()
+                   .opacity(1); // Reset opacity
+            }
         });
 
-        // Summary
-        doc.moveDown()
-            .fontSize(10)
-            .text(`Subtotal: $${order.sub_total.toFixed(2)}`, {
-                align: "right",
-            })
-            .text(
-                `gst (${order.gst}%): $${(order.total - order.sub_total).toFixed(2)}`,
-                { align: "right" }
-            )
-            .fontSize(12)
-            .text(`Total: $${order.total.toFixed(2)}`, { align: "right" });
+        // Add a line above the summary
+        const summaryY = tableRowY + 20;
+        doc.moveTo(350, summaryY)
+           .lineTo(550, summaryY)
+           .strokeColor(subtleColor)
+           .lineWidth(0.5)
+           .stroke();
 
-        // Footer
-        doc.fontSize(10)
-            .moveDown(3)
-            .text("Thank you for your business!", { align: "center" });
+        // Summary section with clean alignment
+        doc.fillColor(primaryColor)
+           .font('Helvetica')
+           .fontSize(10)
+           .text('Subtotal', 370, summaryY + 10)
+           .text(`$${order.sub_total.toFixed(2)}`, 470, summaryY + 10, { align: 'right' })
+           .text(`GST (${order.gst}%)`, 370, summaryY + 30)
+           .text(`$${(order.total - order.sub_total).toFixed(2)}`, 470, summaryY + 30, { align: 'right' });
+           
+        // Add a double line above total
+        doc.moveTo(350, summaryY + 50)
+           .lineTo(550, summaryY + 50)
+           .strokeColor(subtleColor)
+           .lineWidth(0.5)
+           .stroke();
+        doc.moveTo(350, summaryY + 52)
+           .lineTo(550, summaryY + 52)
+           .strokeColor(subtleColor)
+           .lineWidth(0.5)
+           .stroke();
+
+        // Total with highlight
+        doc.font('Helvetica-Bold')
+           .fontSize(14)
+           .text('TOTAL', 370, summaryY + 60)
+           .fillColor(highlightColor)
+           .text(`$${order.total.toFixed(2)}`, 470, summaryY + 60, { align: 'right' });
+
+        // Add payment information and thank you note
+        const noteY = summaryY + 100;
+        doc.moveTo(50, noteY)
+           .lineTo(550, noteY)
+           .stroke(subtleColor);
+           
+        doc.fillColor(primaryColor)
+           .fontSize(10)
+           .font('Helvetica')
+           .text('Payment Information', 50, noteY + 20, { continued: true })
+           .font('Helvetica-Bold')
+           .text(': Please include the invoice number with your payment.', { continued: false });
+           
+        doc.fontSize(12)
+           .font('Helvetica-Bold')
+           .fillColor(accentColor)
+           .text('Thank you for your business!', 50, noteY + 50);
+
+        // Add footer
+        doc.fontSize(8)
+           .fillColor(subtleColor)
+           .font('Helvetica')
+           .text(
+               `InventoryPro - Invoice #${order.invoice_no}`,
+               50,
+               700,
+               { align: 'center', width: 500 }
+           );
+
+        // Page numbers
+        const pageCount = doc.bufferedPageCount;
+        for (let i = 0; i < pageCount; i++) {
+            doc.switchToPage(i);
+            doc.fontSize(8)
+               .fillColor(subtleColor)
+               .text(
+                   `Page ${i + 1} of ${pageCount}`,
+                   50,
+                   720,
+                   { align: 'center', width: 500 }
+               );
+        }
 
         // Finalize PDF
         doc.end();
