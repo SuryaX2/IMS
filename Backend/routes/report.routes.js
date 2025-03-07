@@ -5,6 +5,7 @@ import {
     getSalesReport,
     getTopProducts,
     getPurchaseReport,
+    getLowStockAlerts,
 } from "../controllers/report.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
@@ -19,5 +20,6 @@ router.route("/stock").get(getStockReport);
 router.route("/sales").get(getSalesReport);
 router.route("/purchases").get(getPurchaseReport);
 router.route("/top-products").get(getTopProducts);
+router.route("/low-stock-alerts").get(getLowStockAlerts);
 
 export default router;

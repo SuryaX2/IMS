@@ -94,6 +94,7 @@ app.use("/api/v1/reports", reportRouter);
     API : http://localhost:3001/api/v1/reports/sales - GET
     API : http://localhost:3001/api/v1/reports/purchases - GET
     API : http://localhost:3001/api/v1/reports/top-products - GET
+    API : http://localhost:3001/api/v1/reports/low-stock-alerts - GET
  */
 
 app.use(errorHandler);

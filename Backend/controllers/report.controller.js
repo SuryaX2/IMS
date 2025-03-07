@@ -387,10 +387,39 @@ const getPurchaseReport = asyncHandler(async (req, res, next) => {
     }
 });
 
+// Get low stock alerts
+const getLowStockAlerts = asyncHandler(async (req, res, next) => {
+    const { threshold = 10 } = req.query;
+
+    try {
+        const lowStockProducts = await Product.find({
+            stock: { $lt: parseInt(threshold) },
+        })
+            .select(
+                "product_name product_code stock buying_price selling_price"
+            )
+            .populate("category_id", "category_name")
+            .sort({ stock: 1 });
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    lowStockProducts,
+                    "Low stock alerts fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
 export {
     getDashboardMetrics,
     getStockReport,
     getSalesReport,
     getTopProducts,
     getPurchaseReport,
+    getLowStockAlerts,
 };
