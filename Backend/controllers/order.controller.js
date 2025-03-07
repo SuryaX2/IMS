@@ -28,9 +28,6 @@ const createOrder = asyncHandler(async (req, res, next) => {
         return next(new ApiError(400, "Invalid order data"));
     }
 
-    const session = await Order.startSession();
-    session.startTransaction();
-
     try {
         // Check if invoice number is unique
         const existingOrder = await Order.findOne({ invoice_no });
@@ -39,42 +36,32 @@ const createOrder = asyncHandler(async (req, res, next) => {
         }
 
         // Create order
-        const order = await Order.create(
-            [
-                {
-                    customer_id,
-                    order_date: new Date(),
-                    order_status: order_status || "pending",
-                    total_products,
-                    sub_total,
-                    gst,
-                    total,
-                    invoice_no,
-                },
-            ],
-            { session }
-        );
+        const order = await Order.create({
+            customer_id,
+            order_date: new Date(),
+            order_status: order_status || "pending",
+            total_products,
+            sub_total,
+            gst,
+            total,
+            invoice_no,
+        });
 
         // Create order details
         const orderDetails = orderItems.map((item) => ({
-            order_id: order[0]._id,
+            order_id: order._id,
             product_id: item.product_id,
             quantity: item.quantity,
             unitcost: item.unitcost,
             total: item.quantity * item.unitcost,
         }));
 
-        await OrderDetail.create(orderDetails, { session });
-
-        await session.commitTransaction();
-        session.endSession();
+        await OrderDetail.create(orderDetails);
 
         return res
             .status(201)
-            .json(new ApiResponse(201, order[0], "Order created successfully"));
+            .json(new ApiResponse(201, order, "Order created successfully"));
     } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
         return next(new ApiError(500, error.message));
     }
 });
