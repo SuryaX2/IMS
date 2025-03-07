@@ -7,13 +7,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const createPurchase = asyncHandler(async (req, res, next) => {
     const { supplier_id, purchase_no, purchase_status, details } = req.body;
 
-    // Validate required fields
     if (!supplier_id || !purchase_no || !details || !Array.isArray(details)) {
         return next(new ApiError(400, "Invalid purchase data"));
     }
-
-    const session = await Purchase.startSession();
-    session.startTransaction();
 
     try {
         // Check if purchase number is unique
@@ -22,45 +18,31 @@ const createPurchase = asyncHandler(async (req, res, next) => {
             return next(new ApiError(409, "Purchase number already exists"));
         }
 
-        // Create purchase
-        const purchase = await Purchase.create(
-            [
-                {
-                    supplier_id,
-                    purchase_no,
-                    purchase_status: purchase_status || "pending",
-                    created_by: req.user._id,
-                },
-            ],
-            { session }
-        );
+        // Create purchase without transaction
+        const purchase = await Purchase.create({
+            supplier_id,
+            purchase_no,
+            purchase_status: purchase_status || "pending",
+            created_by: req.user._id,
+        });
 
-        // Create purchase details
+        // Create purchase details separately
         const purchaseDetails = details.map((detail) => ({
-            purchase_id: purchase[0]._id,
+            purchase_id: purchase._id,
             product_id: detail.product_id,
             quantity: detail.quantity,
             unitcost: detail.unitcost,
             total: detail.quantity * detail.unitcost,
         }));
 
-        await PurchaseDetail.create(purchaseDetails, { session });
-
-        await session.commitTransaction();
-        session.endSession();
+        await PurchaseDetail.insertMany(purchaseDetails);
 
         return res
             .status(201)
             .json(
-                new ApiResponse(
-                    201,
-                    purchase[0],
-                    "Purchase created successfully"
-                )
+                new ApiResponse(201, purchase, "Purchase created successfully")
             );
     } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
         return next(new ApiError(500, error.message));
     }
 });
