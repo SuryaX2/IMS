@@ -39,32 +39,46 @@ app.use("/api/v1/purchases", purchaseRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/reports", reportRouter);
 
-// API : http://localhost:3001/api/v1/users - GET, POST, PATCH
+/**
+ * API Documentation
 
-// API : http://localhost:3001/api/v1/categories - GET, POST
-// API : http://localhost:3001/api/v1/categories/:id - PATCH, DELETE
+ * users
+    API : http://localhost:3001/api/v1/users - GET, POST, PATCH
+ 
+ * categories
+    API : http://localhost:3001/api/v1/categories - GET, POST
+    API : http://localhost:3001/api/v1/categories/:id - PATCH, DELETE
+ 
+ * customers
+    API : http://localhost:3001/api/v1/customers - GET, POST
+    API : http://localhost:3001/api/v1/customers/:id - PATCH, DELETE
 
-// API : http://localhost:3001/api/v1/customers - GET, POST
-// API : http://localhost:3001/api/v1/customers/:id - PATCH, DELETE
-
-// API : http://localhost:3001/api/v1/suppliers - GET, POST
-// API : http://localhost:3001/api/v1/suppliers/:id - PATCH, DELETE
-
-// API : http://localhost:3001/api/v1/units - GET, POST
-// API : http://localhost:3001/api/v1/units/:id - PATCH, DELETE
-
-// API : http://localhost:3001/api/v1/products - GET, POST
-// API : http://localhost:3001/api/v1/products/:id - PATCH, DELETE
-
-// API : http://localhost:3001/api/v1/purchases - GET, POST
-// API : http://localhost:3001/api/v1/purchases/:id - GET, PATCH
-
-// API : http://localhost:3001/api/v1/orders - GET, POST
-// API : http://localhost:3001/api/v1/orders/:id - GET, PATCH
-
-// API : http://localhost:3001/api/v1/reports/stock - GET
-// API : http://localhost:3001/api/v1/reports/sales - GET
-// API : http://localhost:3001/api/v1/reports/top-products - GET
+ * suppliers
+    API : http://localhost:3001/api/v1/suppliers - GET, POST
+    API : http://localhost:3001/api/v1/suppliers/:id - PATCH, DELETE
+ 
+ * units 
+    API : http://localhost:3001/api/v1/units - GET, POST
+    API : http://localhost:3001/api/v1/units/:id - PATCH, DELETE
+ 
+ * products
+    API : http://localhost:3001/api/v1/products - GET, POST
+    API : http://localhost:3001/api/v1/products/:id - PATCH, DELETE
+ 
+ * purchases
+    API : http://localhost:3001/api/v1/purchases - GET, POST
+    API : http://localhost:3001/api/v1/purchases/:id - GET, PATCH
+ 
+ * orders
+    API : http://localhost:3001/api/v1/orders - GET, POST
+    API : http://localhost:3001/api/v1/orders/:id - GET, PATCH
+ 
+ * reports
+    API : http://localhost:3001/api/v1/reports/stock - GET
+    API : http://localhost:3001/api/v1/reports/sales - GET
+    API : http://localhost:3001/api/v1/reports/purchases - GET
+    API : http://localhost:3001/api/v1/reports/top-products - GET
+ */
 
 app.use(errorHandler);
 export { app };

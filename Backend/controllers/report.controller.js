@@ -5,8 +5,94 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-// Stock report
-export const getStockReport = asyncHandler(async (req, res, next) => {
+// Get dashboard metrics (total sales, inventory value, low stock)
+const getDashboardMetrics = asyncHandler(async (req, res, next) => {
+    try {
+        // Get total sales (sum of all orders)
+        const salesData = await Order.aggregate([
+            { $match: { order_status: { $ne: "cancelled" } } },
+            { $group: { _id: null, totalSales: { $sum: "$total" } } },
+        ]);
+
+        // Get total purchase value
+        const purchaseData = await Purchase.aggregate([
+            {
+                $lookup: {
+                    from: "purchasedetails",
+                    localField: "_id",
+                    foreignField: "purchase_id",
+                    as: "details",
+                },
+            },
+            { $unwind: "$details" },
+            {
+                $group: {
+                    _id: null,
+                    totalPurchase: { $sum: "$details.total" },
+                },
+            },
+        ]);
+
+        // Get inventory value and count
+        const inventoryData = await Product.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    inventoryValue: {
+                        $sum: { $multiply: ["$stock", "$buying_price"] },
+                    },
+                    totalProducts: { $sum: 1 },
+                    totalStock: { $sum: "$stock" },
+                },
+            },
+        ]);
+
+        // Get recent orders (last 5)
+        const recentOrders = await Order.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate("customer_id", "name");
+
+        // Get low stock products (stock < 10)
+        const lowStockProducts = await Product.find({ stock: { $lt: 10 } })
+            .select("product_name stock")
+            .sort({ stock: 1 })
+            .limit(10);
+
+        // Get out of stock products
+        const outOfStockCount = await Product.countDocuments({ stock: 0 });
+
+        const metrics = {
+            totalSales: salesData.length > 0 ? salesData[0].totalSales : 0,
+            totalPurchase:
+                purchaseData.length > 0 ? purchaseData[0].totalPurchase : 0,
+            inventoryValue:
+                inventoryData.length > 0 ? inventoryData[0].inventoryValue : 0,
+            totalProducts:
+                inventoryData.length > 0 ? inventoryData[0].totalProducts : 0,
+            totalStock:
+                inventoryData.length > 0 ? inventoryData[0].totalStock : 0,
+            outOfStockCount,
+            lowStockProducts,
+            recentOrders,
+        };
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    metrics,
+                    "Dashboard metrics fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+// Get stock report
+const getStockReport = asyncHandler(async (req, res, next) => {
     try {
         const stockReport = await Product.aggregate([
             {
@@ -18,180 +104,189 @@ export const getStockReport = asyncHandler(async (req, res, next) => {
                 },
             },
             {
-                $unwind: "$category",
+                $lookup: {
+                    from: "units",
+                    localField: "unit_id",
+                    foreignField: "_id",
+                    as: "unit",
+                },
             },
+            { $unwind: "$category" },
+            { $unwind: "$unit" },
             {
                 $project: {
                     product_name: 1,
                     product_code: 1,
                     category_name: "$category.category_name",
-                    stock: 1,
+                    unit_name: "$unit.unit_name",
                     buying_price: 1,
                     selling_price: 1,
-                    stock_value: { $multiply: ["$stock", "$buying_price"] },
-                },
-            },
-            {
-                $sort: { stock: -1 },
-            },
-        ]);
-
-        // Calculate totals
-        const totalStock = stockReport.reduce(
-            (sum, product) => sum + product.stock,
-            0
-        );
-        const totalValue = stockReport.reduce(
-            (sum, product) => sum + product.stock_value,
-            0
-        );
-
-        return res.status(200).json(
-            new ApiResponse(
-                200,
-                {
-                    report: stockReport,
-                    summary: {
-                        totalProducts: stockReport.length,
-                        totalStock,
-                        totalValue,
+                    stock: 1,
+                    inventory_value: { $multiply: ["$stock", "$buying_price"] },
+                    status: {
+                        $cond: {
+                            if: { $eq: ["$stock", 0] },
+                            then: "Out of Stock",
+                            else: {
+                                $cond: {
+                                    if: { $lt: ["$stock", 10] },
+                                    then: "Low Stock",
+                                    else: "In Stock",
+                                },
+                            },
+                        },
                     },
                 },
-                "Stock report generated successfully"
-            )
-        );
+            },
+            { $sort: { stock: 1 } },
+        ]);
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    stockReport,
+                    "Stock report fetched successfully"
+                )
+            );
     } catch (error) {
         return next(new ApiError(500, error.message));
     }
 });
 
-// Sales report by period
-export const getSalesReport = asyncHandler(async (req, res, next) => {
-    const { startDate, endDate } = req.query;
+// Get sales report
+const getSalesReport = asyncHandler(async (req, res, next) => {
+    const { start_date, end_date } = req.query;
 
-    // Format dates or use default (last 30 days)
-    const end = endDate ? new Date(endDate) : new Date();
-    const start = startDate
-        ? new Date(startDate)
-        : new Date(end - 30 * 24 * 60 * 60 * 1000);
-
-    try {
-        const salesReport = await Order.aggregate([
-            {
-                $match: {
-                    order_date: { $gte: start, $lte: end },
-                    order_status: "completed",
-                },
+    let dateFilter = {};
+    if (start_date && end_date) {
+        dateFilter = {
+            order_date: {
+                $gte: new Date(start_date),
+                $lte: new Date(end_date),
             },
-            {
-                $lookup: {
-                    from: "customers",
-                    localField: "customer_id",
-                    foreignField: "_id",
-                    as: "customer",
-                },
-            },
-            {
-                $unwind: "$customer",
-            },
-            {
-                $project: {
-                    invoice_no: 1,
-                    order_date: 1,
-                    customer_name: "$customer.name",
-                    total_products: 1,
-                    sub_total: 1,
-                    vat: 1,
-                    total: 1,
-                },
-            },
-            {
-                $sort: { order_date: -1 },
-            },
-        ]);
-
-        // Calculate summary
-        const totalSales = salesReport.reduce(
-            (sum, order) => sum + order.total,
-            0
-        );
-        const totalVat = salesReport.reduce((sum, order) => sum + order.vat, 0);
-        const totalOrders = salesReport.length;
-
-        return res.status(200).json(
-            new ApiResponse(
-                200,
-                {
-                    report: salesReport,
-                    summary: {
-                        totalOrders,
-                        totalSales,
-                        totalVat,
-                        averageOrderValue: totalOrders
-                            ? totalSales / totalOrders
-                            : 0,
-                    },
-                    period: { start, end },
-                },
-                "Sales report generated successfully"
-            )
-        );
-    } catch (error) {
-        return next(new ApiError(500, error.message));
+        };
     }
-});
-
-// Top selling products
-export const getTopSellingProducts = asyncHandler(async (req, res, next) => {
-    const { limit = 10 } = req.query;
 
     try {
-        const topProducts = await OrderDetail.aggregate([
+        // Get sales by date
+        const salesByDate = await Order.aggregate([
+            { $match: { ...dateFilter, order_status: { $ne: "cancelled" } } },
             {
                 $group: {
-                    _id: "$product_id",
-                    totalSold: { $sum: "$quantity" },
-                    totalRevenue: { $sum: "$total" },
+                    _id: {
+                        $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$order_date",
+                        },
+                    },
+                    total: { $sum: "$total" },
+                    orders: { $sum: 1 },
                 },
             },
+            { $sort: { _id: 1 } },
+        ]);
+
+        // Get sales by product
+        const salesByProduct = await Order.aggregate([
+            { $match: { ...dateFilter, order_status: { $ne: "cancelled" } } },
+            {
+                $lookup: {
+                    from: "orderdetails",
+                    localField: "_id",
+                    foreignField: "order_id",
+                    as: "details",
+                },
+            },
+            { $unwind: "$details" },
             {
                 $lookup: {
                     from: "products",
-                    localField: "_id",
+                    localField: "details.product_id",
                     foreignField: "_id",
                     as: "product",
                 },
             },
+            { $unwind: "$product" },
             {
-                $unwind: "$product",
+                $group: {
+                    _id: "$product._id",
+                    product_name: { $first: "$product.product_name" },
+                    quantity: { $sum: "$details.quantity" },
+                    total: { $sum: "$details.total" },
+                },
             },
+            { $sort: { total: -1 } },
+            { $limit: 10 },
+        ]);
+
+        const report = {
+            salesByDate,
+            salesByProduct,
+            summary: {
+                totalSales: salesByDate.reduce(
+                    (sum, item) => sum + item.total,
+                    0
+                ),
+                totalOrders: salesByDate.reduce(
+                    (sum, item) => sum + item.orders,
+                    0
+                ),
+            },
+        };
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    report,
+                    "Sales report fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+// Get top selling products
+const getTopProducts = asyncHandler(async (req, res, next) => {
+    const { limit = 10 } = req.query;
+
+    try {
+        const topProducts = await Order.aggregate([
+            { $match: { order_status: { $ne: "cancelled" } } },
             {
                 $lookup: {
-                    from: "categories",
-                    localField: "product.category_id",
+                    from: "orderdetails",
+                    localField: "_id",
+                    foreignField: "order_id",
+                    as: "details",
+                },
+            },
+            { $unwind: "$details" },
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "details.product_id",
                     foreignField: "_id",
-                    as: "category",
+                    as: "product",
                 },
             },
+            { $unwind: "$product" },
             {
-                $unwind: "$category",
-            },
-            {
-                $project: {
-                    product_name: "$product.product_name",
-                    product_code: "$product.product_code",
-                    category: "$category.category_name",
-                    totalSold: 1,
-                    totalRevenue: 1,
-                    averagePrice: { $divide: ["$totalRevenue", "$totalSold"] },
+                $group: {
+                    _id: "$product._id",
+                    product_name: { $first: "$product.product_name" },
+                    product_code: { $first: "$product.product_code" },
+                    product_image: { $first: "$product.product_image" },
+                    quantity_sold: { $sum: "$details.quantity" },
+                    total_sales: { $sum: "$details.total" },
                 },
             },
-            {
-                $sort: { totalSold: -1 },
-            },
-            {
-                $limit: parseInt(limit),
-            },
+            { $sort: { quantity_sold: -1 } },
+            { $limit: parseInt(limit) },
         ]);
 
         return res
@@ -200,10 +295,102 @@ export const getTopSellingProducts = asyncHandler(async (req, res, next) => {
                 new ApiResponse(
                     200,
                     topProducts,
-                    "Top selling products report generated successfully"
+                    "Top products fetched successfully"
                 )
             );
     } catch (error) {
         return next(new ApiError(500, error.message));
     }
 });
+
+// Get purchase report
+const getPurchaseReport = asyncHandler(async (req, res, next) => {
+    const { start_date, end_date } = req.query;
+
+    let dateFilter = {};
+    if (start_date && end_date) {
+        dateFilter = {
+            purchase_date: {
+                $gte: new Date(start_date),
+                $lte: new Date(end_date),
+            },
+        };
+    }
+
+    try {
+        // Get purchases by date
+        const purchasesByDate = await Purchase.aggregate([
+            { $match: dateFilter },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$purchase_date",
+                        },
+                    },
+                    count: { $sum: 1 },
+                },
+            },
+            { $sort: { _id: 1 } },
+        ]);
+
+        // Get purchases by supplier
+        const purchasesBySupplier = await Purchase.aggregate([
+            { $match: dateFilter },
+            {
+                $lookup: {
+                    from: "suppliers",
+                    localField: "supplier_id",
+                    foreignField: "_id",
+                    as: "supplier",
+                },
+            },
+            { $unwind: "$supplier" },
+            {
+                $lookup: {
+                    from: "purchasedetails",
+                    localField: "_id",
+                    foreignField: "purchase_id",
+                    as: "details",
+                },
+            },
+            { $unwind: "$details" },
+            {
+                $group: {
+                    _id: "$supplier._id",
+                    supplier_name: { $first: "$supplier.name" },
+                    shopname: { $first: "$supplier.shopname" },
+                    total_purchases: { $sum: "$details.total" },
+                    count: { $sum: 1 },
+                },
+            },
+            { $sort: { total_purchases: -1 } },
+        ]);
+
+        const report = {
+            purchasesByDate,
+            purchasesBySupplier,
+        };
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    report,
+                    "Purchase report fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+export {
+    getDashboardMetrics,
+    getStockReport,
+    getSalesReport,
+    getTopProducts,
+    getPurchaseReport,
+};
