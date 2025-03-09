@@ -90,6 +90,7 @@ app.use("/api/v1/reports", reportRouter);
     API : http://localhost:3001/api/v1/orders/:id/invoice - GET
  
  * reports
+    API : http://localhost:3001/api/v1/reports/dashboard - GET
     API : http://localhost:3001/api/v1/reports/stock - GET
     API : http://localhost:3001/api/v1/reports/sales - GET
     API : http://localhost:3001/api/v1/reports/purchases - GET
