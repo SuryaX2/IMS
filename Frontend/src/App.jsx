@@ -10,6 +10,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorPage from "./components/error/ErrorPage";
 import LandingPage from "./pages/LandingPage";
 import ProfilePage from "./components/ProfilePage";
+import Dashboard from "./pages/Dashboard";
+import DashboardLayout from "./components/layout/DashboardLayout";
 
 function App() {
     return (
@@ -45,6 +47,29 @@ function App() {
                                 </ProtectedRoute>
                             }
                         />
+
+                        {/* Dashboard and related routes */}
+                        <Route
+                            path="/"
+                            element={
+                                <ProtectedRoute>
+                                    <DashboardLayout />
+                                </ProtectedRoute>
+                            }
+                        >
+                            <Route path="dashboard" element={<Dashboard />} />
+                            {/* <Route path="products" element={<div>Products Page</div>} />
+                            <Route path="orders" element={<div>Orders Page</div>} />
+                            <Route path="purchases" element={<div>Purchases Page</div>} />
+                            <Route path="customers" element={<div>Customers Page</div>} />
+                            <Route path="suppliers" element={<div>Suppliers Page</div>} />
+                            <Route path="categories" element={<div>Categories Page</div>} />
+                            <Route path="reports">
+                                <Route path="stock" element={<div>Stock Report</div>} />
+                                <Route path="sales" element={<div>Sales Report</div>} />
+                                <Route path="purchases" element={<div>Purchase Report</div>} />
+                            </Route> */}
+                        </Route>
 
                         {/* catch all */}
                         <Route path="/*" element={<ErrorPage />} />
