@@ -40,7 +40,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
             customer_id,
             order_date: new Date(),
             order_status: order_status || "pending",
-            total_products,
+            total_products: orderItems.length,
             sub_total,
             gst,
             total,
