@@ -107,6 +107,19 @@ const updatePurchaseStatus = asyncHandler(async (req, res, next) => {
             return next(new ApiError(404, "Purchase not found"));
         }
 
+        // If purchase is now approved/completed, update stock levels
+        if (purchase_status === "completed" || purchase_status === "approved") {
+            // Get all purchase details for this purchase
+            const purchaseDetails = await PurchaseDetail.find({
+                purchase_id: id,
+            });
+
+            // Update stock for each product using the addStockProduct method
+            for (const detail of purchaseDetails) {
+                await detail.addStockProduct();
+            }
+        }
+
         return res
             .status(200)
             .json(
