@@ -3,7 +3,7 @@ import { Card, Alert, Empty, List, Typography } from "antd";
 import { Pie } from "@ant-design/plots";
 import { TrophyOutlined } from "@ant-design/icons";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const ProductDistribution = ({ topProducts }) => {
     const hasData = topProducts && topProducts.length > 0;

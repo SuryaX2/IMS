@@ -59,28 +59,21 @@ const Dashboard = () => {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(currentDate.getDate() - 30);
 
-            const startDate = thirtyDaysAgo.toISOString().split("T")[0];
-            const endDate = currentDate.toISOString().split("T")[0];
+            // const startDate = thirtyDaysAgo.toISOString().split("T")[0];
+            // const endDate = currentDate.toISOString().split("T")[0];
 
-            const salesReportResponse = await api.get(
-                `/reports/sales?start_date=${startDate}&end_date=${endDate}`
-            );
+            const salesReportResponse = await api.get(`/reports/sales`);
 
             if (dashboardResponse.data.success) {
                 const metricsData = dashboardResponse.data.data;
                 const topProductsData = topProductsResponse.data.data || [];
                 const salesReportData = salesReportResponse.data.data || {};
 
-                // Prepare sales trend data
-                const salesTrend = salesReportData.salesByDate || [];
-
+                // Pass the complete salesReportData object to maintain the correct structure
                 setDashboardData({
                     ...metricsData,
-                    salesData: salesTrend.map((item) => ({
-                        date: item._id,
-                        sales: item.total,
-                    })),
                     topProducts: topProductsData,
+                    salesData: salesReportData, // Pass the complete salesReportData object
                 });
 
                 toast.success("Dashboard data loaded successfully");
@@ -158,10 +151,11 @@ const Dashboard = () => {
     // Recent orders columns
     const recentOrdersColumns = [
         {
-            title: "Order #",
+            title: "Order ID",
             dataIndex: "order_number",
             key: "order_number",
             width: 120,
+            render: (_, record) => `#${record.invoice_no}`,
         },
         {
             title: "Customer",
