@@ -2,7 +2,13 @@ import {
     DatabaseOutlined,
     TeamOutlined,
     BarChartOutlined,
+    DashboardOutlined,
+    AppstoreOutlined,
+    ShoppingCartOutlined,
+    ShoppingOutlined,
+    UserSwitchOutlined,
 } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 
 export const navLinks = [
     { name: "Features", path: "features" },
@@ -70,5 +76,62 @@ export const steps = [
         title: "Start Managing Efficiently",
         description:
             "Track, analyze, and optimize your inventory in real-time.",
+    },
+];
+
+export const menuItems = [
+    {
+        key: "dashboard",
+        icon: <DashboardOutlined />,
+        label: <Link to="/dashboard">Dashboard</Link>,
+    },
+    {
+        key: "products",
+        icon: <AppstoreOutlined />,
+        label: <Link to="/products">Products</Link>,
+    },
+    {
+        key: "orders",
+        icon: <ShoppingCartOutlined />,
+        label: <Link to="/orders">Orders</Link>,
+    },
+    {
+        key: "purchases",
+        icon: <ShoppingOutlined />,
+        label: <Link to="/purchases">Purchases</Link>,
+    },
+    {
+        key: "customers",
+        icon: <TeamOutlined />,
+        label: <Link to="/customers">Customers</Link>,
+    },
+    {
+        key: "suppliers",
+        icon: <UserSwitchOutlined />,
+        label: <Link to="/suppliers">Suppliers</Link>,
+    },
+    {
+        key: "categories",
+        icon: <AppstoreOutlined />,
+        label: <Link to="/categories">Categories</Link>,
+    },
+    {
+        key: "reports",
+        icon: <BarChartOutlined />,
+        label: "Reports",
+        children: [
+            {
+                key: "reports/stock",
+                label: <Link to="/reports/stock">Stock Report</Link>,
+            },
+            {
+                key: "reports/sales",
+                label: <Link to="/reports/sales">Sales Report</Link>,
+            },
+            {
+                key: "reports/purchases",
+                label: <Link to="/reports/purchases">Purchase Report</Link>,
+            },
+        ],
     },
 ];

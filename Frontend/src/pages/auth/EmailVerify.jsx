@@ -24,9 +24,9 @@ const EmailVerify = () => {
         // Redirect if user is already verified, but don't show toast if we just verified
         if (user?.isVerified && !justVerified) {
             toast.success("Your email is already verified!");
-            navigate("/home");
+            navigate("/dashboard");
         } else if (user?.isVerified && justVerified) {
-            navigate("/home");
+            navigate("/dashboard");
         }
     }, [user, navigate, justVerified]);
 
@@ -94,7 +94,7 @@ const EmailVerify = () => {
 
                 // Redirect to home page after short delay
                 setTimeout(() => {
-                    navigate("/home");
+                    navigate("/dashboard");
                 }, 1500);
             } else {
                 toast.error(data.message || "Verification failed");

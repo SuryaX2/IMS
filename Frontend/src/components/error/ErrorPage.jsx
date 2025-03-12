@@ -10,7 +10,7 @@ const ErrorPage = () => (
             extra={
                 <Button
                     type="primary"
-                    onClick={() => window.location.replace("/home")}
+                    onClick={() => window.location.replace("/dashboard")}
                 >
                     Back Home
                 </Button>
