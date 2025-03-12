@@ -1,4 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { Card, Row, Col, Tag, Divider, Typography, theme } from "antd";
+import {
+    DollarOutlined,
+    InboxOutlined,
+    ShoppingCartOutlined,
+    ShoppingOutlined,
+    WarningOutlined,
+    AreaChartOutlined,
+    PieChartOutlined,
+} from "@ant-design/icons";
+import toast from "react-hot-toast";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import StatCard from "../components/dashboard/StatCard";
 import SalesChart from "../components/dashboard/SalesChart";
@@ -7,10 +18,12 @@ import DataTable from "../components/dashboard/DataTable";
 import LoadingSpinner from "../components/dashboard/LoadingSpinner";
 import ErrorDisplay from "../components/dashboard/ErrorDisplay";
 import { api } from "../api/api";
-import { Row,Col,Tag } from "antd";
-import { DollarOutlined, InboxOutlined, ShoppingCartOutlined, ShoppingOutlined, WarningOutlined } from "@ant-design/icons";
+
+const { Title } = Typography;
+const { useToken } = theme;
 
 const Dashboard = () => {
+    const { token } = useToken();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [dashboardData, setDashboardData] = useState({
@@ -69,15 +82,19 @@ const Dashboard = () => {
                     })),
                     topProducts: topProductsData,
                 });
+
+                toast.success("Dashboard data loaded successfully");
             } else {
                 setError("Failed to fetch dashboard data");
+                toast.error("Failed to load dashboard data");
             }
         } catch (err) {
             console.error("Dashboard data fetch error:", err);
-            setError(
+            const errorMessage =
                 err.response?.data?.message ||
-                    "Something went wrong while fetching dashboard data"
-            );
+                "Something went wrong while fetching dashboard data";
+            setError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -89,12 +106,14 @@ const Dashboard = () => {
             title: "Product",
             dataIndex: "product_name",
             key: "product_name",
+            ellipsis: true,
         },
         {
             title: "Units Sold",
             dataIndex: "quantity_sold",
             key: "quantity_sold",
             sorter: (a, b) => a.quantity_sold - b.quantity_sold,
+            responsive: ["md"],
         },
         {
             title: "Total Sales",
@@ -111,17 +130,25 @@ const Dashboard = () => {
             title: "Product",
             dataIndex: "product_name",
             key: "product_name",
+            ellipsis: true,
         },
         {
-            title: "Current Stock",
+            title: "Stock",
             dataIndex: "stock",
             key: "stock",
+            width: 100,
+            align: "center",
         },
         {
             title: "Status",
             key: "status",
+            width: 120,
+            align: "center",
             render: (_, record) => (
-                <Tag color={record.stock === 0 ? "error" : "warning"}>
+                <Tag
+                    color={record.stock === 0 ? "error" : "warning"}
+                    className="w-full text-center"
+                >
                     {record.stock === 0 ? "Out of Stock" : "Low Stock"}
                 </Tag>
             ),
@@ -131,19 +158,22 @@ const Dashboard = () => {
     // Recent orders columns
     const recentOrdersColumns = [
         {
-            title: "Order Number",
+            title: "Order #",
             dataIndex: "order_number",
             key: "order_number",
+            width: 120,
         },
         {
             title: "Customer",
             key: "customer",
+            ellipsis: true,
             render: (_, record) =>
                 record.customer_id?.name || "Unknown Customer",
         },
         {
             title: "Date",
             key: "date",
+            responsive: ["md"],
             render: (_, record) =>
                 new Date(record.createdAt).toLocaleDateString(),
         },
@@ -178,74 +208,96 @@ const Dashboard = () => {
     }
 
     return (
-        <div>
-            <Row gutter={[0, 16]}>
-                <Col span={24}>
-                    <DashboardHeader />
-                </Col>
-            </Row>
+        <div className="px-4 py-6">
+            <DashboardHeader />
 
-            {/* Key metrics - First Row */}
-            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+            {/* Key metrics cards */}
+            <Row gutter={[16, 16]} className="mt-6">
                 <Col xs={24} sm={12} md={8}>
                     <StatCard
                         title="Total Sales"
                         value={dashboardData.totalSales}
                         prefix={<ShoppingCartOutlined />}
-                        valueStyle={{ color: "#3f8600" }}
+                        valueStyle={{ color: token.colorSuccess }}
+                        icon={
+                            <ShoppingCartOutlined className="text-2xl text-success" />
+                        }
+                        className="dashboard-stat-card"
+                        formatter={(value) => `$${value.toLocaleString()}`}
                     />
                 </Col>
-                <Col xs={24} sm={12} md={4}>
+                <Col xs={24} sm={12} md={8}>
                     <StatCard
                         title="Total Purchases"
                         value={dashboardData.totalPurchase}
                         prefix={<ShoppingOutlined />}
-                        valueStyle={{ color: "#1890ff" }}
+                        valueStyle={{ color: token.colorPrimary }}
+                        icon={
+                            <ShoppingOutlined className="text-2xl text-primary" />
+                        }
+                        className="dashboard-stat-card"
+                        formatter={(value) => `$${value.toLocaleString()}`}
                     />
                 </Col>
-                <Col xs={24} sm={12} md={12}>
+                <Col xs={24} sm={24} md={8}>
                     <StatCard
                         title="Inventory Value"
                         value={dashboardData.inventoryValue}
                         prefix={<DollarOutlined />}
-                        valueStyle={{ color: "#722ed1" }}
+                        valueStyle={{ color: token.colorPurple }}
+                        icon={
+                            <DollarOutlined className="text-2xl text-purple" />
+                        }
+                        className="dashboard-stat-card"
+                        formatter={(value) => `$${value.toLocaleString()}`}
+                        precision={2}
                     />
                 </Col>
             </Row>
 
-            {/* Key metrics - Second Row */}
-            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+            <Row gutter={[16, 16]} className="mt-4">
                 <Col xs={24} sm={8}>
                     <StatCard
                         title="Total Products"
                         value={dashboardData.totalProducts}
-                        prefix={<InboxOutlined />}
+                        icon={<InboxOutlined className="text-2xl text-blue" />}
+                        className="dashboard-stat-card"
                     />
                 </Col>
                 <Col xs={24} sm={8}>
                     <StatCard
                         title="Total Stock"
                         value={dashboardData.totalStock}
-                        prefix={<ShoppingOutlined />}
+                        icon={
+                            <ShoppingOutlined className="text-2xl text-cyan" />
+                        }
+                        className="dashboard-stat-card"
                     />
                 </Col>
                 <Col xs={24} sm={8}>
                     <StatCard
-                        title="Out of Stock Products"
+                        title="Out of Stock"
                         value={dashboardData.outOfStockCount}
-                        prefix={<WarningOutlined />}
+                        icon={<WarningOutlined className="text-2xl" />}
                         valueStyle={{
                             color:
                                 dashboardData.outOfStockCount > 0
-                                    ? "#cf1322"
-                                    : "#3f8600",
+                                    ? token.colorError
+                                    : token.colorSuccess,
                         }}
+                        className="dashboard-stat-card"
                     />
                 </Col>
             </Row>
 
+            <Divider className="my-8">
+                <Title level={4} className="m-0 flex items-center">
+                    <AreaChartOutlined className="mr-2" /> Analytics
+                </Title>
+            </Divider>
+
             {/* Sales trend chart and product distribution */}
-            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+            <Row gutter={[16, 16]}>
                 <Col xs={24} lg={16}>
                     <SalesChart salesData={dashboardData.salesData} />
                 </Col>
@@ -256,13 +308,19 @@ const Dashboard = () => {
                 </Col>
             </Row>
 
+            <Divider className="my-8">
+                <Title level={4} className="m-0 flex items-center">
+                    <PieChartOutlined className="mr-2" /> Reports
+                </Title>
+            </Divider>
+
             {/* Tables section */}
-            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+            <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
                     <DataTable
                         title="Top Selling Products"
                         columns={topProductsColumns}
-                        dataSource={dashboardData.topProducts}
+                        dataSource={dashboardData.topProducts.slice(0, 5)}
                         viewAllLink="/reports/top-products"
                     />
                 </Col>
@@ -270,19 +328,19 @@ const Dashboard = () => {
                     <DataTable
                         title="Low Stock Alerts"
                         columns={lowStockColumns}
-                        dataSource={dashboardData.lowStockProducts}
+                        dataSource={dashboardData.lowStockProducts.slice(0, 5)}
                         viewAllLink="/reports/low-stock-alerts"
                     />
                 </Col>
             </Row>
 
             {/* Recent orders section */}
-            <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+            <Row gutter={[16, 16]} className="mt-4 mb-6">
                 <Col xs={24}>
                     <DataTable
                         title="Recent Orders"
                         columns={recentOrdersColumns}
-                        dataSource={dashboardData.recentOrders}
+                        dataSource={dashboardData.recentOrders.slice(0, 5)}
                         viewAllLink="/orders"
                     />
                 </Col>

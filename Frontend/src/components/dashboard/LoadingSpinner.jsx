@@ -1,18 +1,16 @@
 import React from "react";
-import { Spin } from "antd";
+import { Spin, Typography } from "antd";
 
-const LoadingSpinner = ({ tip = "Loading..." }) => {
+const { Text } = Typography;
+
+const LoadingSpinner = ({ tip = "Loading...", height = "75vh" }) => {
     return (
         <div
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-                padding: "100px",
-            }}
+            className="flex flex-col items-center justify-center"
+            style={{ height }}
         >
-            <Spin size="large" tip={tip} />
+            <Spin size="large" />
+            <Text className="mt-4 text-gray-500">{tip}</Text>
         </div>
     );
 };
