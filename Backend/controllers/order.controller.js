@@ -56,7 +56,9 @@ const createOrder = asyncHandler(async (req, res, next) => {
             total: item.quantity * item.unitcost,
         }));
 
-        await OrderDetail.create(orderDetails);
+        for (const item of orderDetails) {
+            await OrderDetail.createDetail(item);
+        }
 
         return res
             .status(201)
@@ -173,6 +175,7 @@ const getOrderDetails = asyncHandler(async (req, res, next) => {
 const updateOrderStatus = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const { order_status } = req.body;
+    const prevOrder = await Order.findById(id);
 
     if (!order_status) {
         return next(new ApiError(400, "Order status is required"));
@@ -187,6 +190,39 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
 
         if (!order) {
             return next(new ApiError(404, "Order not found"));
+        }
+
+        // If order is being completed and wasn't completed before
+        if (
+            order_status === "completed" &&
+            prevOrder.order_status !== "completed"
+        ) {
+            // Get all order details
+            const orderDetails = await OrderDetail.find({ order_id: id });
+
+            // Reduce stock for each item if not already done
+            for (const detail of orderDetails) {
+                await detail.reduceStockProduct();
+            }
+        }
+
+        // If order was completed and now it's cancelled, restore stock
+        if (
+            prevOrder.order_status === "completed" &&
+            order_status === "cancelled"
+        ) {
+            const orderDetails = await OrderDetail.find({ order_id: id });
+
+            // Restore stock for each item
+            for (const detail of orderDetails) {
+                // The third parameter 'false' in updateStock means reduce stock,
+                // so 'true' would mean increase stock
+                await Product.updateStock(
+                    detail.product_id,
+                    detail.quantity,
+                    true
+                );
+            }
         }
 
         return res
