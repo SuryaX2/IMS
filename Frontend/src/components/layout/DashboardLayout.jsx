@@ -4,7 +4,6 @@ import { Layout } from "antd";
 import { Outlet, useLocation } from "react-router-dom";
 import DashboardHeader from "./DashboardHeader";
 import DashboardSidebar from "./DashboardSidebar";
-import DashboardBreadcrumb from "./DashboardBreadcrumb";
 import MobileMenu from "./MobileMenu";
 
 const { Content } = Layout;
@@ -53,9 +52,8 @@ const DashboardLayout = () => {
                 {/* Mobile menu (shows when screen is small) */}
                 <MobileMenu collapsed={collapsed} currentPage={currentPage} />
 
-                <Content className="m-4 p-4 sm:p-6 bg-gray-50 rounded-lg">
-                    <DashboardBreadcrumb pathSegments={pathSegments} />
-
+                <Content className="m-0 p-4 sm:p-6">
+                    {/* <DashboardBreadcrumb pathSegments={pathSegments} /> */}
                     <div className="bg-white p-4 rounded-lg min-h-screen border border-gray-100 shadow-sm">
                         <Outlet />
                     </div>
