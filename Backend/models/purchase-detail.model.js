@@ -35,6 +35,7 @@ const purchaseDetailSchema = mongoose.Schema(
 purchaseDetailSchema.methods.addStockProduct = async function () {
     try {
         await Product.updateStock(this.product_id, this.quantity, true);
+        return true;
     } catch (error) {
         throw new Error(error.message);
     }
@@ -50,8 +51,17 @@ purchaseDetailSchema.statics.createDetail = async function (detailData) {
 
         const detail = await this.create(detailData);
 
-        // Add to stock when purchase detail is created
-        await detail.addStockProduct();
+        // Get the associated purchase to check its status
+        const purchase = await Purchase.findById(detail.purchase_id);
+
+        // Only add to stock when purchase is completed or approved
+        if (
+            purchase &&
+            (purchase.purchase_status === "completed" ||
+                purchase.purchase_status === "approved")
+        ) {
+            await detail.addStockProduct();
+        }
 
         return detail;
     } catch (error) {

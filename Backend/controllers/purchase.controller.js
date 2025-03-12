@@ -18,7 +18,7 @@ const createPurchase = asyncHandler(async (req, res, next) => {
             return next(new ApiError(409, "Purchase number already exists"));
         }
 
-        // Create purchase without transaction
+        // Create purchase
         const purchase = await Purchase.create({
             supplier_id,
             purchase_no,
@@ -26,21 +26,41 @@ const createPurchase = asyncHandler(async (req, res, next) => {
             created_by: req.user._id,
         });
 
-        // Create purchase details separately
-        const purchaseDetails = details.map((detail) => ({
-            purchase_id: purchase._id,
-            product_id: detail.product_id,
-            quantity: detail.quantity,
-            unitcost: detail.unitcost,
-            total: detail.quantity * detail.unitcost,
-        }));
+        // Create purchase details individually using createDetail method
+        // This will properly update stock for each product if status is completed
+        const purchaseDetails = [];
+        for (const detail of details) {
+            const detailData = {
+                purchase_id: purchase._id,
+                product_id: detail.product_id,
+                quantity: detail.quantity,
+                unitcost: detail.unitcost,
+                total: detail.quantity * detail.unitcost,
+            };
 
-        await PurchaseDetail.insertMany(purchaseDetails);
+            // Only update stock if purchase is marked as completed right away
+            if (
+                purchase.purchase_status === "completed" ||
+                purchase.purchase_status === "approved"
+            ) {
+                const createdDetail =
+                    await PurchaseDetail.createDetail(detailData);
+                purchaseDetails.push(createdDetail);
+            } else {
+                // For pending purchases, don't update stock yet - just create the record
+                const createdDetail = await PurchaseDetail.create(detailData);
+                purchaseDetails.push(createdDetail);
+            }
+        }
 
         return res
             .status(201)
             .json(
-                new ApiResponse(201, purchase, "Purchase created successfully")
+                new ApiResponse(
+                    201,
+                    { purchase, purchaseDetails },
+                    "Purchase created successfully"
+                )
             );
     } catch (error) {
         return next(new ApiError(500, error.message));
@@ -114,7 +134,7 @@ const updatePurchaseStatus = asyncHandler(async (req, res, next) => {
                 purchase_id: id,
             });
 
-            // Update stock for each product using the addStockProduct method
+            // For each purchase detail, manually call addStockProduct
             for (const detail of purchaseDetails) {
                 await detail.addStockProduct();
             }
