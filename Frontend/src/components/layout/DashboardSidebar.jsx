@@ -67,7 +67,7 @@ const SidebarLogo = ({ collapsed }) => (
 );
 
 const SidebarUserProfile = ({ user, logout }) => (
-    <div className="absolute bottom-8 left-4 right-4 rounded-lg p-4">
+    <div className="absolute bottom-3 left-4 right-4 rounded-lg p-4">
         <div className="flex items-center mb-4">
             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
                 {user.avatar && (

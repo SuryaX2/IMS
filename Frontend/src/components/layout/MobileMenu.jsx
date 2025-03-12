@@ -8,20 +8,20 @@ const MobileMenu = ({ collapsed, currentPage }) => {
         <div
             className="md:hidden overflow-hidden transition-all duration-300"
             style={{
-                maxHeight: collapsed ? "0" : "300px",
-                background: "linear-gradient(to bottom, #1a237e, #283593)",
+                maxHeight: collapsed ? "0" : "70vh",
             }}
         >
-            <Menu
-                theme="dark"
-                defaultSelectedKeys={[currentPage]}
-                mode="inline"
-                items={menuItems}
-                className="border-r-0"
-                style={{
-                    background: "transparent",
-                }}
-            />
+            <div className="max-h-full overflow-y-auto pb-4">
+                {" "}
+                {/* Added scrollable container */}
+                <Menu
+                    theme="dark"
+                    defaultSelectedKeys={[currentPage]}
+                    mode="inline"
+                    items={menuItems}
+                    className="border-r-0"
+                />
+            </div>
         </div>
     );
 };
