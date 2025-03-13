@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { Card, Empty, Typography, Spin } from "antd";
 import {
     LineChartOutlined,
-    CalendarOutlined,
     ArrowUpOutlined,
     ArrowDownOutlined,
 } from "@ant-design/icons";
