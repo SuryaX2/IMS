@@ -12,12 +12,12 @@ import {
 import toast from "react-hot-toast";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import StatCard from "../components/dashboard/StatCard";
-import SalesChart from "../components/dashboard/SalesChart";
 import ProductDistribution from "../components/dashboard/ProductDistribution";
 import DataTable from "../components/dashboard/DataTable";
 import LoadingSpinner from "../components/dashboard/LoadingSpinner";
 import ErrorDisplay from "../components/dashboard/ErrorDisplay";
 import { api } from "../api/api";
+import SalesChart from "../components/dashboard/SalesChart/.";
 
 const { Title } = Typography;
 const { useToken } = theme;
@@ -43,37 +43,31 @@ const Dashboard = () => {
         fetchDashboardData();
     }, []);
 
-    // Fetch dashboard data
+    // Fetch dashboard data from API endpoints
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
 
-            // Fetch dashboard metrics
-            const dashboardResponse = await api.get("/reports/dashboard");
-
-            // Fetch top products
-            const topProductsResponse = await api.get("/reports/top-products");
-
-            // Fetch sales report for trend data
-            const currentDate = new Date();
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(currentDate.getDate() - 30);
-
-            // const startDate = thirtyDaysAgo.toISOString().split("T")[0];
-            // const endDate = currentDate.toISOString().split("T")[0];
-
-            const salesReportResponse = await api.get(`/reports/sales`);
+            // Using the API endpoints you provided
+            const [
+                dashboardResponse,
+                topProductsResponse,
+                salesReportResponse,
+            ] = await Promise.all([
+                api.get("/reports/dashboard"),
+                api.get("/reports/top-products"),
+                api.get("/reports/sales"),
+            ]);
 
             if (dashboardResponse.data.success) {
                 const metricsData = dashboardResponse.data.data;
                 const topProductsData = topProductsResponse.data.data || [];
                 const salesReportData = salesReportResponse.data.data || {};
 
-                // Pass the complete salesReportData object to maintain the correct structure
                 setDashboardData({
                     ...metricsData,
                     topProducts: topProductsData,
-                    salesData: salesReportData, // Pass the complete salesReportData object
+                    salesData: salesReportData,
                 });
 
                 toast.success("Dashboard data loaded successfully");
@@ -152,10 +146,10 @@ const Dashboard = () => {
     const recentOrdersColumns = [
         {
             title: "Order ID",
-            dataIndex: "order_number",
-            key: "order_number",
+            dataIndex: "invoice_no",
+            key: "invoice_no",
             width: 120,
-            render: (_, record) => `#${record.invoice_no}`,
+            render: (value) => `#${value}`,
         },
         {
             title: "Customer",
@@ -285,9 +279,9 @@ const Dashboard = () => {
             </Row>
 
             <Divider className="my-8">
-                <Title level={4} className="m-0 flex items-center">
+                <h1 className="text-xl m-0 flex items-center">
                     <AreaChartOutlined className="mr-2" /> Analytics
-                </Title>
+                </h1>
             </Divider>
 
             {/* Sales trend chart and product distribution */}
@@ -303,9 +297,9 @@ const Dashboard = () => {
             </Row>
 
             <Divider className="my-8">
-                <Title level={4} className="m-0 flex items-center">
+                <h1 className="text-xl m-0 flex items-center">
                     <PieChartOutlined className="mr-2" /> Reports
-                </Title>
+                </h1>
             </Divider>
 
             {/* Tables section */}

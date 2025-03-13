@@ -1,7 +1,21 @@
 import React, { useMemo } from "react";
 import { Card, Empty, Typography, Spin } from "antd";
-import { Area } from "@ant-design/plots";
-import { LineChartOutlined, CalendarOutlined } from "@ant-design/icons";
+import {
+    LineChartOutlined,
+    CalendarOutlined,
+    ArrowUpOutlined,
+    ArrowDownOutlined,
+} from "@ant-design/icons";
+import {
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
+
 const { Text, Title } = Typography;
 
 const SalesChart = ({ salesData = {}, loading = false }) => {
@@ -23,7 +37,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
     const chartData = useMemo(
         () =>
             salesByDate.map((item) => ({
-                date: item._id,
+                date: item._id, // Use the date string directly
                 sales: item.total,
                 orders: item.orders || 0, // Ensure orders has a default value
             })),
@@ -78,78 +92,34 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
         return ((secondHalfTotal - firstHalfTotal) / firstHalfTotal) * 100;
     }, [chartData, hasSalesData]);
 
-    // Area chart configuration
-    const areaConfig = {
-        data: chartData,
-        xField: "date",
-        yField: "sales",
-        seriesField: "type",
-        xAxis: {
-            type: "time",
-            tickCount: 5,
-            label: {
-                formatter: (v) => {
-                    const date = new Date(v);
-                    return `${date.getDate()}/${date.getMonth() + 1}`;
-                },
-            },
-        },
-        yAxis: {
-            label: {
-                formatter: (v) => `$${Number(v).toLocaleString()}`,
-            },
-        },
-        smooth: true,
-        areaStyle: () => ({
-            fill: "l(270) 0:rgba(24,144,255,0.0) 0.5:rgba(24,144,255,0.2) 1:rgba(24,144,255,0.4)",
-        }),
-        line: {
-            color: "#1890ff",
-            size: 2.5,
-        },
-        point: {
-            size: 3,
-            shape: "circle",
-            style: {
-                fill: "#fff",
-                stroke: "#1890ff",
-                lineWidth: 2,
-            },
-        },
-        meta: {
-            sales: {
-                alias: "Sales Amount",
-                formatter: (v) => `$${Number(v).toLocaleString()}`,
-            },
-            date: {
-                alias: "Date",
-            },
-        },
-        tooltip: {
-            showMarkers: true,
-            formatter: (data) => {
-                const date = new Date(data.date);
-                const formattedDate = date.toLocaleDateString("en-US", {
-                    weekday: "short",
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                });
-
-                return {
-                    name: "Sales",
-                    value: `$${Number(data.sales).toLocaleString()}`,
-                    title: formattedDate,
-                };
-            },
-        },
-        animation: {
-            appear: {
-                animation: "wave-in",
-                duration: 1500,
-            },
-        },
+    // Custom tooltip for the Recharts component
+    const CustomTooltip = ({ active, payload, label }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-white p-3 border border-gray-200 shadow-md rounded">
+                    <p className="text-gray-600 font-medium">{label}</p>
+                    <p className="text-blue-600 font-bold">
+                        ${Number(payload[0].value).toLocaleString()}
+                    </p>
+                </div>
+            );
+        }
+        return null;
     };
+
+    // Format dollar values
+    const formatDollar = (value) => `$${Number(value).toLocaleString()}`;
+
+    // Get summary data directly from the API response if available
+    const summaryData = useMemo(() => {
+        if (salesData && salesData.summary) {
+            return salesData.summary;
+        }
+        return {
+            totalSales,
+            totalOrders,
+        };
+    }, [salesData, totalSales, totalOrders]);
 
     return (
         <Card
@@ -160,15 +130,6 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                     />
                     <span>Sales Trend</span>
                 </div>
-            }
-            extra={
-                <a
-                    href="/reports/sales"
-                    className="text-blue-500 hover:text-blue-700 flex items-center"
-                >
-                    <CalendarOutlined style={{ marginRight: 4 }} /> View Full
-                    Report
-                </a>
             }
             className="shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200"
             styles={{ padding: "12px 24px" }}
@@ -186,7 +147,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                 Total Sales
                             </Text>
                             <Title level={3} className="m-0 text-blue-700">
-                                ${totalSales.toLocaleString()}
+                                ${summaryData.totalSales.toLocaleString()}
                             </Title>
                         </div>
 
@@ -195,7 +156,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                 Orders
                             </Text>
                             <Title level={3} className="m-0 text-gray-700">
-                                {totalOrders}
+                                {summaryData.totalOrders}
                             </Title>
                         </div>
 
@@ -222,12 +183,14 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                 }`}
                             >
                                 {trend > 0 ? (
-                                    <LineChartOutlined
+                                    <ArrowUpOutlined
                                         style={{ marginRight: 8 }}
+                                        className="text-green-600"
                                     />
                                 ) : trend < 0 ? (
-                                    <LineChartOutlined
+                                    <ArrowDownOutlined
                                         style={{ marginRight: 8 }}
+                                        className="text-red-600"
                                     />
                                 ) : null}
                                 {trend > 0 ? "+" : ""}
@@ -236,12 +199,83 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                         </div>
                     </div>
 
-                    <div style={{ height: 350 }}>
-                        <Area {...areaConfig} />
+                    <div style={{ height: 350, width: "100%" }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart
+                                data={chartData}
+                                margin={{
+                                    top: 10,
+                                    right: 30,
+                                    left: 0,
+                                    bottom: 0,
+                                }}
+                            >
+                                <defs>
+                                    <linearGradient
+                                        id="colorSales"
+                                        x1="0"
+                                        y1="0"
+                                        x2="0"
+                                        y2="1"
+                                    >
+                                        <stop
+                                            offset="5%"
+                                            stopColor="#1890ff"
+                                            stopOpacity={0.1}
+                                        />
+                                        <stop
+                                            offset="95%"
+                                            stopColor="#1890ff"
+                                            stopOpacity={0.01}
+                                        />
+                                    </linearGradient>
+                                </defs>
+                                <XAxis
+                                    dataKey="date"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tickMargin={10}
+                                    tick={{ fill: "#6b7280", fontSize: 12 }}
+                                />
+                                <YAxis
+                                    tickFormatter={formatDollar}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tickMargin={10}
+                                    tick={{ fill: "#6b7280", fontSize: 12 }}
+                                />
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                    stroke="#e5e7eb"
+                                />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Area
+                                    type="monotone"
+                                    dataKey="sales"
+                                    stroke="#1890ff"
+                                    strokeWidth={2.5}
+                                    fillOpacity={1}
+                                    fill="url(#colorSales)"
+                                    activeDot={{
+                                        r: 6,
+                                        strokeWidth: 2,
+                                        stroke: "#fff",
+                                        fill: "#1890ff",
+                                    }}
+                                    dot={{
+                                        r: 4,
+                                        strokeWidth: 2,
+                                        stroke: "#1890ff",
+                                        fill: "#fff",
+                                    }}
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
 
                     <div className="text-xs text-gray-500 mt-4 text-right">
-                        Average daily sales: ${averageSales.toLocaleString()}
+                        Average sales per day: ${averageSales.toLocaleString()}
                     </div>
                 </>
             ) : (
