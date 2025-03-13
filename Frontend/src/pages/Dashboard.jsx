@@ -19,7 +19,6 @@ import ErrorDisplay from "../components/dashboard/ErrorDisplay";
 import { api } from "../api/api";
 import SalesChart from "../components/dashboard/SalesChart/.";
 
-const { Title } = Typography;
 const { useToken } = theme;
 
 const Dashboard = () => {
@@ -70,10 +69,10 @@ const Dashboard = () => {
                     salesData: salesReportData,
                 });
 
-                toast.success("Dashboard data loaded successfully");
+                toast.success("Data loaded successfully");
             } else {
                 setError("Failed to fetch dashboard data");
-                toast.error("Failed to load dashboard data");
+                toast.error("Failed to load data");
             }
         } catch (err) {
             console.error("Dashboard data fetch error:", err);
