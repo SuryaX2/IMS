@@ -8,6 +8,15 @@ const categorySchema = mongoose.Schema(
             trim: true,
             maxlength: 50,
         },
+        created_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        updated_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
     },
     { timestamps: true }
 );
@@ -25,6 +34,16 @@ categorySchema.statics.createCategory = async function (categoryData) {
 categorySchema.statics.getAllCategories = async function () {
     try {
         const categories = await this.find({});
+        return categories;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+// Get categories by user
+categorySchema.statics.getCategoriesByUser = async function (userId) {
+    try {
+        const categories = await this.find({ created_by: userId });
         return categories;
     } catch (error) {
         throw new Error(error.message);
