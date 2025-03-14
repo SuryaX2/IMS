@@ -44,6 +44,15 @@ const productSchema = mongoose.Schema(
             required: true,
             default: "default-product.png",
         },
+        created_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        updated_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
     },
     { timestamps: true }
 );
@@ -61,6 +70,18 @@ productSchema.statics.createProduct = async function (productData) {
 productSchema.statics.getAllProducts = async function () {
     try {
         const products = await this.find({})
+            .populate("category_id", "category_name")
+            .populate("unit_id", "unit_name");
+        return products;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+// Get products by user
+productSchema.statics.getProductsByUser = async function (userId) {
+    try {
+        const products = await this.find({ created_by: userId })
             .populate("category_id", "category_name")
             .populate("unit_id", "unit_name");
         return products;
@@ -134,6 +155,60 @@ productSchema.statics.getProductsWithDetails = async function () {
                     product_image: 1,
                     category_name: "$category.category_name",
                     unit_name: "$unit.unit_name",
+                    created_by: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                },
+            },
+        ]);
+
+        return products;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+// Get products with details by user
+productSchema.statics.getProductsWithDetailsByUser = async function (userId) {
+    try {
+        const products = await this.aggregate([
+            {
+                $match: { created_by: new mongoose.Types.ObjectId(userId) },
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "category_id",
+                    foreignField: "_id",
+                    as: "category",
+                },
+            },
+            {
+                $lookup: {
+                    from: "units",
+                    localField: "unit_id",
+                    foreignField: "_id",
+                    as: "unit",
+                },
+            },
+            {
+                $unwind: "$category",
+            },
+            {
+                $unwind: "$unit",
+            },
+            {
+                $project: {
+                    _id: 1,
+                    product_name: 1,
+                    product_code: 1,
+                    buying_price: 1,
+                    selling_price: 1,
+                    stock: 1,
+                    product_image: 1,
+                    category_name: "$category.category_name",
+                    unit_name: "$unit.unit_name",
+                    created_by: 1,
                     createdAt: 1,
                     updatedAt: 1,
                 },
