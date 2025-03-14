@@ -41,6 +41,15 @@ const orderSchema = mongoose.Schema(
             trim: true,
             maxlength: 10,
         },
+        created_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        updated_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
     },
     { timestamps: true }
 );
@@ -66,12 +75,34 @@ orderSchema.statics.getAllOrders = async function () {
     }
 };
 
-// Get order with customer details and order items
-orderSchema.statics.getOrderWithDetails = async function (orderId) {
+// Get orders by user
+orderSchema.statics.getOrdersByUser = async function (userId) {
     try {
+        const orders = await this.find({ created_by: userId })
+            .populate("customer_id", "name")
+            .sort({ createdAt: -1 });
+        return orders;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+// Get order with customer details and order items
+orderSchema.statics.getOrderWithDetails = async function (
+    orderId,
+    userId = null
+) {
+    try {
+        const matchStage = userId
+            ? {
+                  _id: new mongoose.Types.ObjectId(orderId),
+                  created_by: new mongoose.Types.ObjectId(userId),
+              }
+            : { _id: new mongoose.Types.ObjectId(orderId) };
+
         const order = await this.aggregate([
             {
-                $match: { _id: new mongoose.Types.ObjectId(orderId) },
+                $match: matchStage,
             },
             {
                 $lookup: {
@@ -101,6 +132,17 @@ orderSchema.statics.getOrderWithDetails = async function (orderId) {
                 },
             },
             {
+                $lookup: {
+                    from: "users",
+                    localField: "created_by",
+                    foreignField: "_id",
+                    as: "creator",
+                },
+            },
+            {
+                $unwind: "$creator",
+            },
+            {
                 $project: {
                     _id: 1,
                     invoice_no: 1,
@@ -113,6 +155,7 @@ orderSchema.statics.getOrderWithDetails = async function (orderId) {
                     customer_name: "$customer.name",
                     customer_phone: "$customer.phone",
                     customer_address: "$customer.address",
+                    created_by: "$creator.username",
                     orderItems: {
                         $map: {
                             input: "$orderItems",
