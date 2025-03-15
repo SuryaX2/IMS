@@ -60,8 +60,11 @@ app.use("/api/v1/reports", reportRouter);
     API : http://localhost:3001/api/v1/users/verify-change-password-otp - POST
  
  * categories
-    API : http://localhost:3001/api/v1/categories - GET, POST
-    API : http://localhost:3001/api/v1/categories/:id - PATCH, DELETE
+    API : http://localhost:3001/api/v1/categories - POST
+    API : http://localhost:3001/api/v1/categories/user - GET
+    API : http://localhost:3001/api/v1/categories/user/:id - PATCH, DELETE
+    API : http://localhost:3001/api/v1/categories/all - GET (Admin only)
+    API : http://localhost:3001/api/v1/categories/:id - PATCH, DELETE (Admin only)
  
  * customers
     API : http://localhost:3001/api/v1/customers - GET, POST

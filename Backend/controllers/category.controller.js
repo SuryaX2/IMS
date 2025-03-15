@@ -11,12 +11,21 @@ const createCategory = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        const existingCategory = await Category.findOne({ category_name });
+        const existingCategory = await Category.findOne({
+            category_name,
+            created_by: req.user._id,
+        });
+
         if (existingCategory) {
             return next(new ApiError(409, "Category already exists"));
         }
 
-        const category = await Category.createCategory({ category_name });
+        const categoryData = {
+            category_name,
+            created_by: req.user._id,
+        };
+
+        const category = await Category.createCategory(categoryData);
 
         return res
             .status(201)
@@ -38,7 +47,25 @@ const getAllCategories = asyncHandler(async (req, res, next) => {
                 new ApiResponse(
                     200,
                     categories,
-                    "Categories fetched successfully"
+                    "All categories fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+const getUserCategories = asyncHandler(async (req, res, next) => {
+    try {
+        const categories = await Category.getCategoriesByUser(req.user._id);
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    categories,
+                    "User categories fetched successfully"
                 )
             );
     } catch (error) {
@@ -55,20 +82,44 @@ const updateCategory = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        const category = await Category.findByIdAndUpdate(
-            id,
-            { category_name },
-            { new: true }
-        );
+        // Find the category first to check permissions
+        const category = await Category.findById(id);
 
         if (!category) {
             return next(new ApiError(404, "Category not found"));
         }
 
+        // Check if the user is the creator (admin check happens in middleware)
+        if (
+            !req.user.role === "admin" &&
+            !category.created_by.equals(req.user._id)
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to update this category"
+                )
+            );
+        }
+
+        // Update the category
+        const updatedCategory = await Category.findByIdAndUpdate(
+            id,
+            {
+                category_name,
+                updated_by: req.user._id,
+            },
+            { new: true }
+        );
+
         return res
             .status(200)
             .json(
-                new ApiResponse(200, category, "Category updated successfully")
+                new ApiResponse(
+                    200,
+                    updatedCategory,
+                    "Category updated successfully"
+                )
             );
     } catch (error) {
         return next(new ApiError(500, error.message));
@@ -79,11 +130,28 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        const category = await Category.findByIdAndDelete(id);
+        // Find the category first to check permissions
+        const category = await Category.findById(id);
 
         if (!category) {
             return next(new ApiError(404, "Category not found"));
         }
+
+        // Check if the user is the creator (admin check happens in middleware)
+        if (
+            !req.user.role === "admin" &&
+            !category.created_by.equals(req.user._id)
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to delete this category"
+                )
+            );
+        }
+
+        // Delete the category
+        await Category.findByIdAndDelete(id);
 
         return res
             .status(200)
@@ -93,4 +161,10 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
     }
 });
 
-export { createCategory, getAllCategories, updateCategory, deleteCategory };
+export {
+    createCategory,
+    getAllCategories,
+    getUserCategories,
+    updateCategory,
+    deleteCategory,
+};
