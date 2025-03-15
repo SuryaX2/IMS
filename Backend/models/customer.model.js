@@ -51,6 +51,11 @@ const customerSchema = mongoose.Schema(
             required: true,
             default: "default-customer.png",
         },
+        created_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
     },
     { timestamps: true }
 );
@@ -68,6 +73,16 @@ customerSchema.statics.createCustomer = async function (customerData) {
 customerSchema.statics.getAllCustomers = async function () {
     try {
         const customers = await this.find({});
+        return customers;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+// Get customers by user
+customerSchema.statics.getCustomersByUser = async function (userId) {
+    try {
+        const customers = await this.find({ created_by: userId });
         return customers;
     } catch (error) {
         throw new Error(error.message);
