@@ -8,6 +8,15 @@ const unitSchema = mongoose.Schema(
             trim: true,
             maxlength: 50,
         },
+        created_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        updated_by: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
     },
     { timestamps: true }
 );
@@ -25,6 +34,16 @@ unitSchema.statics.createUnit = async function (unitData) {
 unitSchema.statics.getAllUnits = async function () {
     try {
         const units = await this.find({});
+        return units;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+// Units created by a specific user
+unitSchema.statics.getUnitsByUser = async function (userId) {
+    try {
+        const units = await this.find({ created_by: userId });
         return units;
     } catch (error) {
         throw new Error(error.message);
