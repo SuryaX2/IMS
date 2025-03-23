@@ -28,8 +28,11 @@
 
 ## Customers
 
-- **Get/Create Customers**: `GET`, `POST` - [http://localhost:3001/api/v1/customers](http://localhost:3001/api/v1/customers)
-- **Update/Delete Customer**: `PATCH`, `DELETE` - [http://localhost:3001/api/v1/customers/:id](http://localhost:3001/api/v1/customers/:id)
+- **Create Customer**: `POST` - http://localhost:3001/api/v1/customers
+- **Get User's Customers**: `GET` - http://localhost:3001/api/v1/customers
+- **Update Customer**: `PATCH` - http://localhost:3001/api/v1/customers/:id
+- **Delete Customer**: `DELETE` - http://localhost:3001/api/v1/customers/:id
+- **Get All Customers (Admin Only)**: `GET` - http://localhost:3001/api/v1/customers/all
 
 ## Suppliers
 

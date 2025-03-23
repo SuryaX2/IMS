@@ -1,3 +1,4 @@
+// customer.controller.js
 import { Customer } from "../models/customer.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -23,6 +24,7 @@ const createCustomer = asyncHandler(async (req, res, next) => {
     try {
         const existingCustomer = await Customer.findOne({
             $or: [{ email }, { phone }],
+            created_by: req.user._id, // Check only within user's customers
         });
 
         if (existingCustomer) {
@@ -59,6 +61,7 @@ const createCustomer = asyncHandler(async (req, res, next) => {
             account_holder,
             account_number,
             photo: photoUrl,
+            created_by: req.user._id, // Set the current user as creator
         };
 
         const customer = await Customer.createCustomer(customerData);
@@ -77,6 +80,7 @@ const createCustomer = asyncHandler(async (req, res, next) => {
     }
 });
 
+// Get all customers (admin only)
 const getAllCustomers = asyncHandler(async (req, res, next) => {
     try {
         const customers = await Customer.getAllCustomers();
@@ -87,7 +91,26 @@ const getAllCustomers = asyncHandler(async (req, res, next) => {
                 new ApiResponse(
                     200,
                     customers,
-                    "Customers fetched successfully"
+                    "All customers fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+// Get current user's customers
+const getUserCustomers = asyncHandler(async (req, res, next) => {
+    try {
+        const customers = await Customer.getCustomersByUser(req.user._id);
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    customers,
+                    "Your customers fetched successfully"
                 )
             );
     } catch (error) {
@@ -100,6 +123,26 @@ const updateCustomer = asyncHandler(async (req, res, next) => {
     const updateData = req.body;
 
     try {
+        // Check if the customer exists
+        const existingCustomer = await Customer.findById(id);
+
+        if (!existingCustomer) {
+            return next(new ApiError(404, "Customer not found"));
+        }
+
+        // Only allow if admin or the creator of the customer
+        if (
+            req.user.role !== "admin" &&
+            existingCustomer.created_by.toString() !== req.user._id.toString()
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to update this customer"
+                )
+            );
+        }
+
         // If photo is being updated
         if (req.file) {
             const photoLocalPath = req.file.path;
@@ -113,10 +156,6 @@ const updateCustomer = asyncHandler(async (req, res, next) => {
         const customer = await Customer.findByIdAndUpdate(id, updateData, {
             new: true,
         });
-
-        if (!customer) {
-            return next(new ApiError(404, "Customer not found"));
-        }
 
         return res
             .status(200)
@@ -132,11 +171,27 @@ const deleteCustomer = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        const customer = await Customer.findByIdAndDelete(id);
+        // Check if the customer exists
+        const existingCustomer = await Customer.findById(id);
 
-        if (!customer) {
+        if (!existingCustomer) {
             return next(new ApiError(404, "Customer not found"));
         }
+
+        // Only allow if admin or the creator of the customer
+        if (
+            req.user.role !== "admin" &&
+            existingCustomer.created_by.toString() !== req.user._id.toString()
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to delete this customer"
+                )
+            );
+        }
+
+        const customer = await Customer.findByIdAndDelete(id);
 
         return res
             .status(200)
@@ -146,4 +201,10 @@ const deleteCustomer = asyncHandler(async (req, res, next) => {
     }
 });
 
-export { createCustomer, getAllCustomers, updateCustomer, deleteCustomer };
+export {
+    createCustomer,
+    getAllCustomers,
+    getUserCustomers,
+    updateCustomer,
+    deleteCustomer,
+};
