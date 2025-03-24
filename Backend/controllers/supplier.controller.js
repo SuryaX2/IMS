@@ -130,7 +130,7 @@ const updateSupplier = asyncHandler(async (req, res, next) => {
 
         // Check if user owns this supplier or is admin
         if (
-            existingSupplier.user.toString() !== req.user._id.toString() &&
+            existingSupplier.createdBy.toString() !== req.user._id.toString() &&
             req.user.role !== "admin"
         ) {
             return next(
@@ -178,7 +178,7 @@ const deleteSupplier = asyncHandler(async (req, res, next) => {
 
         // Check if user owns this supplier or is admin
         if (
-            existingSupplier.user.toString() !== req.user._id.toString() &&
+            existingSupplier.createdBy.toString() !== req.user._id.toString() &&
             req.user.role !== "admin"
         ) {
             return next(
