@@ -56,6 +56,11 @@ const supplierSchema = mongoose.Schema(
             required: true,
             default: "default-supplier.png",
         },
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
     },
     { timestamps: true }
 );
@@ -73,6 +78,15 @@ supplierSchema.statics.createSupplier = async function (supplierData) {
 supplierSchema.statics.getAllSuppliers = async function () {
     try {
         const suppliers = await this.find({});
+        return suppliers;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+supplierSchema.statics.getSuppliersByUserId = async function (userId) {
+    try {
+        const suppliers = await this.find({ createdBy: userId });
         return suppliers;
     } catch (error) {
         throw new Error(error.message);

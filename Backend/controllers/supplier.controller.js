@@ -25,6 +25,7 @@ const createSupplier = asyncHandler(async (req, res, next) => {
 
     try {
         const existingSupplier = await Supplier.findOne({
+            createdBy: req.user._id,
             $or: [{ email }, { phone }],
         });
 
@@ -64,6 +65,7 @@ const createSupplier = asyncHandler(async (req, res, next) => {
             account_holder,
             account_number,
             photo: photoUrl,
+            createdBy: req.user._id, // Associate supplier with the current user
         };
 
         const supplier = await Supplier.createSupplier(supplierData);
@@ -72,6 +74,24 @@ const createSupplier = asyncHandler(async (req, res, next) => {
             .status(201)
             .json(
                 new ApiResponse(201, supplier, "Supplier created successfully")
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+const getUserSuppliers = asyncHandler(async (req, res, next) => {
+    try {
+        const suppliers = await Supplier.getSuppliersByUserId(req.user._id);
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    suppliers,
+                    "User suppliers fetched successfully"
+                )
             );
     } catch (error) {
         return next(new ApiError(500, error.message));
@@ -88,7 +108,7 @@ const getAllSuppliers = asyncHandler(async (req, res, next) => {
                 new ApiResponse(
                     200,
                     suppliers,
-                    "Suppliers fetched successfully"
+                    "All suppliers fetched successfully"
                 )
             );
     } catch (error) {
@@ -101,6 +121,26 @@ const updateSupplier = asyncHandler(async (req, res, next) => {
     const updateData = req.body;
 
     try {
+        // Check if the supplier exists and belongs to the user
+        const existingSupplier = await Supplier.findById(id);
+
+        if (!existingSupplier) {
+            return next(new ApiError(404, "Supplier not found"));
+        }
+
+        // Check if user owns this supplier or is admin
+        if (
+            existingSupplier.user.toString() !== req.user._id.toString() &&
+            req.user.role !== "admin"
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to update this supplier"
+                )
+            );
+        }
+
         // If photo is being updated
         if (req.file) {
             const photoLocalPath = req.file.path;
@@ -114,10 +154,6 @@ const updateSupplier = asyncHandler(async (req, res, next) => {
         const supplier = await Supplier.findByIdAndUpdate(id, updateData, {
             new: true,
         });
-
-        if (!supplier) {
-            return next(new ApiError(404, "Supplier not found"));
-        }
 
         return res
             .status(200)
@@ -133,11 +169,27 @@ const deleteSupplier = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        const supplier = await Supplier.findByIdAndDelete(id);
+        // Check if the supplier exists and belongs to the user
+        const existingSupplier = await Supplier.findById(id);
 
-        if (!supplier) {
+        if (!existingSupplier) {
             return next(new ApiError(404, "Supplier not found"));
         }
+
+        // Check if user owns this supplier or is admin
+        if (
+            existingSupplier.user.toString() !== req.user._id.toString() &&
+            req.user.role !== "admin"
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to delete this supplier"
+                )
+            );
+        }
+
+        await Supplier.findByIdAndDelete(id);
 
         return res
             .status(200)
@@ -147,4 +199,10 @@ const deleteSupplier = asyncHandler(async (req, res, next) => {
     }
 });
 
-export { createSupplier, getAllSuppliers, updateSupplier, deleteSupplier };
+export {
+    createSupplier,
+    getUserSuppliers,
+    getAllSuppliers,
+    updateSupplier,
+    deleteSupplier,
+};

@@ -36,8 +36,9 @@
 
 ## Suppliers
 
-- **Get/Create Suppliers**: `GET`, `POST` - [http://localhost:3001/api/v1/suppliers](http://localhost:3001/api/v1/suppliers)
-- **Update/Delete Supplier**: `PATCH`, `DELETE` - [http://localhost:3001/api/v1/suppliers/:id](http://localhost:3001/api/v1/suppliers/:id)
+- **Get User's Suppliers/Create Supplier**: `GET`, `POST` - [http://localhost:3001/api/v1/suppliers](http://localhost:3001/api/v1/suppliers)
+- **Update/Delete User's Supplier**: `PATCH`, `DELETE` - [http://localhost:3001/api/v1/suppliers/:id](http://localhost:3001/api/v1/suppliers/:id)
+- **Get All Suppliers (Admin Only)**: `GET` - [http://localhost:3001/api/v1/suppliers/all](http://localhost:3001/api/v1/suppliers/all)
 
 ## Units
 
