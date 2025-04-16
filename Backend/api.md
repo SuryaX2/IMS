@@ -42,8 +42,11 @@
 
 ## Units
 
-- **Get/Create Units**: `GET`, `POST` - [http://localhost:3001/api/v1/units](http://localhost:3001/api/v1/units)
-- **Update/Delete Unit**: `PATCH`, `DELETE` - [http://localhost:3001/api/v1/units/:id](http://localhost:3001/api/v1/units/:id)
+- **Get User's Units**: `GET` - [http://localhost:3001/api/v1/units](http://localhost:3001/api/v1/units)
+- **Create Unit**: `POST` - [http://localhost:3001/api/v1/units](http://localhost:3001/api/v1/units)
+- **Update User's Unit**: `PATCH` - [http://localhost:3001/api/v1/units/:id](http://localhost:3001/api/v1/units/:id)
+- **Delete User's Unit**: `DELETE` - [http://localhost:3001/api/v1/units/:id](http://localhost:3001/api/v1/units/:id)
+- **Get All Units (Admin Only)**: `GET` - [http://localhost:3001/api/v1/units/all](http://localhost:3001/api/v1/units/all)
 
 ## Products
 

@@ -11,12 +11,19 @@ const createUnit = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        const existingUnit = await Unit.findOne({ unit_name });
+        const existingUnit = await Unit.findOne({
+            unit_name,
+            created_by: req.user._id,
+        });
+
         if (existingUnit) {
             return next(new ApiError(409, "Unit already exists"));
         }
 
-        const unit = await Unit.createUnit({ unit_name });
+        const unit = await Unit.createUnit({
+            unit_name,
+            created_by: req.user._id,
+        });
 
         if (!unit) {
             return next(new ApiError(500, "Failed to create unit"));
@@ -32,7 +39,15 @@ const createUnit = asyncHandler(async (req, res, next) => {
 
 const getAllUnits = asyncHandler(async (req, res, next) => {
     try {
-        const units = await Unit.getAllUnits();
+        let units;
+
+        if (req.user.role === "admin") {
+            // Admin can see all units
+            units = await Unit.getAllUnits();
+        } else {
+            // Regular user can only see their units
+            units = await Unit.getUnitsByUser(req.user._id);
+        }
 
         return res
             .status(200)
@@ -51,14 +66,40 @@ const updateUnit = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        const unit = await Unit.findByIdAndUpdate(
-            id,
-            { unit_name },
-            { new: true }
-        );
+        let unit;
+
+        if (req.user.role === "admin") {
+            // Admin can update any unit
+            unit = await Unit.findByIdAndUpdate(
+                id,
+                {
+                    unit_name,
+                    updated_by: req.user._id,
+                },
+                { new: true }
+            );
+        } else {
+            // Regular user can only update their own units
+            unit = await Unit.findOneAndUpdate(
+                {
+                    _id: id,
+                    created_by: req.user._id,
+                },
+                {
+                    unit_name,
+                    updated_by: req.user._id,
+                },
+                { new: true }
+            );
+        }
 
         if (!unit) {
-            return next(new ApiError(404, "Unit not found"));
+            return next(
+                new ApiError(
+                    404,
+                    "Unit not found or you don't have permission to update it"
+                )
+            );
         }
 
         return res
@@ -73,10 +114,26 @@ const deleteUnit = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        const unit = await Unit.findByIdAndDelete(id);
+        let unit;
+
+        if (req.user.role === "admin") {
+            // Admin can delete any unit
+            unit = await Unit.findByIdAndDelete(id);
+        } else {
+            // Regular user can only delete their own units
+            unit = await Unit.findOneAndDelete({
+                _id: id,
+                created_by: req.user._id,
+            });
+        }
 
         if (!unit) {
-            return next(new ApiError(404, "Unit not found"));
+            return next(
+                new ApiError(
+                    404,
+                    "Unit not found or you don't have permission to delete it"
+                )
+            );
         }
 
         return res
