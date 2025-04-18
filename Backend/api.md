@@ -50,8 +50,11 @@
 
 ## Products
 
-- **Get/Create Products**: `GET`, `POST` - [http://localhost:3001/api/v1/products](http://localhost:3001/api/v1/products)
-- **Update/Delete Product**: `PATCH`, `DELETE` - [http://localhost:3001/api/v1/products/:id](http://localhost:3001/api/v1/products/:id)
+- **Get User's Products**: `GET` - [http://localhost:3001/api/v1/products](http://localhost:3001/api/v1/products)
+- **Create Product**: `POST` - [http://localhost:3001/api/v1/products](http://localhost:3001/api/v1/products)
+- **Update Product**: `PATCH` - [http://localhost:3001/api/v1/products/:id](http://localhost:3001/api/v1/products/:id)
+- **Delete Product**: `DELETE` - [http://localhost:3001/api/v1/products/:id](http://localhost:3001/api/v1/products/:id)
+- **Get All Products (Admin Only)**: `GET` - [http://localhost:3001/api/v1/products/all](http://localhost:3001/api/v1/products/all)
 
 ## Purchases
 

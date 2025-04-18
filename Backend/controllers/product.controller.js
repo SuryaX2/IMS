@@ -26,7 +26,12 @@ const createProduct = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        const existingProduct = await Product.findOne({ product_code });
+        // Check if product code already exists for this user
+        const existingProduct = await Product.findOne({
+            product_code,
+            created_by: req.user._id,
+        });
+
         if (existingProduct) {
             return next(
                 new ApiError(409, "Product with this code already exists")
@@ -57,6 +62,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
             selling_price,
             product_image: productImageUrl,
             stock: 0, // Initial stock set to 0
+            created_by: req.user._id, // Set the current user as creator
         };
 
         const product = await Product.createProduct(productData);
@@ -79,8 +85,13 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
     const { search, category, min_stock, max_stock, sort_by, sort_order } =
         req.query;
 
-    // Build filter object
+    // Build filter object - start with filtering by user unless admin
     let filter = {};
+
+    // If not admin, only show products created by this user
+    if (req.user.role !== "admin") {
+        filter.created_by = req.user._id;
+    }
 
     if (search) {
         filter.$or = [
@@ -112,6 +123,7 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
         const products = await Product.find(filter)
             .populate("category_id", "category_name")
             .populate("unit_id", "unit_name")
+            .populate("created_by", "username") // Add user info
             .sort(sortOptions);
 
         return res
@@ -129,6 +141,26 @@ const updateProduct = asyncHandler(async (req, res, next) => {
     const updateData = req.body;
 
     try {
+        // Find the product first to check ownership
+        const existingProduct = await Product.findById(id);
+
+        if (!existingProduct) {
+            return next(new ApiError(404, "Product not found"));
+        }
+
+        // Check if user owns this product or is admin
+        if (
+            req.user.role !== "admin" &&
+            existingProduct.created_by.toString() !== req.user._id.toString()
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to update this product"
+                )
+            );
+        }
+
         // If product image is being updated
         if (req.file) {
             const imageLocalPath = req.file.path;
@@ -139,13 +171,12 @@ const updateProduct = asyncHandler(async (req, res, next) => {
             }
         }
 
+        // Add updated_by field
+        updateData.updated_by = req.user._id;
+
         const product = await Product.findByIdAndUpdate(id, updateData, {
             new: true,
         });
-
-        if (!product) {
-            return next(new ApiError(404, "Product not found"));
-        }
 
         return res
             .status(200)
@@ -161,11 +192,28 @@ const deleteProduct = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        const product = await Product.findByIdAndDelete(id);
+        // Find the product first to check ownership
+        const existingProduct = await Product.findById(id);
 
-        if (!product) {
+        if (!existingProduct) {
             return next(new ApiError(404, "Product not found"));
         }
+
+        // Check if user owns this product or is admin
+        if (
+            req.user.role !== "admin" &&
+            existingProduct.created_by.toString() !== req.user._id.toString()
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to delete this product"
+                )
+            );
+        }
+
+        // Delete the product
+        await Product.findByIdAndDelete(id);
 
         return res
             .status(200)
@@ -175,4 +223,29 @@ const deleteProduct = asyncHandler(async (req, res, next) => {
     }
 });
 
-export { createProduct, getAllProducts, updateProduct, deleteProduct };
+// New admin-only endpoint to get all products
+const getAllProductsAdmin = asyncHandler(async (req, res, next) => {
+    try {
+        const products = await Product.getProductsWithDetails();
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    products,
+                    "All products fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+export {
+    createProduct,
+    getAllProducts,
+    updateProduct,
+    deleteProduct,
+    getAllProductsAdmin,
+};
