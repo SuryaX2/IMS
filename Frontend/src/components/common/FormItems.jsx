@@ -65,7 +65,7 @@ export const PasswordFormItem = ({
             rules={[
                 {
                     required: required,
-                    message: `Please input your ${label.toLowerCase()}!`,
+                    message: `Please input your Password!`,
                 },
                 name === "password" && {
                     min: 6,
