@@ -41,7 +41,7 @@ const ProfileHeader = ({
             
             {/* Background Header with Mesh Gradient */}
             <div 
-                className="h-48 md:h-56 w-full relative overflow-hidden"
+                className="h-36 sm:h-40 md:h-56 w-full relative overflow-hidden"
                 style={{
                     background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 35%, #7c3aed 70%, #6366f1 100%)',
                 }}
@@ -51,11 +51,11 @@ const ProfileHeader = ({
                 </svg>
             </div>
             
-            <div className="relative px-6 pb-8">
-                {/* Avatar Section */}
-                <div className="absolute -top-20 left-8 md:left-10">
+            <div className="relative px-4 sm:px-6 pb-8 pt-16 sm:pt-4 md:pt-0">
+                {/* Avatar Section - Repositioned for mobile */}
+                <div className="absolute -top-16 sm:-top-16 md:-top-20 left-1/2 sm:left-8 md:left-10 transform -translate-x-1/2 sm:translate-x-0">
                     <div className="relative flex items-center justify-center">
-                        <div className="absolute w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full animate-pulse opacity-50"></div>
+                        <div className="absolute w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full animate-pulse opacity-50"></div>
                         <div className="rounded-full p-1 bg-white shadow-2xl">
                             <Badge
                                 dot={isVerified}
@@ -65,10 +65,11 @@ const ProfileHeader = ({
                             >
                                 <Spin spinning={avatarLoading}>
                                     <Avatar
-                                        size={128}
+                                        size={96}
                                         src={user?.avatar}
                                         icon={!user?.avatar && <UserOutlined />}
-                                        className="border-4 border-white shadow-xl"
+                                        className="border-4 border-white shadow-xl sm:w-28 sm:h-28 md:w-32 md:h-32"
+                                        style={{ width: '96px', height: '96px' }}
                                     />
                                 </Spin>
                             </Badge>
@@ -84,7 +85,7 @@ const ProfileHeader = ({
                                 type="primary"
                                 shape="circle"
                                 icon={<CameraOutlined />}
-                                size="large"
+                                size="middle"
                                 className="absolute bottom-0 right-0 bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:scale-110 transition-transform duration-300"
                             />
                         </Upload>
@@ -92,10 +93,10 @@ const ProfileHeader = ({
                 </div>
                 
                 {/* User Info Section */}
-                <div className="mt-2 md:mt-0 md:ml-40 p-4">
+                <div className="mt-12 sm:mt-16 md:mt-0 md:ml-40 p-4">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                        <div className="text-center md:text-left md:mt-2">
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-1 flex items-center flex-wrap">
+                        <div className="text-center md:text-left">
+                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-1 flex items-center justify-center md:justify-start flex-wrap">
                                 {user?.username}
                                 {isVerified && (
                                     <Tooltip title="Verified Account">
@@ -105,9 +106,9 @@ const ProfileHeader = ({
                                     </Tooltip>
                                 )}
                             </h1>
-                            <div className="flex items-center gap-2 mb-4 justify-center md:justify-start text-gray-600">
+                            <div className="flex items-center gap-2 mb-4 justify-center md:justify-start text-gray-600 text-sm sm:text-base">
                                 <MailOutlined className="text-blue-500" />
-                                <p>{user?.email}</p>
+                                <p className="truncate max-w-xs sm:max-w-md">{user?.email}</p>
                             </div>
                             <p className="text-gray-500 max-w-md hidden md:block">
                                 {user?.role === 'admin' 
@@ -115,7 +116,7 @@ const ProfileHeader = ({
                                     : 'Standard user account with basic access'}
                             </p>
                         </div>
-                        <div className="mt-4 md:mt-0">
+                        <div className="mt-4 md:mt-0 flex justify-center md:justify-end">
                             <Button
                                 type="primary"
                                 icon={<EditOutlined />}
@@ -128,47 +129,47 @@ const ProfileHeader = ({
                     </div>
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-                        <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-6">
+                        <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group">
                             <div className="flex items-center gap-3">
-                                <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-3 rounded-full group-hover:bg-blue-200 transition-colors duration-300">
-                                    <CalendarOutlined className="text-blue-500 text-lg" />
+                                <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-2 sm:p-3 rounded-full group-hover:bg-blue-200 transition-colors duration-300">
+                                    <CalendarOutlined className="text-blue-500 text-base sm:text-lg" />
                                 </div>
                                 <div>
                                     <Text className="text-gray-500 text-xs uppercase tracking-wider">Member Since</Text>
-                                    <p className="text-gray-800 font-medium">
+                                    <p className="text-gray-800 font-medium text-sm sm:text-base">
                                         {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group">
+                        <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group">
                             <div className="flex items-center gap-3">
-                                <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-3 rounded-full group-hover:bg-purple-200 transition-colors duration-300">
-                                    <IdcardOutlined className="text-purple-500 text-lg" />
+                                <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-2 sm:p-3 rounded-full group-hover:bg-purple-200 transition-colors duration-300">
+                                    <IdcardOutlined className="text-purple-500 text-base sm:text-lg" />
                                 </div>
                                 <div>
                                     <Text className="text-gray-500 text-xs uppercase tracking-wider">Account Type</Text>
-                                    <p className="text-gray-800 font-medium">
+                                    <p className="text-gray-800 font-medium text-sm sm:text-base">
                                         {user?.role || "Standard User"}
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group">
+                        <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group">
                             <div className="flex items-center gap-3">
-                                <div className={`p-3 rounded-full transition-colors duration-300 ${
+                                <div className={`p-2 sm:p-3 rounded-full transition-colors duration-300 ${
                                     isVerified 
                                     ? "bg-gradient-to-br from-green-100 to-green-200 group-hover:bg-green-200" 
                                     : "bg-gradient-to-br from-red-100 to-red-200 group-hover:bg-red-200"
                                 }`}>
                                     <SecurityScanOutlined className={
-                                        isVerified ? "text-green-500 text-lg" : "text-red-500 text-lg"
+                                        isVerified ? "text-green-500 text-base sm:text-lg" : "text-red-500 text-base sm:text-lg"
                                     } />
                                 </div>
                                 <div>
                                     <Text className="text-gray-500 text-xs uppercase tracking-wider">Account Status</Text>
-                                    <p className={isVerified ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                                    <p className={isVerified ? "text-green-600 font-medium text-sm sm:text-base" : "text-red-600 font-medium text-sm sm:text-base"}>
                                         {isVerified ? "Verified" : "Unverified"}
                                     </p>
                                 </div>
