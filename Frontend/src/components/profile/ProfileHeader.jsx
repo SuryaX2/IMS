@@ -7,8 +7,7 @@ import {
     Upload,
     Button,
     Tooltip,
-    Row,
-    Col,
+    Typography,
 } from "antd";
 import {
     UserOutlined,
@@ -16,10 +15,12 @@ import {
     MailOutlined,
     CheckCircleOutlined,
     CalendarOutlined,
+    CameraOutlined,
     IdcardOutlined,
     SecurityScanOutlined,
-    CameraOutlined,
 } from "@ant-design/icons";
+
+const { Text } = Typography;
 
 const ProfileHeader = ({
     user,
@@ -31,127 +32,149 @@ const ProfileHeader = ({
 }) => {
     return (
         <Card 
-            className="overflow-hidden mb-8 border-0 shadow-2xl transition-all duration-300 rounded-3xl"
-            style={{
-                background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #3B82F6 100%)',
-            }}
+            className="overflow-hidden mb-8 border-0 shadow-2xl transition-all duration-300 rounded-2xl"
+            bodyStyle={{ padding: 0 }}
         >
-            <div className="flex flex-col md:flex-row items-center p-6 md:p-10 gap-8">
-                <div className="relative">
-                    <Badge
-                        dot={isVerified}
-                        color="green"
-                        offset={[-4, 4]}
-                        size="large"
-                        title={
-                            isVerified
-                                ? "Verified Account"
-                                : "Unverified Account"
-                        }
-                    >
-                        <div className="rounded-full p-2 bg-white/30 backdrop-blur-sm">
-                            <Spin spinning={avatarLoading}>
-                                <Avatar
-                                    size={120}
-                                    src={user?.avatar}
-                                    icon={!user?.avatar && <UserOutlined />}
-                                    className="border-4 border-white shadow-xl"
-                                />
-                            </Spin>
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600 rounded-full opacity-10 transform translate-x-1/2 -translate-y-1/2 z-0"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600 rounded-full opacity-10 transform -translate-x-1/2 translate-y-1/2 z-0"></div>
+            
+            {/* Background Header with Mesh Gradient */}
+            <div 
+                className="h-48 md:h-56 w-full relative overflow-hidden"
+                style={{
+                    background: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 35%, #7c3aed 70%, #6366f1 100%)',
+                }}
+            >
+                <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 50L60 45.7C120 41.3 240 32.7 360 30.8C480 29 600 34 720 38.3C840 42.7 960 46.3 1080 43.3C1200 40.3 1320 30.7 1380 25.8L1440 21V101H1380C1320 101 1200 101 1080 101C960 101 840 101 720 101C600 101 480 101 360 101C240 101 120 101 60 101H0V50Z" fill="white"/>
+                </svg>
+            </div>
+            
+            <div className="relative px-6 pb-8">
+                {/* Avatar Section */}
+                <div className="absolute -top-20 left-8 md:left-10">
+                    <div className="relative flex items-center justify-center">
+                        <div className="absolute w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full animate-pulse opacity-50"></div>
+                        <div className="rounded-full p-1 bg-white shadow-2xl">
+                            <Badge
+                                dot={isVerified}
+                                color="green"
+                                offset={[-4, 4]}
+                                size="large"
+                            >
+                                <Spin spinning={avatarLoading}>
+                                    <Avatar
+                                        size={128}
+                                        src={user?.avatar}
+                                        icon={!user?.avatar && <UserOutlined />}
+                                        className="border-4 border-white shadow-xl"
+                                    />
+                                </Spin>
+                            </Badge>
                         </div>
-                    </Badge>
-                    <Upload
-                        name="avatar"
-                        showUploadList={false}
-                        customRequest={customUploadRequest}
-                        onChange={handleAvatarUpload}
-                    >
-                        <Button
-                            type="primary"
-                            shape="circle"
-                            icon={<CameraOutlined />}
-                            size="large"
-                            className="absolute bottom-0 right-0 bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:scale-110 transition-transform duration-300"
-                        />
-                    </Upload>
+                        
+                        <Upload
+                            name="avatar"
+                            showUploadList={false}
+                            customRequest={customUploadRequest}
+                            onChange={handleAvatarUpload}
+                        >
+                            <Button
+                                type="primary"
+                                shape="circle"
+                                icon={<CameraOutlined />}
+                                size="large"
+                                className="absolute bottom-0 right-0 bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:scale-110 transition-transform duration-300"
+                            />
+                        </Upload>
+                    </div>
                 </div>
-
-                <div className="text-center md:text-left flex-1">
+                
+                {/* User Info Section */}
+                <div className="mt-2 md:mt-0 md:ml-40 p-4">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <h1 className="text-3xl md:text-4xl font-bold mb-1 text-white">
+                        <div className="text-center md:text-left md:mt-2">
+                            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-1 flex items-center flex-wrap">
                                 {user?.username}
-                            </h1>
-                            <div className="flex items-center gap-2 mb-4 justify-center md:justify-start text-white/90">
-                                <MailOutlined className="text-white" />
-                                <p>{user?.email}</p>
                                 {isVerified && (
-                                    <Tooltip title="Email Verified">
-                                        <CheckCircleOutlined className="text-green-400" />
+                                    <Tooltip title="Verified Account">
+                                        <span className="inline-flex ml-2 items-center justify-center bg-green-100 rounded-full p-1">
+                                            <CheckCircleOutlined className="text-green-500 text-sm" />
+                                        </span>
                                     </Tooltip>
                                 )}
+                            </h1>
+                            <div className="flex items-center gap-2 mb-4 justify-center md:justify-start text-gray-600">
+                                <MailOutlined className="text-blue-500" />
+                                <p>{user?.email}</p>
                             </div>
+                            <p className="text-gray-500 max-w-md hidden md:block">
+                                {user?.role === 'admin' 
+                                    ? 'Administrator account with extended privileges' 
+                                    : 'Standard user account with basic access'}
+                            </p>
                         </div>
                         <div className="mt-4 md:mt-0">
                             <Button
-                                type="default"
+                                type="primary"
                                 icon={<EditOutlined />}
                                 onClick={() => setEditMode(true)}
-                                className="border-white text-indigo-700 hover:text-indigo-800 bg-white hover:bg-white/90 rounded-full shadow-md px-6 hover:scale-105 transition-all duration-300"
-                                size="large"
+                                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-0 rounded-full shadow-md px-6 h-10 flex items-center gap-1"
                             >
                                 Edit Profile
                             </Button>
                         </div>
                     </div>
 
-                    <Row gutter={[16, 16]} className="mt-6">
-                        <Col xs={24} sm={12} md={8}>
-                            <div className="flex items-center gap-3 mb-2 bg-white/20 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-white/30 hover:bg-white/30 transition-all duration-300">
-                                <CalendarOutlined className="text-white text-2xl" />
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+                        <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-3 rounded-full group-hover:bg-blue-200 transition-colors duration-300">
+                                    <CalendarOutlined className="text-blue-500 text-lg" />
+                                </div>
                                 <div>
-                                    <p className="text-white/70 text-xs block">
-                                        Member Since
-                                    </p>
-                                    <p className="text-white font-medium">
-                                        {user?.createdAt
-                                            ? new Date(
-                                                  user.createdAt
-                                              ).toLocaleDateString()
-                                            : "N/A"}
+                                    <Text className="text-gray-500 text-xs uppercase tracking-wider">Member Since</Text>
+                                    <p className="text-gray-800 font-medium">
+                                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
                                     </p>
                                 </div>
                             </div>
-                        </Col>
-                        <Col xs={24} sm={12} md={8}>
-                            <div className="flex items-center gap-3 mb-2 bg-white/20 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-white/30 hover:bg-white/30 transition-all duration-300">
-                                <IdcardOutlined className="text-white text-2xl" />
+                        </div>
+                        <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-3 rounded-full group-hover:bg-purple-200 transition-colors duration-300">
+                                    <IdcardOutlined className="text-purple-500 text-lg" />
+                                </div>
                                 <div>
-                                    <p className="text-white/70 text-xs block">
-                                        Account Type
-                                    </p>
-                                    <p className="text-white font-medium">
+                                    <Text className="text-gray-500 text-xs uppercase tracking-wider">Account Type</Text>
+                                    <p className="text-gray-800 font-medium">
                                         {user?.role || "Standard User"}
                                     </p>
                                 </div>
                             </div>
-                        </Col>
-                        <Col xs={24} sm={12} md={8}>
-                            <div className="flex items-center gap-3 mb-2 bg-white/20 backdrop-blur-sm p-4 rounded-xl shadow-sm border border-white/30 hover:bg-white/30 transition-all duration-300">
-                                <SecurityScanOutlined className="text-white text-2xl" />
+                        </div>
+                        <div className="bg-white rounded-xl shadow-md p-4 border border-gray-100 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group">
+                            <div className="flex items-center gap-3">
+                                <div className={`p-3 rounded-full transition-colors duration-300 ${
+                                    isVerified 
+                                    ? "bg-gradient-to-br from-green-100 to-green-200 group-hover:bg-green-200" 
+                                    : "bg-gradient-to-br from-red-100 to-red-200 group-hover:bg-red-200"
+                                }`}>
+                                    <SecurityScanOutlined className={
+                                        isVerified ? "text-green-500 text-lg" : "text-red-500 text-lg"
+                                    } />
+                                </div>
                                 <div>
-                                    <p className="text-white/70 text-xs block">
-                                        Account Status
-                                    </p>
-                                    <p
-                                        className={`font-medium ${isVerified ? "text-green-300" : "text-red-300"}`}
-                                    >
+                                    <Text className="text-gray-500 text-xs uppercase tracking-wider">Account Status</Text>
+                                    <p className={isVerified ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
                                         {isVerified ? "Verified" : "Unverified"}
                                     </p>
                                 </div>
                             </div>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </div>
             </div>
         </Card>
