@@ -60,8 +60,11 @@
 
 ## Purchases
 
-- **Get/Create Purchases**: `GET`, `POST` - [http://localhost:3001/api/v1/purchases](http://localhost:3001/api/v1/purchases)
-- **Get/Update Purchase by ID**: `GET`, `PATCH` - [http://localhost:3001/api/v1/purchases/:id](http://localhost:3001/api/v1/purchases/:id)
+- **Create Purchase**: `POST` - [http://localhost:3001/api/v1/purchases](http://localhost:3001/api/v1/purchases)
+- **Get User's Purchases**: `GET` - [http://localhost:3001/api/v1/purchases](http://localhost:3001/api/v1/purchases)
+- **Get Purchase Details**: `GET` - [http://localhost:3001/api/v1/purchases/:id](http://localhost:3001/api/v1/purchases/:id)
+- **Update Purchase Status**: `PATCH` - [http://localhost:3001/api/v1/purchases/:id](http://localhost:3001/api/v1/purchases/:id)
+- **Get All Purchases (Admin Only)**: `GET` - [http://localhost:3001/api/v1/purchases/all](http://localhost:3001/api/v1/purchases/all)
 
 ## Orders
 

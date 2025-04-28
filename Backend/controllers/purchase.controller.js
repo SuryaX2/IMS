@@ -69,7 +69,18 @@ const createPurchase = asyncHandler(async (req, res, next) => {
 
 const getAllPurchases = asyncHandler(async (req, res, next) => {
     try {
-        const purchases = await Purchase.getAllPurchases();
+        let purchases;
+
+        // If user is admin, get all purchases
+        if (req.user.role === "admin") {
+            purchases = await Purchase.getAllPurchases();
+        } else {
+            // Otherwise, get only user's purchases
+            purchases = await Purchase.find({ created_by: req.user._id })
+                .populate("supplier_id", "name shopname")
+                .populate("created_by", "username")
+                .sort({ createdAt: -1 });
+        }
 
         return res
             .status(200)
@@ -89,6 +100,26 @@ const getPurchaseDetails = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     try {
+        // First find the purchase to check ownership
+        const purchase = await Purchase.findById(id);
+
+        if (!purchase) {
+            return next(new ApiError(404, "Purchase not found"));
+        }
+
+        // Check if user is admin or the creator of the purchase
+        if (
+            req.user.role !== "admin" &&
+            !purchase.created_by.equals(req.user._id)
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to view this purchase"
+                )
+            );
+        }
+
         const details = await PurchaseDetail.getDetailsByPurchaseId(id);
 
         return res
@@ -114,7 +145,27 @@ const updatePurchaseStatus = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        const purchase = await Purchase.findByIdAndUpdate(
+        // First find the purchase to check ownership
+        const purchase = await Purchase.findById(id);
+
+        if (!purchase) {
+            return next(new ApiError(404, "Purchase not found"));
+        }
+
+        // Check if user is admin or the creator of the purchase
+        if (
+            req.user.role !== "admin" &&
+            !purchase.created_by.equals(req.user._id)
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to update this purchase"
+                )
+            );
+        }
+
+        const updatedPurchase = await Purchase.findByIdAndUpdate(
             id,
             {
                 purchase_status,
@@ -122,10 +173,6 @@ const updatePurchaseStatus = asyncHandler(async (req, res, next) => {
             },
             { new: true }
         );
-
-        if (!purchase) {
-            return next(new ApiError(404, "Purchase not found"));
-        }
 
         // If purchase is now approved/completed, update stock levels
         if (purchase_status === "completed" || purchase_status === "approved") {
@@ -145,7 +192,7 @@ const updatePurchaseStatus = asyncHandler(async (req, res, next) => {
             .json(
                 new ApiResponse(
                     200,
-                    purchase,
+                    updatedPurchase,
                     "Purchase status updated successfully"
                 )
             );
