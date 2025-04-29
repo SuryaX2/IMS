@@ -68,7 +68,8 @@
 
 ## Orders
 
-- **Get/Create Orders**: `GET`, `POST` - [http://localhost:3001/api/v1/orders](http://localhost:3001/api/v1/orders)
+- **Create Order**: `POST` - [http://localhost:3001/api/v1/orders](http://localhost:3001/api/v1/orders)
+- **Get Orders**: `GET` - [http://localhost:3001/api/v1/orders](http://localhost:3001/api/v1/orders)
 - **Get Order Details**: `GET` - [http://localhost:3001/api/v1/orders/:id/details](http://localhost:3001/api/v1/orders/:id/details)
 - **Update Order Status**: `PATCH` - [http://localhost:3001/api/v1/orders/:id/status](http://localhost:3001/api/v1/orders/:id/status)
 - **Get Order Invoice**: `GET` - [http://localhost:3001/api/v1/orders/:id/invoice](http://localhost:3001/api/v1/orders/:id/invoice)

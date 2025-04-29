@@ -1,5 +1,6 @@
 import { Order } from "../models/order.model.js";
 import { OrderDetail } from "../models/order-detail.model.js";
+import { Product } from "../models/product.model.js"; // Added import for Product model
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -35,7 +36,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
             return next(new ApiError(409, "Invoice number already exists"));
         }
 
-        // Create order
+        // Create order with the current user as creator
         const order = await Order.create({
             customer_id,
             order_date: new Date(),
@@ -45,6 +46,8 @@ const createOrder = asyncHandler(async (req, res, next) => {
             gst,
             total,
             invoice_no,
+            created_by: req.user._id,
+            updated_by: req.user._id,
         });
 
         // Create order details
@@ -85,6 +88,11 @@ const getAllOrders = asyncHandler(async (req, res, next) => {
 
     // Build filter object
     let filter = {};
+
+    // Only show user's own orders unless they're an admin
+    if (req.user.role !== "admin") {
+        filter.created_by = req.user._id;
+    }
 
     if (search) {
         filter.$or = [{ invoice_no: { $regex: search, $options: "i" } }];
@@ -152,10 +160,30 @@ const getAllOrders = asyncHandler(async (req, res, next) => {
     }
 });
 
+// This can remain the same as getAllOrders already handles both cases
+const getAllOrdersAdmin = getAllOrders;
+
 const getOrderDetails = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     try {
+        // Check if the order exists and belongs to the current user (if not admin)
+        const order = await Order.findById(id);
+
+        if (!order) {
+            return next(new ApiError(404, "Order not found"));
+        }
+
+        // If not admin, verify the order belongs to the current user
+        if (
+            req.user.role !== "admin" &&
+            order.created_by.toString() !== req.user._id.toString()
+        ) {
+            return next(
+                new ApiError(403, "You are not authorized to access this order")
+            );
+        }
+
         const details = await OrderDetail.getDetailsByOrderId(id);
 
         return res
@@ -175,22 +203,38 @@ const getOrderDetails = asyncHandler(async (req, res, next) => {
 const updateOrderStatus = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const { order_status } = req.body;
-    const prevOrder = await Order.findById(id);
 
     if (!order_status) {
         return next(new ApiError(400, "Order status is required"));
     }
 
     try {
-        const order = await Order.findByIdAndUpdate(
-            id,
-            { order_status },
-            { new: true }
-        );
+        // First, find the order to check ownership
+        const prevOrder = await Order.findById(id);
 
-        if (!order) {
+        if (!prevOrder) {
             return next(new ApiError(404, "Order not found"));
         }
+
+        // If not admin, verify the order belongs to the current user
+        if (
+            req.user.role !== "admin" &&
+            prevOrder.created_by.toString() !== req.user._id.toString()
+        ) {
+            return next(
+                new ApiError(403, "You are not authorized to update this order")
+            );
+        }
+
+        // Update the order with new status and updated_by
+        const order = await Order.findByIdAndUpdate(
+            id,
+            {
+                order_status,
+                updated_by: req.user._id,
+            },
+            { new: true }
+        );
 
         // If order is being completed and wasn't completed before
         if (
@@ -240,10 +284,19 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        const order = await Order.getOrderWithDetails(id);
+        // When getting order details, pass the user ID if not admin to ensure user can only access their own orders
+        const orderDetails =
+            req.user.role === "admin"
+                ? await Order.getOrderWithDetails(id)
+                : await Order.getOrderWithDetails(id, req.user._id);
 
-        if (!order) {
-            return next(new ApiError(404, "Order not found"));
+        if (!orderDetails) {
+            return next(
+                new ApiError(
+                    404,
+                    "Order not found or you don't have permission to access it"
+                )
+            );
         }
 
         // Create a PDF document with better margins
@@ -257,7 +310,7 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader(
             "Content-Disposition",
-            `attachment; filename=invoice-${order.invoice_no}.pdf`
+            `attachment; filename=invoice-${orderDetails.invoice_no}.pdf`
         );
 
         // Pipe the PDF to the response
@@ -294,13 +347,13 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
         doc.fontSize(20)
             .fillColor(primaryColor)
             .font("Helvetica-Bold")
-            .text(`#${order.invoice_no}`, 50, 125);
+            .text(`#${orderDetails.invoice_no}`, 50, 125);
 
         doc.fontSize(10)
             .fillColor(subtleColor)
             .font("Helvetica")
             .text(
-                `Issued: ${new Date(order.order_date).toLocaleDateString()}`,
+                `Issued: ${new Date(orderDetails.order_date).toLocaleDateString()}`,
                 50,
                 150
             );
@@ -318,13 +371,15 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
         doc.fontSize(14)
             .fillColor(primaryColor)
             .font("Helvetica-Bold")
-            .text(order.customer_name, 50, billingY + 20);
+            .text(orderDetails.customer_name, 50, billingY + 20);
 
         doc.fontSize(10)
             .fillColor(primaryColor)
             .font("Helvetica")
-            .text(order.customer_address, 50, billingY + 40, { width: 200 })
-            .text(`Phone: ${order.customer_phone}`, 50, doc.y + 10);
+            .text(orderDetails.customer_address, 50, billingY + 40, {
+                width: 200,
+            })
+            .text(`Phone: ${orderDetails.customer_phone}`, 50, doc.y + 10);
 
         // Add table headers with subtle styling
         const tableTop = 290;
@@ -352,7 +407,7 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
         // Line height for item rows
         const lineHeight = 25;
 
-        order.orderItems.forEach((item, index) => {
+        orderDetails.orderItems.forEach((item, index) => {
             doc.fillColor(primaryColor)
                 .font("Helvetica")
                 .fontSize(10)
@@ -365,7 +420,7 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
             tableRowY += lineHeight;
 
             // Add subtle separator between items (except after the last item)
-            if (index < order.orderItems.length - 1) {
+            if (index < orderDetails.orderItems.length - 1) {
                 doc.moveTo(70, tableRowY - 5)
                     .lineTo(530, tableRowY - 5)
                     .strokeColor(subtleColor)
@@ -389,12 +444,12 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
             .font("Helvetica")
             .fontSize(10)
             .text("Subtotal", 370, summaryY + 10)
-            .text(`$${order.sub_total.toFixed(2)}`, 470, summaryY + 10, {
+            .text(`$${orderDetails.sub_total.toFixed(2)}`, 470, summaryY + 10, {
                 align: "right",
             })
-            .text(`GST (${order.gst}%)`, 370, summaryY + 30)
+            .text(`GST (${orderDetails.gst}%)`, 370, summaryY + 30)
             .text(
-                `$${(order.total - order.sub_total).toFixed(2)}`,
+                `$${(orderDetails.total - orderDetails.sub_total).toFixed(2)}`,
                 470,
                 summaryY + 30,
                 { align: "right" }
@@ -417,7 +472,7 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
             .fontSize(14)
             .text("TOTAL", 370, summaryY + 60)
             .fillColor(highlightColor)
-            .text(`$${order.total.toFixed(2)}`, 470, summaryY + 60, {
+            .text(`$${orderDetails.total.toFixed(2)}`, 470, summaryY + 60, {
                 align: "right",
             });
 
@@ -443,10 +498,15 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
         doc.fontSize(8)
             .fillColor(subtleColor)
             .font("Helvetica")
-            .text(`InventoryPro - Invoice #${order.invoice_no}`, 50, 700, {
-                align: "center",
-                width: 500,
-            });
+            .text(
+                `InventoryPro - Invoice #${orderDetails.invoice_no}`,
+                50,
+                700,
+                {
+                    align: "center",
+                    width: 500,
+                }
+            );
 
         // Page numbers
         const pageCount = doc.bufferedPageCount;
@@ -470,6 +530,7 @@ const generateInvoice = asyncHandler(async (req, res, next) => {
 export {
     createOrder,
     getAllOrders,
+    getAllOrdersAdmin,
     getOrderDetails,
     updateOrderStatus,
     generateInvoice,

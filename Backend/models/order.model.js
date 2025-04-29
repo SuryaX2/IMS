@@ -93,6 +93,7 @@ orderSchema.statics.getOrderWithDetails = async function (
     userId = null
 ) {
     try {
+        // If userId is provided, include it in the match criteria
         const matchStage = userId
             ? {
                   _id: new mongoose.Types.ObjectId(orderId),
