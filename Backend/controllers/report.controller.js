@@ -1,21 +1,45 @@
 import { Product } from "../models/product.model.js";
 import { Order } from "../models/order.model.js";
 import { Purchase } from "../models/purchase.model.js";
+import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import transporter from "../utils/nodemailer.js";
 
 // Get dashboard metrics (total sales, inventory value, low stock)
 const getDashboardMetrics = asyncHandler(async (req, res, next) => {
     try {
+        const userId = req.user._id;
+        const isAdmin = req.user.role === "admin";
+
+        // Base query for filtering by user
+        const userFilter = isAdmin ? {} : { created_by: userId };
+
         // Get total sales (sum of all orders)
+        const salesQuery = isAdmin
+            ? [{ $match: { order_status: { $ne: "cancelled" } } }]
+            : [
+                  {
+                      $match: {
+                          order_status: { $ne: "cancelled" },
+                          created_by: userId,
+                      },
+                  },
+              ];
+
         const salesData = await Order.aggregate([
-            { $match: { order_status: { $ne: "cancelled" } } },
+            ...salesQuery,
             { $group: { _id: null, totalSales: { $sum: "$total" } } },
         ]);
 
         // Get total purchase value
+        const purchaseQuery = isAdmin
+            ? [{}]
+            : [{ $match: { created_by: userId } }];
+
         const purchaseData = await Purchase.aggregate([
+            ...purchaseQuery,
             {
                 $lookup: {
                     from: "purchasedetails",
@@ -35,6 +59,7 @@ const getDashboardMetrics = asyncHandler(async (req, res, next) => {
 
         // Get inventory value and count
         const inventoryData = await Product.aggregate([
+            { $match: userFilter },
             {
                 $group: {
                     _id: null,
@@ -48,19 +73,25 @@ const getDashboardMetrics = asyncHandler(async (req, res, next) => {
         ]);
 
         // Get recent orders (last 5)
-        const recentOrders = await Order.find()
+        const recentOrders = await Order.find(userFilter)
             .sort({ createdAt: -1 })
             .limit(5)
             .populate("customer_id", "name");
 
         // Get low stock products (stock < 10)
-        const lowStockProducts = await Product.find({ stock: { $lt: 10 } })
+        const lowStockProducts = await Product.find({
+            ...userFilter,
+            stock: { $lt: 10 },
+        })
             .select("product_name stock")
             .sort({ stock: 1 })
             .limit(10);
 
         // Get out of stock products
-        const outOfStockCount = await Product.countDocuments({ stock: 0 });
+        const outOfStockCount = await Product.countDocuments({
+            ...userFilter,
+            stock: 0,
+        });
 
         const metrics = {
             totalSales: salesData.length > 0 ? salesData[0].totalSales : 0,
@@ -94,7 +125,16 @@ const getDashboardMetrics = asyncHandler(async (req, res, next) => {
 // Get stock report
 const getStockReport = asyncHandler(async (req, res, next) => {
     try {
+        const userId = req.user._id;
+        const isAdmin = req.user.role === "admin";
+
+        // Match stage for filtering by user
+        const matchStage = isAdmin
+            ? {}
+            : { created_by: new mongoose.Types.ObjectId(userId) };
+
         const stockReport = await Product.aggregate([
+            { $match: matchStage },
             {
                 $lookup: {
                     from: "categories",
@@ -158,6 +198,8 @@ const getStockReport = asyncHandler(async (req, res, next) => {
 // Get sales report
 const getSalesReport = asyncHandler(async (req, res, next) => {
     const { start_date, end_date } = req.query;
+    const userId = req.user._id;
+    const isAdmin = req.user.role === "admin";
 
     let dateFilter = {};
     if (start_date && end_date) {
@@ -167,6 +209,11 @@ const getSalesReport = asyncHandler(async (req, res, next) => {
                 $lte: new Date(end_date),
             },
         };
+    }
+
+    // Add user filtering for non-admin users
+    if (!isAdmin) {
+        dateFilter.created_by = new mongoose.Types.ObjectId(userId);
     }
 
     try {
@@ -253,10 +300,20 @@ const getSalesReport = asyncHandler(async (req, res, next) => {
 // Get top selling products
 const getTopProducts = asyncHandler(async (req, res, next) => {
     const { limit = 10 } = req.query;
+    const userId = req.user._id;
+    const isAdmin = req.user.role === "admin";
 
     try {
+        // Match stage for non-admin users
+        const orderMatch = isAdmin
+            ? { order_status: { $ne: "cancelled" } }
+            : {
+                  order_status: { $ne: "cancelled" },
+                  created_by: new mongoose.Types.ObjectId(userId),
+              };
+
         const topProducts = await Order.aggregate([
-            { $match: { order_status: { $ne: "cancelled" } } },
+            { $match: orderMatch },
             {
                 $lookup: {
                     from: "orderdetails",
@@ -306,6 +363,8 @@ const getTopProducts = asyncHandler(async (req, res, next) => {
 // Get purchase report
 const getPurchaseReport = asyncHandler(async (req, res, next) => {
     const { start_date, end_date } = req.query;
+    const userId = req.user._id;
+    const isAdmin = req.user.role === "admin";
 
     let dateFilter = {};
     if (start_date && end_date) {
@@ -315,6 +374,11 @@ const getPurchaseReport = asyncHandler(async (req, res, next) => {
                 $lte: new Date(end_date),
             },
         };
+    }
+
+    // Add user filtering for non-admin users
+    if (!isAdmin) {
+        dateFilter.created_by = new mongoose.Types.ObjectId(userId);
     }
 
     try {
@@ -387,29 +451,262 @@ const getPurchaseReport = asyncHandler(async (req, res, next) => {
     }
 });
 
-// Get low stock alerts
+// Get low stock alerts and send email notifications
 const getLowStockAlerts = asyncHandler(async (req, res, next) => {
-    const { threshold = 10 } = req.query;
+    const { threshold = 10, sendEmail = false } = req.query;
+    const userId = req.user._id;
+    const isAdmin = req.user.role === "admin";
+
+    // Base user filter
+    const userFilter = isAdmin ? {} : { created_by: userId };
 
     try {
         const lowStockProducts = await Product.find({
+            ...userFilter,
             stock: { $lt: parseInt(threshold) },
         })
             .select(
                 "product_name product_code stock buying_price selling_price"
             )
             .populate("category_id", "category_name")
+            .populate("created_by", "username email")
             .sort({ stock: 1 });
 
-        return res
-            .status(200)
-            .json(
-                new ApiResponse(
-                    200,
+        // Send email notifications if requested
+        if (sendEmail === "true" && lowStockProducts.length > 0) {
+            // Get user email
+            const user = await User.findById(userId).select("username email");
+
+            if (user && user.email) {
+                // Create HTML table of low stock products
+                const productsTable = lowStockProducts
+                    .map(
+                        (product) => `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${product.product_name}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${product.product_code}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${product.stock}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${product.category_id?.category_name || "N/A"}</td>
+                    </tr>
+                `
+                    )
+                    .join("");
+
+                const mailOptions = {
+                    from: process.env.SENDER_EMAIL,
+                    to: user.email,
+                    subject: "Low Stock Alert - Action Required",
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+                            <h1 style="color: #d9534f; text-align: center;">⚠️ Low Stock Alert</h1>
+                            <p style="font-size: 16px; color: #555;">
+                                Hello ${user.username},
+                            </p>
+                            <p style="font-size: 16px; color: #555;">
+                                The following products are running low on stock and may require replenishment:
+                            </p>
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px;">
+                                <thead>
+                                    <tr style="background-color: #f2f2f2;">
+                                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Product Name</th>
+                                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Product Code</th>
+                                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Current Stock</th>
+                                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${productsTable}
+                                </tbody>
+                            </table>
+                            <p style="font-size: 16px; color: #555;">
+                                Please consider restocking these items soon to avoid any disruption in your operations.
+                            </p>
+                            <p style="font-size: 16px; color: #555; margin-top: 20px;">
+                                Regards,<br>
+                                <strong>Inventory Management System</strong>
+                            </p>
+                            <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                            <p style="text-align: center; font-size: 14px; color: #888;">
+                                &copy; ${new Date().getFullYear()} Inventory Management System. All rights reserved.
+                            </p>
+                        </div>
+                    `,
+                };
+
+                await transporter.sendMail(mailOptions);
+            }
+        }
+
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                {
                     lowStockProducts,
-                    "Low stock alerts fetched successfully"
-                )
+                    emailSent:
+                        sendEmail === "true" && lowStockProducts.length > 0,
+                },
+                "Low stock alerts fetched successfully"
+            )
+        );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+// Additional report: Get sales vs purchases comparison
+const getSalesVsPurchasesReport = asyncHandler(async (req, res, next) => {
+    const { period = "monthly", year } = req.query;
+    const userId = req.user._id;
+    const isAdmin = req.user.role === "admin";
+
+    // Base filter for user data
+    const userFilter = isAdmin ? {} : { created_by: userId };
+
+    // Determine the grouping format based on period
+    let dateFormat;
+    if (period === "daily") {
+        dateFormat = "%Y-%m-%d";
+    } else if (period === "weekly") {
+        dateFormat = "%G-W%V"; // ISO week number format
+    } else if (period === "monthly") {
+        dateFormat = "%Y-%m";
+    } else if (period === "yearly") {
+        dateFormat = "%Y";
+    } else {
+        return next(
+            new ApiError(
+                400,
+                "Invalid period. Use daily, weekly, monthly, or yearly"
+            )
+        );
+    }
+
+    // Year filter
+    const yearFilter = year
+        ? {
+              $expr: {
+                  $eq: [
+                      {
+                          $year:
+                              period === "daily"
+                                  ? "$order_date"
+                                  : "$order_date",
+                      },
+                      parseInt(year),
+                  ],
+              },
+          }
+        : {};
+
+    try {
+        // Get sales data
+        const salesData = await Order.aggregate([
+            {
+                $match: {
+                    ...userFilter,
+                    ...yearFilter,
+                    order_status: { $ne: "cancelled" },
+                },
+            },
+            {
+                $group: {
+                    _id: {
+                        date: {
+                            $dateToString: {
+                                format: dateFormat,
+                                date: "$order_date",
+                            },
+                        },
+                    },
+                    sales: { $sum: "$total" },
+                },
+            },
+            { $sort: { "_id.date": 1 } },
+        ]);
+
+        // Get purchase data
+        const purchaseMatchStage = { ...userFilter, ...yearFilter };
+        if (period === "daily") {
+            purchaseMatchStage.purchase_date = { $exists: true };
+        }
+
+        const purchaseData = await Purchase.aggregate([
+            { $match: purchaseMatchStage },
+            {
+                $lookup: {
+                    from: "purchasedetails",
+                    localField: "_id",
+                    foreignField: "purchase_id",
+                    as: "details",
+                },
+            },
+            { $unwind: "$details" },
+            {
+                $group: {
+                    _id: {
+                        date: {
+                            $dateToString: {
+                                format: dateFormat,
+                                date: "$purchase_date",
+                            },
+                        },
+                    },
+                    purchases: { $sum: "$details.total" },
+                },
+            },
+            { $sort: { "_id.date": 1 } },
+        ]);
+
+        // Combine data for comparison
+        const combinedData = [];
+        const allDates = new Set([
+            ...salesData.map((item) => item._id.date),
+            ...purchaseData.map((item) => item._id.date),
+        ]);
+
+        allDates.forEach((date) => {
+            const salesItem = salesData.find((item) => item._id.date === date);
+            const purchaseItem = purchaseData.find(
+                (item) => item._id.date === date
             );
+
+            combinedData.push({
+                date,
+                sales: salesItem ? salesItem.sales : 0,
+                purchases: purchaseItem ? purchaseItem.purchases : 0,
+                profit:
+                    (salesItem ? salesItem.sales : 0) -
+                    (purchaseItem ? purchaseItem.purchases : 0),
+            });
+        });
+
+        // Sort by date
+        combinedData.sort((a, b) => a.date.localeCompare(b.date));
+
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    period,
+                    data: combinedData,
+                    summary: {
+                        totalSales: combinedData.reduce(
+                            (sum, item) => sum + item.sales,
+                            0
+                        ),
+                        totalPurchases: combinedData.reduce(
+                            (sum, item) => sum + item.purchases,
+                            0
+                        ),
+                        totalProfit: combinedData.reduce(
+                            (sum, item) => sum + item.profit,
+                            0
+                        ),
+                    },
+                },
+                "Sales vs Purchases report generated successfully"
+            )
+        );
     } catch (error) {
         return next(new ApiError(500, error.message));
     }
@@ -422,4 +719,5 @@ export {
     getTopProducts,
     getPurchaseReport,
     getLowStockAlerts,
+    getSalesVsPurchasesReport,
 };
