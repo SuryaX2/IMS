@@ -1,147 +1,421 @@
-# API Documentation
+# Inventory Management System API Documentation
 
-## Users
+## Overview
 
-- **Register**: `POST` - [http://localhost:3001/api/v1/users/register](http://localhost:3001/api/v1/users/register)
+This API documentation provides details for the Inventory Management System backend API. The system handles inventory tracking, order management, purchase tracking, customer and supplier management, and more.
 
-- **Login**: `POST` - [http://localhost:3001/api/v1/users/login](http://localhost:3001/api/v1/users/login)
+## Base URL
 
-- **Logout**: `POST` - [http://localhost:3001/api/v1/users/logout](http://localhost:3001/api/v1/users/logout)
+```
+https://localhost:3001/v1
+```
 
-- **Refresh Token**: `POST` - [http://localhost:3001/api/v1/users/refresh-token](http://localhost:3001/api/v1/users/refresh-token)
+## Authentication
 
-- **Change Password**: `POST` - [http://localhost:3001/api/v1/users/change-password](http://localhost:3001/api/v1/users/change-password)
+Most endpoints require authentication. Authentication is handled via JWT (JSON Web Tokens).
 
-- **Update Account**: `PATCH` - [http://localhost:3001/api/v1/users/update-account](http://localhost:3001/api/v1/users/update-account)
+### Authentication Flow
 
-- **Update Avatar**: `PATCH` - [http://localhost:3001/api/v1/users/avatar](http://localhost:3001/api/v1/users/avatar)
+1. Register or login to receive an access token and refresh token
+2. Include the access token in the Authorization header for protected requests
+3. Use the refresh token endpoint to obtain a new access token when it expires
 
-- **Get Current User**: `GET` - [http://localhost:3001/api/v1/users/current-user](http://localhost:3001/api/v1/users/current-user)
+**Authorization Header Format:**
 
-- **Send Verification OTP**: `POST` - [http://localhost:3001/api/v1/users/send-verify-otp](http://localhost:3001/api/v1/users/send-verify-otp)
+```
+Authorization: Bearer <your_access_token>
+```
 
-- **Verify Email**: `POST` - [http://localhost:3001/api/v1/users/verify-email](http://localhost:3001/api/v1/users/verify-email)
+## User Management
 
-- **Check Authentication**: `POST` - [http://localhost:3001/api/v1/users/is-auth](http://localhost:3001/api/v1/users/is-auth)
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|--------|
+| `/users/register` | POST | Register a new user | Public |
+| `/users/login` | POST | Login and get authentication tokens | Public |
+| `/users/logout` | POST | Logout and invalidate token | Authenticated |
+| `/users/refresh-token` | POST | Get a new access token using refresh token | Public |
+| `/users/current-user` | GET | Get current user details | Authenticated |
+| `/users/change-password` | POST | Change current user password | Authenticated |
+| `/users/update-account` | PATCH | Update account details | Authenticated |
+| `/users/avatar` | PATCH | Update user avatar | Authenticated |
+| `/users/send-verify-otp` | POST | Send email verification OTP | Authenticated |
+| `/users/verify-email` | POST | Verify email with OTP | Authenticated |
+| `/users/is-auth` | POST | Check if user is authenticated | Authenticated |
+| `/users/send-reset-otp` | POST | Send password reset OTP | Public |
+| `/users/reset-password` | POST | Reset password with OTP | Public |
+| `/users/send-change-password-otp` | POST | Send OTP for password change | Authenticated |
+| `/users/verify-change-password-otp` | POST | Verify OTP for password change | Authenticated |
 
-- **Send Reset OTP**: `POST` - [http://localhost:3001/api/v1/users/send-reset-otp](http://localhost:3001/api/v1/users/send-reset-otp)
+### User Registration
 
-- **Reset Password**: `POST` - [http://localhost:3001/api/v1/users/reset-password](http://localhost:3001/api/v1/users/reset-password)
+**Endpoint:** `/users/register`
 
-- **Send Change Password OTP**: `POST` - [http://localhost:3001/api/v1/users/send-change-password-otp](http://localhost:3001/api/v1/users/send-change-password-otp)
+**Method:** POST
 
-- **Verify Change Password OTP**: `POST` - [http://localhost:3001/api/v1/users/verify-change-password-otp](http://localhost:3001/api/v1/users/verify-change-password-otp)
+**Input Fields:**
+- `username` (required): Unique username 
+- `email` (required): Valid email address
+- `password` (required): User password
+- `avatar` (optional): Profile image (file upload)
+
+### User Login
+
+**Endpoint:** `/users/login`
+
+**Method:** POST
+
+**Input Fields:**
+- `username` or `email` (required): User identifier
+- `password` (required): User password
+
+**Response includes:**
+- `accessToken`: JWT for authentication
+- `refreshToken`: Token to request new access tokens
 
 ## Categories
 
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|--------|
+| `/categories` | POST | Create a new category | Authenticated |
+| `/categories/user` | GET | Get categories created by current user | Authenticated |
+| `/categories/user/:id` | PATCH | Update a category created by user | Authenticated |
+| `/categories/user/:id` | DELETE | Delete a category created by user | Authenticated |
+| `/categories/all` | GET | Get all categories in the system | Admin |
+| `/categories/:id` | PATCH | Update any category | Admin |
+| `/categories/:id` | DELETE | Delete any category | Admin |
 
-- **Create Category**: `POST` - [http://localhost:3001/api/v1/categories](http://localhost:3001/api/v1/categories)
+### Create Category
 
-- **Get User Categories**: `GET` - [http://localhost:3001/api/v1/categories/user](http://localhost:3001/api/v1/categories/user)
+**Endpoint:** `/categories`
 
-- **Update/Delete User Category**: `PATCH`, `DELETE` - [http://localhost:3001/api/v1/categories/user/:id](http://localhost:3001/api/v1/categories/user/:id)
+**Method:** POST
 
-- **Get All Categories (Admin Only)**: `GET` - [http://localhost:3001/api/v1/categories/all](http://localhost:3001/api/v1/categories/all)
-
-- **Update/Delete Category (Admin Only)**: `PATCH`, `DELETE` - [http://localhost:3001/api/v1/categories/:id](http://localhost:3001/api/v1/categories/:id)
-
-## Customers
-
-
-- **Create Customer**: `POST` - http://localhost:3001/api/v1/customers
-
-- **Get User's Customers**: `GET` - http://localhost:3001/api/v1/customers
-
-- **Update Customer**: `PATCH` - http://localhost:3001/api/v1/customers/:id
-
-- **Delete Customer**: `DELETE` - http://localhost:3001/api/v1/customers/:id
-
-- **Get All Customers (Admin Only)**: `GET` - http://localhost:3001/api/v1/customers/all
-
-## Suppliers
-
-
-- **Get User's Suppliers**: `GET` - [http://localhost:3001/api/v1/suppliers](http://localhost:3001/api/v1/suppliers)
-
-- **Create User's Supplier**: `POST` - [http://localhost:3001/api/v1/suppliers](http://localhost:3001/api/v1/suppliers)
-
-- **Update User's Supplier**: `PATCH` - [http://localhost:3001/api/v1/suppliers/:id](http://localhost:3001/api/v1/suppliers/:id)
-
-- **Delete User's Supplier**: `DELETE` - [http://localhost:3001/api/v1/suppliers/:id](http://localhost:3001/api/v1/suppliers/:id)
-
-- **Get All Suppliers (Admin Only)**: `GET` - [http://localhost:3001/api/v1/suppliers/all](http://localhost:3001/api/v1/suppliers/all)
+**Input Fields:**
+- `category_name` (required): Name of the category (max 50 chars)
 
 ## Units
 
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|--------|
+| `/units` | POST | Create a new unit | Authenticated |
+| `/units` | GET | Get units created by current user | Authenticated |
+| `/units/:id` | PATCH | Update a unit | Authenticated |
+| `/units/:id` | DELETE | Delete a unit | Authenticated |
+| `/units/all` | GET | Get all units in the system | Admin |
 
-- **Get User's Units**: `GET` - [http://localhost:3001/api/v1/units](http://localhost:3001/api/v1/units)
+### Create Unit
 
-- **Create Unit**: `POST` - [http://localhost:3001/api/v1/units](http://localhost:3001/api/v1/units)
+**Endpoint:** `/units`
 
-- **Update User's Unit**: `PATCH` - [http://localhost:3001/api/v1/units/:id](http://localhost:3001/api/v1/units/:id)
+**Method:** POST
 
-- **Delete User's Unit**: `DELETE` - [http://localhost:3001/api/v1/units/:id](http://localhost:3001/api/v1/units/:id)
-
-- **Get All Units (Admin Only)**: `GET` - [http://localhost:3001/api/v1/units/all](http://localhost:3001/api/v1/units/all)
+**Input Fields:**
+- `unit_name` (required): Name of the unit (max 50 chars)
 
 ## Products
 
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|--------|
+| `/products` | POST | Create a new product | Authenticated |
+| `/products` | GET | Get products created by current user | Authenticated |
+| `/products/:id` | PATCH | Update a product | Authenticated |
+| `/products/:id` | DELETE | Delete a product | Authenticated |
+| `/products/all` | GET | Get all products in the system | Admin |
 
-- **Get User's Products**: `GET` - [http://localhost:3001/api/v1/products](http://localhost:3001/api/v1/products)
+### Create Product
 
-- **Create Product**: `POST` - [http://localhost:3001/api/v1/products](http://localhost:3001/api/v1/products)
+**Endpoint:** `/products`
 
-- **Update Product**: `PATCH` - [http://localhost:3001/api/v1/products/:id](http://localhost:3001/api/v1/products/:id)
+**Method:** POST
 
-- **Delete Product**: `DELETE` - [http://localhost:3001/api/v1/products/:id](http://localhost:3001/api/v1/products/:id)
+**Input Fields:**
+- `product_name` (required): Name of the product (max 50 chars)
+- `product_code` (required): Unique code for the product (max 5 chars)
+- `category_id` (required): ID of the product category
+- `unit_id` (required): ID of the unit for the product
+- `buying_price` (required): Cost price of the product
+- `selling_price` (required): Selling price of the product
+- `product_image` (optional): Image file for the product
 
-- **Get All Products (Admin Only)**: `GET` - [http://localhost:3001/api/v1/products/all](http://localhost:3001/api/v1/products/all)
+## Suppliers
+
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|--------|
+| `/suppliers` | POST | Create a new supplier | Authenticated |
+| `/suppliers` | GET | Get suppliers created by current user | Authenticated |
+| `/suppliers/:id` | PATCH | Update a supplier | Authenticated |
+| `/suppliers/:id` | DELETE | Delete a supplier | Authenticated |
+| `/suppliers/all` | GET | Get all suppliers in the system | Admin |
+
+### Create Supplier
+
+**Endpoint:** `/suppliers`
+
+**Method:** POST
+
+**Input Fields:**
+- `name` (required): Name of the supplier (max 50 chars)
+- `email` (required): Email of the supplier (max 50 chars)
+- `phone` (required): Phone number of the supplier (max 15 chars)
+- `address` (required): Address of the supplier (max 100 chars)
+- `shopname` (optional): Name of the supplier's shop (max 50 chars)
+- `type` (optional): Type of supplier (max 15 chars)
+- `bank_name` (optional): Bank name for the supplier (max 50 chars)
+- `account_holder` (optional): Bank account holder name (max 50 chars)
+- `account_number` (optional): Bank account number (max 50 chars)
+- `photo` (optional): Image file for the supplier
+
+## Customers
+
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|--------|
+| `/customers` | POST | Create a new customer | Authenticated |
+| `/customers` | GET | Get customers created by current user | Authenticated |
+| `/customers/:id` | PATCH | Update a customer | Authenticated |
+| `/customers/:id` | DELETE | Delete a customer | Authenticated |
+| `/customers/all` | GET | Get all customers in the system | Admin |
+
+### Create Customer
+
+**Endpoint:** `/customers`
+
+**Method:** POST
+
+**Input Fields:**
+- `name` (required): Name of the customer (max 50 chars)
+- `email` (required): Email of the customer (max 50 chars)
+- `phone` (required): Phone number of the customer (max 15 chars)
+- `address` (optional): Address of the customer (max 100 chars)
+- `type` (optional): Type of customer (max 15 chars, default: "regular")
+- `store_name` (optional): Name of the customer's store (max 50 chars)
+- `account_holder` (optional): Bank account holder name (max 50 chars)
+- `account_number` (optional): Bank account number (max 50 chars)
+- `photo` (optional): Image file for the customer
 
 ## Purchases
 
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|--------|
+| `/purchases` | POST | Create a new purchase | Authenticated |
+| `/purchases` | GET | Get purchases created by current user | Authenticated |
+| `/purchases/:id` | GET | Get purchase details | Authenticated |
+| `/purchases/:id` | PATCH | Update purchase status | Authenticated |
+| `/purchases/all` | GET | Get all purchases in the system | Admin |
 
-- **Create Purchase**: `POST` - [http://localhost:3001/api/v1/purchases](http://localhost:3001/api/v1/purchases)
+### Create Purchase
 
-- **Get User's Purchases**: `GET` - [http://localhost:3001/api/v1/purchases](http://localhost:3001/api/v1/purchases)
+**Endpoint:** `/purchases`
 
-- **Get Purchase Details**: `GET` - [http://localhost:3001/api/v1/purchases/:id](http://localhost:3001/api/v1/purchases/:id)
+**Method:** POST
 
-- **Update Purchase Status**: `PATCH` - [http://localhost:3001/api/v1/purchases/:id](http://localhost:3001/api/v1/purchases/:id)
+**Input Fields:**
+- `purchase_date` (optional): Date of purchase (default: current date)
+- `purchase_no` (required): Unique purchase number (max 10 chars)
+- `supplier_id` (required): ID of the supplier
+- `purchase_status` (optional): Status of the purchase (default: "pending", enum: "pending", "completed", "returned")
+- `purchaseItems` (required): Array of purchase items with:
+  - `product_id` (required): ID of the product
+  - `quantity` (required): Quantity purchased
+  - `unitcost` (required): Cost per unit
+  - `total` (optional): Total cost (calculated if not provided)
 
-- **Get All Purchases (Admin Only)**: `GET` - [http://localhost:3001/api/v1/purchases/all](http://localhost:3001/api/v1/purchases/all)
+### Update Purchase Status
+
+**Endpoint:** `/purchases/:id`
+
+**Method:** PATCH
+
+**Input Fields:**
+- `purchase_status` (required): New status (enum: "pending", "completed", "returned")
 
 ## Orders
 
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|--------|
+| `/orders` | POST | Create a new order | Authenticated |
+| `/orders` | GET | Get orders created by current user | Authenticated |
+| `/orders/:id/details` | GET | Get order details | Authenticated |
+| `/orders/:id/status` | PATCH | Update order status | Authenticated |
+| `/orders/:id/invoice` | GET | Generate invoice for order | Authenticated |
+| `/orders/all` | GET | Get all orders in the system | Admin |
 
-- **Create Order**: `POST` - [http://localhost:3001/api/v1/orders](http://localhost:3001/api/v1/orders)
+### Create Order
 
-- **Get Orders**: `GET` - [http://localhost:3001/api/v1/orders](http://localhost:3001/api/v1/orders)
+**Endpoint:** `/orders`
 
-- **Get Order Details**: `GET` - [http://localhost:3001/api/v1/orders/:id/details](http://localhost:3001/api/v1/orders/:id/details)
+**Method:** POST
 
-- **Update Order Status**: `PATCH` - [http://localhost:3001/api/v1/orders/:id/status](http://localhost:3001/api/v1/orders/:id/status)
+**Input Fields:**
+- `customer_id` (required): ID of the customer
+- `order_date` (optional): Date of the order (default: current date)
+- `total_products` (required): Total number of products in the order
+- `sub_total` (required): Subtotal amount
+- `gst` (optional): GST amount (default: 0)
+- `total` (required): Total amount
+- `invoice_no` (required): Unique invoice number (max 10 chars)
+- `orderItems` (required): Array of order items with:
+  - `product_id` (required): ID of the product
+  - `quantity` (required): Quantity ordered
+  - `unitcost` (required): Cost per unit
+  - `total` (optional): Total cost (calculated if not provided)
 
-- **Get Order Invoice**: `GET` - [http://localhost:3001/api/v1/orders/:id/invoice](http://localhost:3001/api/v1/orders/:id/invoice)
+### Update Order Status
+
+**Endpoint:** `/orders/:id/status`
+
+**Method:** PATCH
+
+**Input Fields:**
+- `order_status` (required): New status (enum: "pending", "processing", "completed", "cancelled")
 
 ## Reports
 
+| Endpoint | Method | Description | Access |
+|----------|--------|-------------|--------|
+| `/reports/dashboard` | GET | Get dashboard metrics | Authenticated |
+| `/reports/stock` | GET | Get stock report | Authenticated |
+| `/reports/sales` | GET | Get sales report | Authenticated |
+| `/reports/purchases` | GET | Get purchase report | Authenticated |
+| `/reports/top-products` | GET | Get top products report | Authenticated |
+| `/reports/low-stock-alerts` | GET | Get low stock alerts | Authenticated |
+| `/reports/sales-vs-purchases` | GET | Get sales vs purchases comparison | Authenticated |
 
-- **Dashboard Report**: `GET` - [http://localhost:3001/api/v1/reports/dashboard](http://localhost:3001/api/v1/reports/dashboard)
+## Error Handling
 
+All API endpoints follow a consistent error response format:
 
-- **Stock Report**: `GET` - [http://localhost:3001/api/v1/reports/stock](http://localhost:3001/api/v1/reports/stock)
+```json
+{
+  "success": false,
+  "message": "Error message describing what went wrong",
+  "errors": ["Specific error details if available"]
+}
+```
 
+Common HTTP status codes:
 
-- **Sales Report**: `GET` - [http://localhost:3001/api/v1/reports/sales?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD](http://localhost:3001/api/v1/reports/sales?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD)
+| Status Code | Description |
+|-------------|-------------|
+| 200 | Success |
+| 201 | Created successfully |
+| 400 | Bad request - client error |
+| 401 | Unauthorized - authentication required |
+| 403 | Forbidden - insufficient permissions |
+| 404 | Not found |
+| 500 | Server error |
 
+## Data Models
 
-- **Purchases Report**: `GET` - [http://localhost:3001/api/v1/reports/purchases?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD](http://localhost:3001/api/v1/reports/purchases?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD)
+### User Model
+- `username`: String (required, unique)
+- `email`: String (required, unique)
+- `password`: String (required, hashed)
+- `role`: String (enum: "user", "admin", default: "user")
+- `verifyOtp`: String
+- `verifyOtpExpiry`: Number
+- `isVerified`: Boolean (default: false)
+- `resetOtp`: String
+- `resetOtpExpiry`: Number
+- `avatar`: String (required)
+- `refreshToken`: String
+- `timestamps`: Created and updated dates
 
+### Category Model
+- `category_name`: String (required, max 50 chars)
+- `created_by`: User ID (required)
+- `updated_by`: User ID
+- `timestamps`: Created and updated dates
 
-- **Top Products Report**: `GET` - [http://localhost:3001/api/v1/reports/top-products?limit=10](http://localhost:3001/api/v1/reports/top-products?limit=10)
+### Unit Model
+- `unit_name`: String (required, max 50 chars)
+- `created_by`: User ID (required)
+- `updated_by`: User ID
+- `timestamps`: Created and updated dates
 
+### Product Model
+- `product_name`: String (required, max 50 chars)
+- `product_code`: String (required, max 5 chars)
+- `category_id`: Category ID (required)
+- `unit_id`: Unit ID (required)
+- `buying_price`: Number (required)
+- `selling_price`: Number (required)
+- `stock`: Number (default: 0)
+- `product_image`: String (default: "default-product.png")
+- `created_by`: User ID (required)
+- `updated_by`: User ID
+- `timestamps`: Created and updated dates
 
-- **Low Stock Alerts**: `GET` - [http://localhost:3001/api/v1/reports/low-stock-alerts?threshold=10&sendEmail=true](http://localhost:3001/api/v1/reports/low-stock-alerts?threshold=10&sendEmail=true)
+### Supplier Model
+- `name`: String (required, max 50 chars)
+- `email`: String (required, max 50 chars)
+- `phone`: String (required, max 15 chars)
+- `address`: String (required, max 100 chars)
+- `shopname`: String (max 50 chars)
+- `type`: String (max 15 chars)
+- `bank_name`: String (max 50 chars)
+- `account_holder`: String (max 50 chars)
+- `account_number`: String (max 50 chars)
+- `photo`: String (default: "default-supplier.png")
+- `createdBy`: User ID (required)
+- `timestamps`: Created and updated dates
 
+### Customer Model
+- `name`: String (required, max 50 chars)
+- `email`: String (required, max 50 chars)
+- `phone`: String (required, max 15 chars)
+- `address`: String (max 100 chars)
+- `type`: String (max 15 chars, default: "regular")
+- `store_name`: String (max 50 chars)
+- `account_holder`: String (max 50 chars)
+- `account_number`: String (max 50 chars)
+- `photo`: String (default: "default-customer.png")
+- `created_by`: User ID (required)
+- `timestamps`: Created and updated dates
 
-- **Sales vs Purchases**: `GET` - [http://localhost:3001/api/v1/reports/sales-vs-purchases?period=monthly&year=2024](http://localhost:3001/api/v1/reports/sales-vs-purchases?period=monthly&year=2024)
+### Purchase Model
+- `purchase_date`: Date (default: current date)
+- `purchase_no`: String (required, unique, max 10 chars)
+- `supplier_id`: Supplier ID (required)
+- `purchase_status`: String (enum: "pending", "completed", "returned", default: "pending")
+- `created_by`: User ID (required)
+- `updated_by`: User ID
+- `timestamps`: Created and updated dates
+
+### Purchase Detail Model
+- `purchase_id`: Purchase ID (required)
+- `product_id`: Product ID (required)
+- `quantity`: Number (required, min: 1)
+- `unitcost`: Number (required)
+- `total`: Number (required)
+- `timestamps`: Created and updated dates
+
+### Order Model
+- `customer_id`: Customer ID (required)
+- `order_date`: Date (default: current date)
+- `order_status`: String (enum: "pending", "processing", "completed", "cancelled", default: "pending")
+- `total_products`: Number (required)
+- `sub_total`: Number (required)
+- `gst`: Number (default: 0)
+- `total`: Number (required)
+- `invoice_no`: String (required, unique, max 10 chars)
+- `created_by`: User ID (required)
+- `updated_by`: User ID
+- `timestamps`: Created and updated dates
+
+### Order Detail Model
+- `order_id`: Order ID (required)
+- `product_id`: Product ID (required)
+- `quantity`: Number (required, min: 1)
+- `unitcost`: Number (required)
+- `total`: Number (required)
+- `timestamps`: Created and updated dates
+
+## File Uploads
+
+The API supports file uploads for the following entities:
+- User avatars
+- Product images
+- Supplier photos
+- Customer photos
+
+Files are uploaded using multipart/form-data format.
