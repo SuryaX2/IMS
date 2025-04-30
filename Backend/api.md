@@ -77,8 +77,15 @@
 ## Reports
 
 - **Dashboard Report**: `GET` - [http://localhost:3001/api/v1/reports/dashboard](http://localhost:3001/api/v1/reports/dashboard)
+
 - **Stock Report**: `GET` - [http://localhost:3001/api/v1/reports/stock](http://localhost:3001/api/v1/reports/stock)
-- **Sales Report**: `GET` - [http://localhost:3001/api/v1/reports/sales](http://localhost:3001/api/v1/reports/sales)
-- **Purchases Report**: `GET` - [http://localhost:3001/api/v1/reports/purchases](http://localhost:3001/api/v1/reports/purchases)
-- **Top Products Report**: `GET` - [http://localhost:3001/api/v1/reports/top-products](http://localhost:3001/api/v1/reports/top-products)
-- **Low Stock Alerts**: `GET` - [http://localhost:3001/api/v1/reports/low-stock-alerts](http://localhost:3001/api/v1/reports/low-stock-alerts)
+
+- **Sales Report**: `GET` - [http://localhost:3001/api/v1/reports/sales?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD](http://localhost:3001/api/v1/reports/sales?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD)
+
+- **Purchases Report**: `GET` - [http://localhost:3001/api/v1/reports/purchases?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD](http://localhost:3001/api/v1/reports/purchases?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD)
+
+- **Top Products Report**: `GET` - [http://localhost:3001/api/v1/reports/top-products?limit=10](http://localhost:3001/api/v1/reports/top-products?limit=10)
+
+- **Low Stock Alerts**: `GET` - [http://localhost:3001/api/v1/reports/low-stock-alerts?threshold=10&sendEmail=true](http://localhost:3001/api/v1/reports/low-stock-alerts?threshold=10&sendEmail=true)
+
+- **Sales vs Purchases**: `GET` - [http://localhost:3001/api/v1/reports/sales-vs-purchases?period=monthly&year=2024](http://localhost:3001/api/v1/reports/sales-vs-purchases?period=monthly&year=2024)
