@@ -6,6 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import transporter from "../utils/nodemailer.js";
+import mongoose from "mongoose";
 
 // Get dashboard metrics (total sales, inventory value, low stock)
 const getDashboardMetrics = asyncHandler(async (req, res, next) => {
