@@ -1,5 +1,18 @@
+// Updated Dashboard.jsx analytics section
 import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Tag, Divider, Typography, theme } from "antd";
+import {
+    Card,
+    Row,
+    Col,
+    Tag,
+    Divider,
+    Typography,
+    Tabs,
+    Button,
+    Badge,
+    Tooltip,
+    theme,
+} from "antd";
 import {
     DollarOutlined,
     InboxOutlined,
@@ -8,6 +21,10 @@ import {
     WarningOutlined,
     AreaChartOutlined,
     PieChartOutlined,
+    InfoCircleOutlined,
+    CalendarOutlined,
+    AppstoreOutlined,
+    ReloadOutlined
 } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
@@ -17,9 +34,11 @@ import DataTable from "../components/dashboard/DataTable";
 import LoadingSpinner from "../components/dashboard/LoadingSpinner";
 import ErrorDisplay from "../components/dashboard/ErrorDisplay";
 import { api } from "../api/api";
-import SalesChart from "../components/dashboard/SalesChart/.";
+import SalesChart from "../components/dashboard/SalesChart";
 
 const { useToken } = theme;
+const { Title, Text } = Typography;
+const { TabPane } = Tabs;
 
 const Dashboard = () => {
     const { token } = useToken();
@@ -37,10 +56,11 @@ const Dashboard = () => {
         salesData: [],
         topProducts: [],
     });
+    const [timeframe, setTimeframe] = useState("30days");
 
     useEffect(() => {
         fetchDashboardData();
-    }, []);
+    }, [timeframe]);
 
     // Fetch dashboard data from API endpoints
     const fetchDashboardData = async () => {
@@ -53,9 +73,9 @@ const Dashboard = () => {
                 topProductsResponse,
                 salesReportResponse,
             ] = await Promise.all([
-                api.get("/reports/dashboard"),
-                api.get("/reports/top-products"),
-                api.get("/reports/sales"),
+                api.get("/reports/dashboard", { params: { timeframe } }),
+                api.get("/reports/top-products", { params: { timeframe } }),
+                api.get("/reports/sales", { params: { timeframe } }),
             ]);
 
             if (dashboardResponse.data.success) {
@@ -186,17 +206,51 @@ const Dashboard = () => {
         },
     ];
 
+    const TimeframeSelector = () => (
+        <div className="flex items-center space-x-2 mb-4">
+            <Text className="text-gray-500 whitespace-nowrap">
+                Showing data for:
+            </Text>
+            <div className="flex bg-gray-100 rounded-lg p-1">
+                <Button
+                    type={timeframe === "7days" ? "primary" : "text"}
+                    size="small"
+                    onClick={() => setTimeframe("7days")}
+                    className={timeframe !== "7days" ? "text-gray-600" : ""}
+                >
+                    7 Days
+                </Button>
+                <Button
+                    type={timeframe === "30days" ? "primary" : "text"}
+                    size="small"
+                    onClick={() => setTimeframe("30days")}
+                    className={timeframe !== "30days" ? "text-gray-600" : ""}
+                >
+                    30 Days
+                </Button>
+                <Button
+                    type={timeframe === "90days" ? "primary" : "text"}
+                    size="small"
+                    onClick={() => setTimeframe("90days")}
+                    className={timeframe !== "90days" ? "text-gray-600" : ""}
+                >
+                    90 Days
+                </Button>
+            </div>
+        </div>
+    );
+
     if (loading) {
         return <LoadingSpinner tip="Loading dashboard data..." />;
     }
 
     if (error) {
-        return <ErrorDisplay error={error} />;
+        return <ErrorDisplay error={error} onRetry={fetchDashboardData} />;
     }
 
     return (
         <div className="px-4 py-6">
-            <DashboardHeader />
+            <DashboardHeader onRefresh={fetchDashboardData} />
 
             {/* Key metrics cards */}
             <Row gutter={[16, 16]} className="mt-6">
@@ -277,23 +331,142 @@ const Dashboard = () => {
                 </Col>
             </Row>
 
-            <Divider className="my-8">
-                <h1 className="text-xl m-0 flex items-center">
-                    <AreaChartOutlined className="mr-2" /> Analytics
-                </h1>
-            </Divider>
+            {/* Enhanced Analytics Section */}
+            <Card
+                className="mt-8 shadow-md hover:shadow-lg transition-all duration-300"
+                title={
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                            <AreaChartOutlined className="text-blue-500 mr-2 text-xl" />
+                            <span className="text-xl font-bold">
+                                Analytics Dashboard
+                            </span>
+                        </div>
+                        <TimeframeSelector />
+                    </div>
+                }
+            >
+                <Tabs
+                    defaultActiveKey="sales"
+                    className="dashboard-analytics-tabs"
+                    tabBarExtraContent={
+                        <Tooltip title="Refresh data">
+                            <Button
+                                icon={<ReloadOutlined />}
+                                onClick={fetchDashboardData}
+                                type="text"
+                            />
+                        </Tooltip>
+                    }
+                >
+                    <TabPane
+                        tab={
+                            <span>
+                                <AreaChartOutlined /> Sales Analysis
+                            </span>
+                        }
+                        key="sales"
+                    >
+                        <Row gutter={[16, 16]}>
+                            <Col xs={24} lg={16}>
+                                <Card
+                                    className="shadow-sm bg-gradient-to-r from-blue-50 to-white"
+                                    bordered={false}
+                                >
+                                    <SalesChart
+                                        salesData={dashboardData.salesData}
+                                    />
+                                </Card>
+                            </Col>
+                            <Col xs={24} lg={8}>
+                                <ProductDistribution
+                                    topProducts={dashboardData.topProducts}
+                                />
 
-            {/* Sales trend chart and product distribution */}
-            <Row gutter={[16, 16]}>
-                <Col xs={24} lg={16}>
-                    <SalesChart salesData={dashboardData.salesData} />
-                </Col>
-                <Col xs={24} lg={8}>
-                    <ProductDistribution
-                        topProducts={dashboardData.topProducts}
-                    />
-                </Col>
-            </Row>
+                                {/* If we have data, show quick insights */}
+                                {dashboardData.topProducts &&
+                                    dashboardData.topProducts.length > 0 && (
+                                        <Card
+                                            title={
+                                                <div className="flex items-center">
+                                                    <InfoCircleOutlined className="text-blue-500 mr-2" />
+                                                    <span>Quick Insights</span>
+                                                </div>
+                                            }
+                                            className="mt-4 shadow-sm"
+                                            size="small"
+                                        >
+                                            <div className="space-y-3">
+                                                <div>
+                                                    <Text strong>
+                                                        Top Performer:{" "}
+                                                    </Text>
+                                                    <Text>
+                                                        {
+                                                            dashboardData
+                                                                .topProducts[0]
+                                                                ?.product_name
+                                                        }
+                                                    </Text>
+                                                    <Badge
+                                                        count={`${dashboardData.topProducts[0]?.quantity_sold} units`}
+                                                        className="ml-2"
+                                                        style={{
+                                                            backgroundColor:
+                                                                "#52c41a",
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Text strong>
+                                                        Most Profitable:{" "}
+                                                    </Text>
+                                                    <Text>
+                                                        {
+                                                            dashboardData.topProducts.sort(
+                                                                (a, b) =>
+                                                                    b.total_sales -
+                                                                    a.total_sales
+                                                            )[0]?.product_name
+                                                        }
+                                                    </Text>
+                                                    <Badge
+                                                        count={`$${dashboardData.topProducts.sort((a, b) => b.total_sales - a.total_sales)[0]?.total_sales.toLocaleString()}`}
+                                                        className="ml-2"
+                                                        style={{
+                                                            backgroundColor:
+                                                                "#1890ff",
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    )}
+                            </Col>
+                        </Row>
+                    </TabPane>
+                    <TabPane
+                        tab={
+                            <span>
+                                <CalendarOutlined /> Historical Trends
+                            </span>
+                        }
+                        key="trends"
+                    >
+                        <div className="bg-gray-50 p-6 rounded-lg text-center">
+                            <AppstoreOutlined
+                                style={{ fontSize: 48 }}
+                                className="text-gray-400 mb-4"
+                            />
+                            <Title level={4}>Historical Trends</Title>
+                            <Text className="text-gray-500">
+                                Detailed historical trend analysis will be
+                                available in a future update.
+                            </Text>
+                        </div>
+                    </TabPane>
+                </Tabs>
+            </Card>
 
             <Divider className="my-8">
                 <h1 className="text-xl m-0 flex items-center">
