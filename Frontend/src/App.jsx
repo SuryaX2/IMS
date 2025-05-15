@@ -12,6 +12,7 @@ import LandingPage from "./pages/LandingPage";
 import ProfilePage from "./components/ProfilePage";
 import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./components/layout/DashboardLayout";
+import Products from "./pages/Products";
 
 function App() {
     return (
@@ -58,8 +59,8 @@ function App() {
                             }
                         >
                             <Route path="dashboard" element={<Dashboard />} />
-                            {/* <Route path="products" element={<div>Products Page</div>} />
-                            <Route path="orders" element={<div>Orders Page</div>} />
+                            <Route path="products" element={<Products />} />
+                            {/* <Route path="orders" element={<div>Orders Page</div>} />
                             <Route path="purchases" element={<div>Purchases Page</div>} />
                             <Route path="customers" element={<div>Customers Page</div>} />
                             <Route path="suppliers" element={<div>Suppliers Page</div>} />
