@@ -14,30 +14,48 @@ const ProductSearchBar = ({
     onReset,
 }) => {
     return (
-        <Card className="mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
+        <Card className="mb-4 sm:mb-6">
+            <div className="flex flex-col gap-3 sm:gap-4">
+                {/* Search Input */}
                 <Input
                     placeholder="Search products by name or code"
                     prefix={<SearchOutlined />}
                     value={searchText}
                     onChange={(e) => onSearchChange(e.target.value)}
                     onPressEnter={onSearch}
-                    className="md:w-72"
+                    size="large"
+                    className="w-full"
                 />
 
-                <Space>
-                    <Button icon={<FilterOutlined />} onClick={onShowFilters}>
-                        Filters
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                    <Button
+                        icon={<FilterOutlined />}
+                        onClick={onShowFilters}
+                        className="flex-1 min-w-0 sm:flex-none"
+                        size="large"
+                    >
+                        <span className="hidden sm:inline">Filters</span>
                     </Button>
 
-                    <Button icon={<ReloadOutlined />} onClick={onReset}>
-                        Reset
+                    <Button
+                        icon={<ReloadOutlined />}
+                        onClick={onReset}
+                        className="flex-1 min-w-0 sm:flex-none"
+                        size="large"
+                    >
+                        <span className="hidden sm:inline">Reset</span>
                     </Button>
 
-                    <Button type="primary" onClick={onSearch}>
+                    <Button
+                        type="primary"
+                        onClick={onSearch}
+                        className="flex-1 min-w-0 sm:flex-none"
+                        size="large"
+                    >
                         Search
                     </Button>
-                </Space>
+                </div>
             </div>
         </Card>
     );

@@ -23,17 +23,24 @@ const ProductDetailsDrawer = ({ visible, product, onClose }) => {
             placement="right"
             onClose={onClose}
             open={visible}
-            width={400}
+            width="100%"
+            style={{
+                maxWidth: window.innerWidth < 768 ? "100vw" : "400px",
+            }}
         >
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
                 {/* Product Image */}
                 <div className="text-center">
                     <Image
                         src={product.product_image}
                         alt={product.product_name}
-                        width={200}
+                        width="100%"
                         height={200}
-                        style={{ objectFit: "cover" }}
+                        style={{
+                            objectFit: "cover",
+                            maxWidth:
+                                window.innerWidth < 768 ? "200px" : "200px",
+                        }}
                         fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6U"
                     />
                 </div>
@@ -42,11 +49,28 @@ const ProductDetailsDrawer = ({ visible, product, onClose }) => {
 
                 {/* Product Information */}
                 <div>
-                    <Title level={4}>{product.product_name}</Title>
-                    <Text type="secondary">Code: {product.product_code}</Text>
+                    <Title level={4} className="text-base sm:text-lg mb-2">
+                        {product.product_name}
+                    </Title>
+                    <Text type="secondary" className="text-sm">
+                        Code: {product.product_code}
+                    </Text>
                 </div>
 
-                <Descriptions column={1} bordered size="small">
+                <Descriptions
+                    column={1}
+                    bordered
+                    size="small"
+                    labelStyle={{
+                        fontSize: "12px",
+                        padding: "8px 12px",
+                        fontWeight: "bold",
+                    }}
+                    contentStyle={{
+                        fontSize: "12px",
+                        padding: "8px 12px",
+                    }}
+                >
                     <Descriptions.Item label="Category">
                         {product.category_id?.category_name}
                     </Descriptions.Item>
@@ -85,13 +109,13 @@ const ProductDetailsDrawer = ({ visible, product, onClose }) => {
                 </Descriptions>
 
                 {/* Additional Information */}
-                <div>
-                    <Text type="secondary" className="text-sm">
+                <div className="text-xs sm:text-sm">
+                    <Text type="secondary">
                         Created:{" "}
                         {new Date(product.createdAt).toLocaleDateString()}
                     </Text>
                     <br />
-                    <Text type="secondary" className="text-sm">
+                    <Text type="secondary">
                         Last Updated:{" "}
                         {new Date(product.updatedAt).toLocaleDateString()}
                     </Text>

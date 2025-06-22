@@ -24,11 +24,19 @@ const ProductModal = ({
             onCancel={onCancel}
             confirmLoading={loading}
             onOk={onSave}
-            width={700}
+            width="95%"
+            style={{
+                maxWidth: "700px",
+                top: 20,
+            }}
+            bodyStyle={{
+                maxHeight: "calc(100vh - 200px)",
+                overflowY: "auto",
+            }}
         >
             <Form form={form} layout="vertical" initialValues={{ stock: 0 }}>
-                <Row gutter={16}>
-                    <Col span={12}>
+                <Row gutter={[16, 0]}>
+                    <Col xs={24} sm={12}>
                         <Form.Item
                             name="product_name"
                             label="Product Name"
@@ -43,11 +51,14 @@ const ProductModal = ({
                                 },
                             ]}
                         >
-                            <Input placeholder="Enter product name" />
+                            <Input
+                                placeholder="Enter product name"
+                                size="large"
+                            />
                         </Form.Item>
                     </Col>
 
-                    <Col span={12}>
+                    <Col xs={24} sm={12}>
                         <Form.Item
                             name="product_code"
                             label="Product Code"
@@ -65,13 +76,14 @@ const ProductModal = ({
                             <Input
                                 placeholder="Enter product code"
                                 disabled={!!editingProduct}
+                                size="large"
                             />
                         </Form.Item>
                     </Col>
                 </Row>
 
-                <Row gutter={16}>
-                    <Col span={12}>
+                <Row gutter={[16, 0]}>
+                    <Col xs={24} sm={12}>
                         <Form.Item
                             name="category_id"
                             label="Category"
@@ -82,7 +94,7 @@ const ProductModal = ({
                                 },
                             ]}
                         >
-                            <Select placeholder="Select category">
+                            <Select placeholder="Select category" size="large">
                                 {categories.map((category) => (
                                     <Option
                                         key={category._id}
@@ -95,7 +107,7 @@ const ProductModal = ({
                         </Form.Item>
                     </Col>
 
-                    <Col span={12}>
+                    <Col xs={24} sm={12}>
                         <Form.Item
                             name="unit_id"
                             label="Unit"
@@ -106,7 +118,7 @@ const ProductModal = ({
                                 },
                             ]}
                         >
-                            <Select placeholder="Select unit">
+                            <Select placeholder="Select unit" size="large">
                                 {units.map((unit) => (
                                     <Option key={unit._id} value={unit._id}>
                                         {unit.unit_name}
@@ -117,8 +129,8 @@ const ProductModal = ({
                     </Col>
                 </Row>
 
-                <Row gutter={16}>
-                    <Col span={12}>
+                <Row gutter={[16, 0]}>
+                    <Col xs={24} sm={12}>
                         <Form.Item
                             name="buying_price"
                             label="Buying Price"
@@ -139,11 +151,12 @@ const ProductModal = ({
                                 prefix="$"
                                 style={{ width: "100%" }}
                                 precision={2}
+                                size="large"
                             />
                         </Form.Item>
                     </Col>
 
-                    <Col span={12}>
+                    <Col xs={24} sm={12}>
                         <Form.Item
                             name="selling_price"
                             label="Selling Price"
@@ -164,6 +177,7 @@ const ProductModal = ({
                                 prefix="$"
                                 style={{ width: "100%" }}
                                 precision={2}
+                                size="large"
                             />
                         </Form.Item>
                     </Col>

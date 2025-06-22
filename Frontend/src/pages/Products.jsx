@@ -173,48 +173,67 @@ const Products = () => {
 
     return (
         <Layout>
-            <Content className="p-6">
-                <div className="max-w-7xl mx-auto">
+            <Content className="p-2 sm:p-4 lg:p-6">
+                <div className="max-w-full lg:max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="flex justify-between items-center mb-6">
-                        <div>
-                            <h1 className="text-2xl font-bold">Products</h1>
-                            <p className="text-gray-600">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-4">
+                        <div className="flex-1 min-w-0">
+                            <h1 className="text-xl sm:text-2xl font-bold truncate">
+                                Products
+                            </h1>
+                            <p className="text-gray-600 text-sm sm:text-base hidden sm:block">
                                 Manage your product inventory
                             </p>
                         </div>
-                        <Button
-                            type="primary"
-                            icon={<PlusOutlined />}
-                            onClick={handleAddProduct}
-                            size="large"
-                        >
-                            Add Product
-                        </Button>
+                        <div className="flex-shrink-0">
+                            <Button
+                                type="primary"
+                                icon={<PlusOutlined />}
+                                onClick={handleAddProduct}
+                                size="large"
+                                className="w-full sm:w-auto"
+                                block={window.innerWidth < 640}
+                            >
+                                <span className="hidden xs:inline">
+                                    Add Product
+                                </span>
+                                <span className="inline xs:hidden">Add</span>
+                            </Button>
+                        </div>
                     </div>
 
-                    {/* Search Bar */}
-                    <ProductSearchBar
-                        searchText={searchText}
-                        onSearchChange={setSearchText}
-                        onSearch={handleSearch}
-                        onShowFilters={() => setIsFiltersVisible(true)}
-                        onReset={handleReset}
-                    />
-
-                    {/* Products Table */}
-                    <Card>
-                        <ProductsTable
-                            products={products}
-                            loading={loading}
-                            categories={categories}
-                            onEdit={handleEditProduct}
-                            onDelete={handleDeleteProduct}
-                            onViewDetails={handleViewDetails}
+                    {/* Search Bar - Responsive */}
+                    <div className="mb-4 sm:mb-6">
+                        <ProductSearchBar
+                            searchText={searchText}
+                            onSearchChange={setSearchText}
+                            onSearch={handleSearch}
+                            onShowFilters={() => setIsFiltersVisible(true)}
+                            onReset={handleReset}
                         />
+                    </div>
+
+                    {/* Products Table - Responsive Card */}
+                    <Card
+                        className="overflow-hidden"
+                        bodyStyle={{
+                            padding: window.innerWidth < 768 ? "12px" : "24px",
+                            overflowX: "auto",
+                        }}
+                    >
+                        <div className="min-w-full">
+                            <ProductsTable
+                                products={products}
+                                loading={loading}
+                                categories={categories}
+                                onEdit={handleEditProduct}
+                                onDelete={handleDeleteProduct}
+                                onViewDetails={handleViewDetails}
+                            />
+                        </div>
                     </Card>
 
-                    {/* Product Modal */}
+                    {/* Product Modal - Responsive */}
                     <ProductModal
                         visible={isModalVisible}
                         title={
@@ -235,9 +254,11 @@ const Products = () => {
                             form.resetFields();
                         }}
                         onImageChange={handleImageChange}
+                        width={window.innerWidth < 768 ? "95%" : "800px"}
+                        centered={window.innerWidth < 768}
                     />
 
-                    {/* Filters Drawer */}
+                    {/* Filters Drawer - Already responsive as it's a drawer */}
                     <ProductFilters
                         visible={isFiltersVisible}
                         categories={categories}
@@ -248,9 +269,12 @@ const Products = () => {
                         onApply={handleApplyFilters}
                         onReset={handleResetFilters}
                         onClose={() => setIsFiltersVisible(false)}
+                        placement={window.innerWidth < 768 ? "bottom" : "right"}
+                        height={window.innerWidth < 768 ? "70vh" : undefined}
+                        width={window.innerWidth < 768 ? "100%" : "400px"}
                     />
 
-                    {/* Product Details Drawer */}
+                    {/* Product Details Drawer - Responsive */}
                     <ProductDetailsDrawer
                         visible={isDetailsVisible}
                         product={selectedProduct}
@@ -258,6 +282,9 @@ const Products = () => {
                             setIsDetailsVisible(false);
                             setSelectedProduct(null);
                         }}
+                        placement={window.innerWidth < 768 ? "bottom" : "right"}
+                        height={window.innerWidth < 768 ? "80vh" : undefined}
+                        width={window.innerWidth < 768 ? "100%" : "500px"}
                     />
                 </div>
             </Content>

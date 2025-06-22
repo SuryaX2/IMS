@@ -21,6 +21,10 @@ const ProductImageUpload = ({ imageUrl, onChange }) => {
                 beforeUpload={() => false}
                 onChange={onChange}
                 showUploadList={false}
+                style={{
+                    width: "100%",
+                    minHeight: "120px",
+                }}
             >
                 {imageUrl ? (
                     <img
@@ -30,12 +34,13 @@ const ProductImageUpload = ({ imageUrl, onChange }) => {
                             width: "100%",
                             height: "100%",
                             objectFit: "cover",
+                            minHeight: "100px",
                         }}
                     />
                 ) : (
-                    <div>
-                        <UploadOutlined />
-                        <div className="mt-2">Upload</div>
+                    <div className="flex flex-col items-center justify-center p-4">
+                        <UploadOutlined className="text-lg mb-2" />
+                        <div className="text-sm">Upload</div>
                     </div>
                 )}
             </Upload>
