@@ -26,10 +26,10 @@ const ProductModal = ({
             onOk={onSave}
             width="95%"
             style={{
-                maxWidth: "700px",
-                top: 20,
+                maxWidth: "750px",
+                top: 50,
             }}
-            bodyStyle={{
+            body={{
                 maxHeight: "calc(100vh - 200px)",
                 overflowY: "auto",
             }}

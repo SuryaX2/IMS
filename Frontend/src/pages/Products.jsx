@@ -173,15 +173,15 @@ const Products = () => {
 
     return (
         <Layout>
-            <Content className="p-2 sm:p-4 lg:p-6">
+            <Content className="p-2 sm:p-4 lg:p-6 bg-white">
                 <div className="max-w-full lg:max-w-7xl mx-auto">
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-4">
                         <div className="flex-1 min-w-0">
-                            <h1 className="text-xl sm:text-2xl font-bold truncate">
+                            <h1 className="truncate mb-1 text-4xl font-bold">
                                 Products
                             </h1>
-                            <p className="text-gray-600 text-sm sm:text-base hidden sm:block">
+                            <p className="text-gray-500 text-base md:text-sm  hidden sm:block">
                                 Manage your product inventory
                             </p>
                         </div>
