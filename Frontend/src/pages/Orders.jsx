@@ -400,16 +400,19 @@ const Orders = () => {
     ];
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="p-6 bg-white min-h-screen">
             {/* Header */}
             <div className="mb-6">
                 <div className="flex justify-between items-center mb-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                        <h1
+                            className="flex items-center gap-2
+                        truncate mb-1 text-4xl font-bold"
+                        >
+                            Orders
                             <ShoppingCartOutlined className="text-blue-600" />
-                            Orders Management
                         </h1>
-                        <p className="text-gray-600 mt-1">
+                        <p className="mt-1 text-gray-500 text-base md:text-sm hidden sm:block">
                             Manage and track your orders
                         </p>
                     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Layout, Card, Button, Form, message } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, ProductOutlined } from "@ant-design/icons";
 
 // Components
 import ProductSearchBar from "../components/products/ProductSearchBar";
@@ -178,8 +178,9 @@ const Products = () => {
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-4">
                         <div className="flex-1 min-w-0">
-                            <h1 className="truncate mb-1 text-4xl font-bold">
+                            <h1 className="truncate mb-1 text-4xl font-bold flex items-center gap-2">
                                 Products
+                                <ProductOutlined className="text-blue-600 inline-block ml-2" />
                             </h1>
                             <p className="text-gray-500 text-base md:text-sm  hidden sm:block">
                                 Manage your product inventory
