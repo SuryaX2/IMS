@@ -10,16 +10,6 @@ export const getStatusColor = (status) => {
     return colors[status] || "default";
 };
 
-// export const getStatusIcon = (status) => {
-//     const icons = {
-//         pending: <ClockCircleOutlined />,
-//         processing: <ClockCircleOutlined />,
-//         completed: <CheckCircleOutlined />,
-//         cancelled: <ClockCircleOutlined />,
-//     };
-//     return icons[status];
-// };
-
 export const calculateOrderTotals = (orderItems) => {
     const subTotal = orderItems.reduce(
         (sum, item) => sum + item.quantity * item.unitcost,
