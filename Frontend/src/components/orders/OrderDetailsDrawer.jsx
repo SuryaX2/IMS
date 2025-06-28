@@ -2,7 +2,9 @@ import React from "react";
 import { Drawer, Descriptions, Tag, Card, Empty, Spin, Button } from "antd";
 import { FilePdfOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getStatusColor, getStatusIcon } from "../../utils/orderHelpers";
+import { getStatusColor } from "../../utils/orderHelpers";
+import { getStatusIcon } from "../../data";
+
 
 const OrderDetailsDrawer = ({
     visible,

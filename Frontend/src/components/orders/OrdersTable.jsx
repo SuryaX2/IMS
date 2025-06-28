@@ -4,9 +4,10 @@ import { EyeOutlined, FilePdfOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import {
     getStatusColor,
-    getStatusIcon,
     ORDER_STATUSES,
 } from "../../utils/orderHelpers";
+import { getStatusIcon } from "../../data";
+
 
 const { Option } = Select;
 

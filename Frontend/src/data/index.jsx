@@ -7,6 +7,8 @@ import {
     ShoppingCartOutlined,
     ShoppingOutlined,
     UserSwitchOutlined,
+    CheckCircleOutlined,
+    ClockCircleOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
@@ -135,3 +137,13 @@ export const menuItems = [
         ],
     },
 ];
+
+export const getStatusIcon = (status) => {
+    const icons = {
+        pending: <ClockCircleOutlined />,
+        processing: <ClockCircleOutlined />,
+        completed: <CheckCircleOutlined />,
+        cancelled: <ClockCircleOutlined />,
+    };
+    return icons[status];
+};
