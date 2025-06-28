@@ -1,15 +1,7 @@
 import React from "react";
-import {
-    Modal,
-    Form,
-    Row,
-    Col,
-    Select,
-    Input,
-    Button,
-    InputNumber,
-} from "antd";
+import { Modal, Form, Row, Col, Select, Input, Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import OrderFormItems from "./OrderFormItems";
 
 const { Option } = Select;
 
@@ -111,98 +103,13 @@ const CreateOrderModal = ({
                                 </Button>
                             </div>
                             {fields.map(({ key, name, ...restField }) => (
-                                <div
+                                <OrderFormItems
                                     key={key}
-                                    className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50"
-                                >
-                                    <Row gutter={16}>
-                                        <Col span={8}>
-                                            <Form.Item
-                                                {...restField}
-                                                name={[name, "product_id"]}
-                                                label="Product"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            "Please select a product",
-                                                    },
-                                                ]}
-                                            >
-                                                <Select
-                                                    placeholder="Select Product"
-                                                    showSearch
-                                                    optionFilterProp="children"
-                                                >
-                                                    {products.map((product) => (
-                                                        <Option
-                                                            key={product._id}
-                                                            value={product._id}
-                                                        >
-                                                            {
-                                                                product.product_name
-                                                            }
-                                                        </Option>
-                                                    ))}
-                                                </Select>
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={6}>
-                                            <Form.Item
-                                                {...restField}
-                                                name={[name, "quantity"]}
-                                                label="Quantity"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            "Please enter quantity",
-                                                    },
-                                                ]}
-                                            >
-                                                <InputNumber
-                                                    placeholder="Quantity"
-                                                    min={1}
-                                                    className="w-full"
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={6}>
-                                            <Form.Item
-                                                {...restField}
-                                                name={[name, "unitcost"]}
-                                                label="Unit Cost"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            "Please enter unit cost",
-                                                    },
-                                                ]}
-                                            >
-                                                <InputNumber
-                                                    placeholder="Unit Cost"
-                                                    min={0}
-                                                    step={0.01}
-                                                    className="w-full"
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col
-                                            span={4}
-                                            className="flex items-end"
-                                        >
-                                            <Button
-                                                type="text"
-                                                danger
-                                                onClick={() => remove(name)}
-                                                className="mb-6"
-                                            >
-                                                Remove
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                </div>
+                                    products={products}
+                                    onRemove={() => remove(name)}
+                                    name={name}
+                                    restField={restField}
+                                />
                             ))}
                         </>
                     )}
