@@ -91,59 +91,79 @@ const Orders = () => {
     };
 
     return (
-        <div className="p-6 bg-white min-h-screen">
-            {/* Page Header */}
-            <PageHeader
-                title="Orders"
-                subtitle="Manage and track your orders"
-                icon={<ShoppingCartOutlined />}
-                actionText="Create Order"
-                actionIcon={<PlusOutlined />}
-                onActionClick={() => setCreateModalVisible(true)}
-            />
+        <div className="min-h-screen bg-gray-50">
+            {/* Container with responsive padding */}
+            <div className="px-3 py-4 sm:px-4 sm:py-6 lg:px-6 lg:py-8 max-w-full">
+                {/* Page Header */}
+                <div className="mb-4 sm:mb-6">
+                    <PageHeader
+                        title="Orders"
+                        subtitle="Manage and track your orders"
+                        icon={
+                            <ShoppingCartOutlined className="text-blue-600 inline-block ml-2" />
+                        }
+                        actionText={
+                            <>
+                                <span className="hidden xs:inline">
+                                    Create Order
+                                </span>
+                                <span className="xs:hidden">Create</span>
+                            </>
+                        }
+                        actionIcon={<PlusOutlined />}
+                        onActionClick={() => setCreateModalVisible(true)}
+                    />
+                </div>
 
-            {/* Stats Cards */}
-            <OrderStats stats={stats} />
+                {/* Stats Cards with responsive spacing */}
+                <div className="mb-4 sm:mb-6">
+                    <OrderStats stats={stats} />
+                </div>
 
-            {/* Filters */}
-            <OrderFilters
-                filters={filters}
-                customers={customers}
-                onFilterChange={handleFilterChange}
-                onApplyFilters={handleApplyFilters}
-                onResetFilters={handleResetFilters}
-            />
+                {/* Filters with responsive spacing */}
+                <div className="mb-4 sm:mb-6">
+                    <OrderFilters
+                        filters={filters}
+                        customers={customers}
+                        onFilterChange={handleFilterChange}
+                        onApplyFilters={handleApplyFilters}
+                        onResetFilters={handleResetFilters}
+                    />
+                </div>
 
-            {/* Orders Table */}
-            <OrdersTable
-                orders={orders}
-                loading={loading}
-                pagination={pagination}
-                onTableChange={handleTableChange}
-                onViewDetails={handleViewDetails}
-                onUpdateStatus={updateOrderStatus}
-                onGenerateInvoice={generateInvoice}
-            />
+                {/* Orders Table with responsive container */}
+                <div className="w-full overflow-hidden">
+                    <OrdersTable
+                        orders={orders}
+                        loading={loading}
+                        pagination={pagination}
+                        onTableChange={handleTableChange}
+                        onViewDetails={handleViewDetails}
+                        onUpdateStatus={updateOrderStatus}
+                        onGenerateInvoice={generateInvoice}
+                    />
+                </div>
 
-            {/* Create Order Modal */}
-            <CreateOrderModal
-                visible={createModalVisible}
-                onCancel={handleCreateModalCancel}
-                onSubmit={handleCreateOrder}
-                customers={customers}
-                products={products}
-                form={createForm}
-            />
+                {/* Create Order Modal */}
+                <CreateOrderModal
+                    visible={createModalVisible}
+                    onCancel={handleCreateModalCancel}
+                    onSubmit={handleCreateOrder}
+                    customers={customers}
+                    products={products}
+                    form={createForm}
+                />
 
-            {/* Order Details Drawer */}
-            <OrderDetailsDrawer
-                visible={detailsDrawerVisible}
-                onClose={() => setDetailsDrawerVisible(false)}
-                selectedOrder={selectedOrder}
-                orderDetails={orderDetails}
-                detailsLoading={detailsLoading}
-                onGenerateInvoice={generateInvoice}
-            />
+                {/* Order Details Drawer */}
+                <OrderDetailsDrawer
+                    visible={detailsDrawerVisible}
+                    onClose={() => setDetailsDrawerVisible(false)}
+                    selectedOrder={selectedOrder}
+                    orderDetails={orderDetails}
+                    detailsLoading={detailsLoading}
+                    onGenerateInvoice={generateInvoice}
+                />
+            </div>
         </div>
     );
 };
