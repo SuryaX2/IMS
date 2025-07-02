@@ -91,7 +91,7 @@ const Orders = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-white">
             {/* Container with responsive padding */}
             <div className="px-3 py-4 sm:px-4 sm:py-6 lg:px-6 lg:py-8 max-w-full">
                 {/* Page Header */}
@@ -100,7 +100,7 @@ const Orders = () => {
                         title="Orders"
                         subtitle="Manage and track your orders"
                         icon={
-                            <ShoppingCartOutlined className="text-blue-600 inline-block ml-2" />
+                            <ShoppingCartOutlined className="text-blue-600 inline-block" />
                         }
                         actionText={
                             <>
