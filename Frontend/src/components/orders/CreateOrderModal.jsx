@@ -19,17 +19,19 @@ const CreateOrderModal = ({
             open={visible}
             onCancel={onCancel}
             footer={null}
-            width={800}
-            className="top-4"
+            width="95vw"
+            style={{ maxWidth: "800px", top: "10px" }}
+            className="mobile-modal"
+            destroyOnClose
         >
             <Form
                 form={form}
                 layout="vertical"
                 onFinish={onSubmit}
-                className="mt-4"
+                className="mt-2 sm:mt-4"
             >
-                <Row gutter={16}>
-                    <Col span={12}>
+                <Row gutter={[8, 0]} className="sm:gutter-16">
+                    <Col xs={24} sm={12}>
                         <Form.Item
                             name="customer_id"
                             label="Customer"
@@ -44,6 +46,8 @@ const CreateOrderModal = ({
                                 placeholder="Select Customer"
                                 showSearch
                                 optionFilterProp="children"
+                                size="large"
+                                className="sm:size-default"
                             >
                                 {customers.map((customer) => (
                                     <Option
@@ -56,7 +60,7 @@ const CreateOrderModal = ({
                             </Select>
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    <Col xs={24} sm={12}>
                         <Form.Item
                             name="invoice_no"
                             label="Invoice Number"
@@ -70,6 +74,8 @@ const CreateOrderModal = ({
                             <Input
                                 placeholder="Enter invoice number"
                                 maxLength={10}
+                                size="large"
+                                className="sm:size-default"
                             />
                         </Form.Item>
                     </Col>
@@ -80,7 +86,7 @@ const CreateOrderModal = ({
                     label="Order Status"
                     initialValue="pending"
                 >
-                    <Select>
+                    <Select size="large" className="sm:size-default">
                         <Option value="pending">Pending</Option>
                         <Option value="processing">Processing</Option>
                         <Option value="completed">Completed</Option>
@@ -90,37 +96,48 @@ const CreateOrderModal = ({
                 <Form.List name="orderItems" initialValue={[{}]}>
                     {(fields, { add, remove }) => (
                         <>
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-medium">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 gap-2">
+                                <h3 className="text-base sm:text-lg font-medium">
                                     Order Items
                                 </h3>
                                 <Button
                                     type="dashed"
                                     onClick={() => add()}
                                     icon={<PlusOutlined />}
+                                    size="large"
+                                    className="sm:size-default w-full sm:w-auto"
                                 >
                                     Add Item
                                 </Button>
                             </div>
-                            {fields.map(({ key, name, ...restField }) => (
-                                <OrderFormItems
-                                    key={key}
-                                    products={products}
-                                    onRemove={() => remove(name)}
-                                    name={name}
-                                    restField={restField}
-                                />
-                            ))}
+                            <div className="space-y-3 sm:space-y-0">
+                                {fields.map(({ key, name, ...restField }) => (
+                                    <OrderFormItems
+                                        key={key}
+                                        products={products}
+                                        onRemove={() => remove(name)}
+                                        name={name}
+                                        restField={restField}
+                                    />
+                                ))}
+                            </div>
                         </>
                     )}
                 </Form.List>
 
-                <div className="flex justify-end gap-2 mt-6">
-                    <Button onClick={onCancel}>Cancel</Button>
+                <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4 sm:mt-6">
+                    <Button
+                        onClick={onCancel}
+                        size="large"
+                        className="sm:size-default order-2 sm:order-1"
+                    >
+                        Cancel
+                    </Button>
                     <Button
                         type="primary"
                         htmlType="submit"
-                        className="bg-blue-600 hover:bg-blue-700"
+                        size="large"
+                        className="bg-blue-600 hover:bg-blue-700 sm:size-default order-1 sm:order-2"
                     >
                         Create Order
                     </Button>

@@ -37,16 +37,29 @@ const OrderStats = ({ stats }) => {
     ];
 
     return (
-        <Row gutter={16} className="mb-6">
+        <Row gutter={[12, 12]} className="mb-4 sm:mb-6 sm:gutter-16">
             {statsConfig.map((stat, index) => (
-                <Col xs={24} sm={12} md={6} key={index}>
-                    <Card className="border-0 shadow-sm">
+                <Col xs={12} sm={12} md={6} key={index}>
+                    <Card className="border-0 shadow-sm h-full">
                         <Statistic
-                            title={stat.title}
+                            title={
+                                <span className="text-xs sm:text-sm text-gray-600">
+                                    {stat.title}
+                                </span>
+                            }
                             value={stat.value}
-                            prefix={stat.prefix}
+                            prefix={
+                                <span className="text-lg sm:text-xl">
+                                    {stat.prefix}
+                                </span>
+                            }
                             precision={stat.precision}
-                            valueStyle={{ color: stat.color }}
+                            valueStyle={{
+                                color: stat.color,
+                                fontSize: "18px",
+                                fontWeight: "600",
+                            }}
+                            className="text-center sm:text-left"
                         />
                     </Card>
                 </Col>

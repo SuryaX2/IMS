@@ -5,7 +5,6 @@ import dayjs from "dayjs";
 import { getStatusColor } from "../../utils/orderHelpers";
 import { getStatusIcon } from "../../data";
 
-
 const OrderDetailsDrawer = ({
     visible,
     onClose,
@@ -18,21 +17,49 @@ const OrderDetailsDrawer = ({
 
     return (
         <Drawer
-            title={`Order Details - ${selectedOrder.invoice_no}`}
+            title={
+                <div className="text-sm sm:text-base">
+                    Order Details - {selectedOrder.invoice_no}
+                </div>
+            }
             placement="right"
             onClose={onClose}
             open={visible}
-            width={600}
+            width="100vw"
+            style={{ maxWidth: "600px" }}
+            className="mobile-drawer"
         >
-            <div className="space-y-6">
-                <Descriptions title="Order Information" bordered>
-                    <Descriptions.Item label="Invoice No" span={2}>
-                        #{selectedOrder.invoice_no}
+            <div className="space-y-4 sm:space-y-6">
+                <Descriptions
+                    title={
+                        <span className="text-base sm:text-lg">
+                            Order Information
+                        </span>
+                    }
+                    bordered
+                    size="small"
+                    column={{ xs: 1, sm: 2 }}
+                    labelStyle={{
+                        fontSize: "14px",
+                        fontWeight: "500",
+                    }}
+                    contentStyle={{
+                        fontSize: "14px",
+                    }}
+                >
+                    <Descriptions.Item
+                        label="Invoice No"
+                        span={{ xs: 1, sm: 2 }}
+                    >
+                        <span className="font-medium">
+                            #{selectedOrder.invoice_no}
+                        </span>
                     </Descriptions.Item>
                     <Descriptions.Item label="Status">
                         <Tag
                             icon={getStatusIcon(selectedOrder.order_status)}
                             color={getStatusColor(selectedOrder.order_status)}
+                            className="text-xs"
                         >
                             {selectedOrder.order_status.toUpperCase()}
                         </Tag>
@@ -58,38 +85,40 @@ const OrderDetailsDrawer = ({
                         )?.toFixed(2)}
                     </Descriptions.Item>
                     <Descriptions.Item label="Total Amount">
-                        <span className="text-lg font-semibold text-green-600">
+                        <span className="text-base sm:text-lg font-semibold text-green-600">
                             ${selectedOrder.total?.toFixed(2)}
                         </span>
                     </Descriptions.Item>
                 </Descriptions>
 
                 <div>
-                    <h3 className="text-lg font-medium mb-4">Order Items</h3>
+                    <h3 className="text-base sm:text-lg font-medium mb-3 sm:mb-4">
+                        Order Items
+                    </h3>
                     {detailsLoading ? (
-                        <div className="text-center py-8">
+                        <div className="text-center py-6 sm:py-8">
                             <Spin size="large" />
                         </div>
                     ) : orderDetails.length > 0 ? (
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                             {orderDetails.map((item, index) => (
                                 <Card
                                     key={index}
                                     size="small"
                                     className="border border-gray-200"
                                 >
-                                    <div className="flex justify-between items-center">
-                                        <div>
-                                            <h4 className="font-medium">
+                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
+                                        <div className="flex-1">
+                                            <h4 className="font-medium text-sm sm:text-base">
                                                 {item.product_id?.product_name}
                                             </h4>
-                                            <p className="text-gray-500 text-sm">
+                                            <p className="text-gray-500 text-xs sm:text-sm">
                                                 Quantity: {item.quantity} × $
                                                 {item.unitcost?.toFixed(2)}
                                             </p>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="font-semibold text-green-600">
+                                        <div className="text-left sm:text-right">
+                                            <p className="font-semibold text-green-600 text-sm sm:text-base">
                                                 ${item.total?.toFixed(2)}
                                             </p>
                                         </div>
@@ -98,11 +127,14 @@ const OrderDetailsDrawer = ({
                             ))}
                         </div>
                     ) : (
-                        <Empty description="No order items found" />
+                        <Empty
+                            description="No order items found"
+                            className="my-4 sm:my-8"
+                        />
                     )}
                 </div>
 
-                <div className="flex gap-2 pt-4 border-t">
+                <div className="flex gap-2 pt-3 sm:pt-4 border-t">
                     <Button
                         type="primary"
                         icon={<FilePdfOutlined />}
@@ -112,9 +144,11 @@ const OrderDetailsDrawer = ({
                                 selectedOrder.invoice_no
                             )
                         }
-                        className="bg-red-600 hover:bg-red-700"
+                        className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
+                        size="large"
                     >
-                        Download Invoice
+                        <span className="hidden xs:inline">Download </span>
+                        Invoice
                     </Button>
                 </div>
             </div>

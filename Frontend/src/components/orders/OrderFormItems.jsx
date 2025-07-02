@@ -1,13 +1,14 @@
 import React from "react";
 import { Form, Row, Col, Select, InputNumber, Button } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
 const OrderFormItems = ({ products, onRemove, name, restField }) => {
     return (
-        <div className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50">
-            <Row gutter={16}>
-                <Col span={8}>
+        <div className="border border-gray-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 bg-gray-50">
+            <Row gutter={[8, 8]} className="sm:gutter-16">
+                <Col xs={24} sm={12} md={8}>
                     <Form.Item
                         {...restField}
                         name={[name, "product_id"]}
@@ -23,6 +24,8 @@ const OrderFormItems = ({ products, onRemove, name, restField }) => {
                             placeholder="Select Product"
                             showSearch
                             optionFilterProp="children"
+                            size="large"
+                            className="sm:size-default"
                         >
                             {products.map((product) => (
                                 <Option key={product._id} value={product._id}>
@@ -32,7 +35,7 @@ const OrderFormItems = ({ products, onRemove, name, restField }) => {
                         </Select>
                     </Form.Item>
                 </Col>
-                <Col span={6}>
+                <Col xs={12} sm={6} md={6}>
                     <Form.Item
                         {...restField}
                         name={[name, "quantity"]}
@@ -45,13 +48,14 @@ const OrderFormItems = ({ products, onRemove, name, restField }) => {
                         ]}
                     >
                         <InputNumber
-                            placeholder="Quantity"
+                            placeholder="Qty"
                             min={1}
                             className="w-full"
+                            size="large"
                         />
                     </Form.Item>
                 </Col>
-                <Col span={6}>
+                <Col xs={12} sm={6} md={6}>
                     <Form.Item
                         {...restField}
                         name={[name, "unitcost"]}
@@ -64,21 +68,24 @@ const OrderFormItems = ({ products, onRemove, name, restField }) => {
                         ]}
                     >
                         <InputNumber
-                            placeholder="Unit Cost"
+                            placeholder="Cost"
                             min={0}
                             step={0.01}
                             className="w-full"
+                            size="large"
                         />
                     </Form.Item>
                 </Col>
-                <Col span={4} className="flex items-end">
+                <Col xs={24} sm={12} md={4} className="flex items-end">
                     <Button
                         type="text"
                         danger
                         onClick={onRemove}
-                        className="mb-6"
+                        className="mb-3 sm:mb-6 w-full sm:w-auto flex items-center justify-center"
+                        icon={<DeleteOutlined />}
+                        size="large"
                     >
-                        Remove
+                        <span className="sm:hidden ml-1">Remove</span>
                     </Button>
                 </Col>
             </Row>
