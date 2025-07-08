@@ -92,36 +92,29 @@ const Orders = () => {
 
     return (
         <div className="min-h-screen bg-white">
-            {/* Container with responsive padding */}
-            <div className="px-3 py-4 sm:px-4 sm:py-6 lg:px-6 lg:py-8 max-w-full">
+            {/* Main Container */}
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                 {/* Page Header */}
-                <div className="mb-4 sm:mb-6">
+                <div className="mb-8">
                     <PageHeader
                         title="Orders"
                         subtitle="Manage and track your orders"
                         icon={
-                            <ShoppingCartOutlined className="text-blue-600 inline-block" />
+                            <ShoppingCartOutlined className="text-blue-600" />
                         }
-                        actionText={
-                            <>
-                                <span className="hidden xs:inline">
-                                    Create Order
-                                </span>
-                                <span className="xs:hidden">Create</span>
-                            </>
-                        }
+                        actionText="Create Order"
                         actionIcon={<PlusOutlined />}
                         onActionClick={() => setCreateModalVisible(true)}
                     />
                 </div>
 
-                {/* Stats Cards with responsive spacing */}
-                <div className="mb-4 sm:mb-6">
+                {/* Stats Section */}
+                <div className="mb-8">
                     <OrderStats stats={stats} />
                 </div>
 
-                {/* Filters with responsive spacing */}
-                <div className="mb-4 sm:mb-6">
+                {/* Filters Section */}
+                <div className="mb-6">
                     <OrderFilters
                         filters={filters}
                         customers={customers}
@@ -131,8 +124,8 @@ const Orders = () => {
                     />
                 </div>
 
-                {/* Orders Table with responsive container */}
-                <div className="w-full overflow-hidden">
+                {/* Orders Table */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     <OrdersTable
                         orders={orders}
                         loading={loading}

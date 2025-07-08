@@ -1,6 +1,6 @@
 import React from "react";
 import { Table, Button, Select, Tag, Space, Tooltip, Card } from "antd";
-import { EyeOutlined, FilePdfOutlined } from "@ant-design/icons";
+import { EyeOutlined, FilePdfOutlined, UserOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { getStatusColor, ORDER_STATUSES } from "../../utils/orderHelpers";
 import { getStatusIcon } from "../../data";
@@ -21,10 +21,9 @@ const OrdersTable = ({
             title: "Invoice No",
             dataIndex: "invoice_no",
             key: "invoice_no",
-            width: 120,
-            fixed: "left",
+            width: 130,
             render: (text) => (
-                <span className="font-medium text-blue-600 text-xs sm:text-sm">
+                <span className="font-medium text-blue-600">
                     #{text}
                 </span>
             ),
@@ -33,24 +32,24 @@ const OrdersTable = ({
             title: "Customer",
             dataIndex: ["customer_id", "name"],
             key: "customer",
-            width: 150,
+            width: 200,
             ellipsis: true,
             render: (text, record) => (
-                <Tooltip title={record.customer_id?.name || "N/A"}>
-                    <span className="text-xs sm:text-sm">
+                <div className="flex items-center gap-2">
+                    <UserOutlined className="text-gray-400" />
+                    <span className="font-medium">
                         {record.customer_id?.name || "N/A"}
                     </span>
-                </Tooltip>
+                </div>
             ),
         },
         {
             title: "Date",
             dataIndex: "order_date",
             key: "order_date",
-            width: 100,
-            responsive: ["md"],
+            width: 120,
             render: (date) => (
-                <span className="text-xs sm:text-sm">
+                <span className="text-gray-600">
                     {dayjs(date).format("MMM DD, YYYY")}
                 </span>
             ),
@@ -59,19 +58,14 @@ const OrdersTable = ({
             title: "Status",
             dataIndex: "order_status",
             key: "order_status",
-            width: 100,
+            width: 130,
             render: (status) => (
                 <Tag
                     icon={getStatusIcon(status)}
                     color={getStatusColor(status)}
-                    className="text-xs"
+                    className="font-medium"
                 >
-                    <span className="hidden xs:inline">
-                        {status.toUpperCase()}
-                    </span>
-                    <span className="xs:hidden">
-                        {status.charAt(0).toUpperCase()}
-                    </span>
+                    {status.toUpperCase()}
                 </Tag>
             ),
         },
@@ -79,10 +73,10 @@ const OrdersTable = ({
             title: "Items",
             dataIndex: "total_products",
             key: "total_products",
-            width: 70,
-            responsive: ["sm"],
+            width: 80,
+            align: "center",
             render: (count) => (
-                <span className="font-medium text-xs sm:text-sm">{count}</span>
+                <span className="font-medium">{count}</span>
             ),
         },
         {
@@ -90,8 +84,9 @@ const OrdersTable = ({
             dataIndex: "total",
             key: "total",
             width: 100,
+            align: "right",
             render: (amount) => (
-                <span className="font-semibold text-green-600 text-xs sm:text-sm">
+                <span className="font-semibold text-green-600">
                     ${amount.toFixed(2)}
                 </span>
             ),
@@ -100,53 +95,37 @@ const OrdersTable = ({
             title: "Actions",
             key: "actions",
             width: 180,
-            fixed: "right",
+            align: "center",
             render: (_, record) => (
-                <Space size="small" className="flex flex-wrap">
+                <Space size="small">
                     <Tooltip title="View Details">
                         <Button
                             type="text"
-                            icon={
-                                <EyeOutlined className="text-xs sm:text-sm" />
-                            }
+                            icon={<EyeOutlined />}
                             onClick={() => onViewDetails(record)}
-                            className="text-blue-600 hover:text-blue-800 p-1 sm:p-2"
-                            size="small"
+                            className="text-blue-600 hover:text-blue-700"
                         />
                     </Tooltip>
 
-                    <Tooltip title="Update Status">
-                        <Select
-                            value={record.order_status}
-                            size="small"
-                            style={{ width: 80, fontSize: "12px" }}
-                            className="sm:w-24"
-                            onChange={(value) =>
-                                onUpdateStatus(record._id, value)
-                            }
-                            dropdownMatchSelectWidth={false}
-                        >
-                            {ORDER_STATUSES.map((status) => (
-                                <Option key={status.value} value={status.value}>
-                                    <span className="text-xs">
-                                        {status.label}
-                                    </span>
-                                </Option>
-                            ))}
-                        </Select>
-                    </Tooltip>
+                    <Select
+                        value={record.order_status}
+                        size="small"
+                        style={{ width: 90 }}
+                        onChange={(value) => onUpdateStatus(record._id, value)}
+                    >
+                        {ORDER_STATUSES.map((status) => (
+                            <Option key={status.value} value={status.value}>
+                                {status.label}
+                            </Option>
+                        ))}
+                    </Select>
 
                     <Tooltip title="Download Invoice">
                         <Button
                             type="text"
-                            icon={
-                                <FilePdfOutlined className="text-xs sm:text-sm" />
-                            }
-                            onClick={() =>
-                                onGenerateInvoice(record._id, record.invoice_no)
-                            }
-                            className="text-red-600 hover:text-red-800 p-1 sm:p-2"
-                            size="small"
+                            icon={<FilePdfOutlined />}
+                            onClick={() => onGenerateInvoice(record._id, record.invoice_no)}
+                            className="text-red-600 hover:text-red-700"
                         />
                     </Tooltip>
                 </Space>
@@ -154,29 +133,29 @@ const OrdersTable = ({
         },
     ];
 
-    // Mobile card view for very small screens
+    // Mobile card view
     const MobileOrderCard = ({ order }) => (
-        <Card size="small" className="mb-3 border border-gray-200">
-            <div className="space-y-2">
+        <Card className="mb-4 shadow-sm">
+            <div className="space-y-3">
                 <div className="flex justify-between items-start">
                     <div>
-                        <span className="font-medium text-blue-600 text-sm">
+                        <span className="font-medium text-blue-600">
                             #{order.invoice_no}
                         </span>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-sm text-gray-600 mt-1">
                             {order.customer_id?.name || "N/A"}
                         </p>
                     </div>
                     <Tag
                         icon={getStatusIcon(order.order_status)}
                         color={getStatusColor(order.order_status)}
-                        className="text-xs"
+                        className="font-medium"
                     >
                         {order.order_status.toUpperCase()}
                     </Tag>
                 </div>
 
-                <div className="flex justify-between items-center text-xs">
+                <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-500">
                         {dayjs(order.order_date).format("MMM DD, YYYY")}
                     </span>
@@ -186,7 +165,7 @@ const OrdersTable = ({
                 </div>
 
                 <div className="flex justify-between items-center pt-2 border-t">
-                    <span className="text-xs text-gray-500">
+                    <span className="text-sm text-gray-500">
                         {order.total_products} items
                     </span>
                     <Space size="small">
@@ -194,16 +173,14 @@ const OrdersTable = ({
                             type="text"
                             icon={<EyeOutlined />}
                             onClick={() => onViewDetails(order)}
-                            className="text-blue-600 hover:text-blue-800"
+                            className="text-blue-600"
                             size="small"
                         />
                         <Button
                             type="text"
                             icon={<FilePdfOutlined />}
-                            onClick={() =>
-                                onGenerateInvoice(order._id, order.invoice_no)
-                            }
-                            className="text-red-600 hover:text-red-800"
+                            onClick={() => onGenerateInvoice(order._id, order.invoice_no)}
+                            className="text-red-600"
                             size="small"
                         />
                     </Space>
@@ -213,64 +190,52 @@ const OrdersTable = ({
     );
 
     return (
-        <Card className="border-0 shadow-sm">
-            {/* Mobile view for screens smaller than 640px */}
-            <div className="block sm:hidden">
+        <>
+            {/* Mobile view */}
+            <div className="block sm:hidden p-4">
                 <div className="mb-4">
-                    <h3 className="text-lg font-medium mb-3">
+                    <h3 className="text-lg font-semibold text-gray-800">
                         Orders ({pagination.total})
                     </h3>
-                    {loading ? (
-                        <div className="text-center py-8">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {orders.map((order) => (
-                                <MobileOrderCard
-                                    key={order._id}
-                                    order={order}
-                                />
-                            ))}
-                        </div>
-                    )}
                 </div>
+                
+                {loading ? (
+                    <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-2 text-gray-500">Loading orders...</p>
+                    </div>
+                ) : (
+                    <div>
+                        {orders.map((order) => (
+                            <MobileOrderCard key={order._id} order={order} />
+                        ))}
+                    </div>
+                )}
 
                 {/* Mobile pagination */}
-                <div className="flex justify-between items-center pt-4 border-t">
+                <div className="flex justify-between items-center mt-4">
                     <span className="text-sm text-gray-500">
                         {(pagination.current - 1) * pagination.pageSize + 1}-
-                        {Math.min(
-                            pagination.current * pagination.pageSize,
-                            pagination.total
-                        )}{" "}
-                        of {pagination.total}
+                        {Math.min(pagination.current * pagination.pageSize, pagination.total)} of {pagination.total}
                     </span>
                     <Space>
                         <Button
                             size="small"
                             disabled={pagination.current === 1}
-                            onClick={() =>
-                                onTableChange({
-                                    current: pagination.current - 1,
-                                    pageSize: pagination.pageSize,
-                                })
-                            }
+                            onClick={() => onTableChange({
+                                current: pagination.current - 1,
+                                pageSize: pagination.pageSize,
+                            })}
                         >
                             Previous
                         </Button>
                         <Button
                             size="small"
-                            disabled={
-                                pagination.current * pagination.pageSize >=
-                                pagination.total
-                            }
-                            onClick={() =>
-                                onTableChange({
-                                    current: pagination.current + 1,
-                                    pageSize: pagination.pageSize,
-                                })
-                            }
+                            disabled={pagination.current * pagination.pageSize >= pagination.total}
+                            onClick={() => onTableChange({
+                                current: pagination.current + 1,
+                                pageSize: pagination.pageSize,
+                            })}
                         >
                             Next
                         </Button>
@@ -278,7 +243,7 @@ const OrdersTable = ({
                 </div>
             </div>
 
-            {/* Desktop table view for screens 640px and larger */}
+            {/* Desktop table view */}
             <div className="hidden sm:block">
                 <Table
                     columns={columns}
@@ -292,17 +257,32 @@ const OrdersTable = ({
                         showSizeChanger: true,
                         showQuickJumper: true,
                         showTotal: (total, range) =>
-                            `${range[0]}-${range[1]} of ${total} items`,
-                        responsive: true,
-                        size: "small",
+                            `${range[0]}-${range[1]} of ${total} orders`,
+                        pageSizeOptions: ["10", "20", "50", "100"],
                     }}
                     onChange={onTableChange}
-                    className="overflow-x-auto"
-                    scroll={{ x: 800 }}
-                    size="small"
+                    scroll={{ x: 900 }}
+                    className="orders-table"
                 />
             </div>
-        </Card>
+
+            <style jsx>{`
+                .orders-table .ant-table-thead > tr > th {
+                    background-color: #f9fafb;
+                    border-bottom: 1px solid #e5e7eb;
+                    font-weight: 600;
+                    color: #374151;
+                }
+                
+                .orders-table .ant-table-tbody > tr > td {
+                    border-bottom: 1px solid #f3f4f6;
+                }
+                
+                .orders-table .ant-table-tbody > tr:hover > td {
+                    background-color: #f9fafb;
+                }
+            `}</style>
+        </>
     );
 };
 
