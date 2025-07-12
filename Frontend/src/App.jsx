@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
+import Purchase from "./pages/Purchase";
 
 function App() {
     return (
@@ -62,15 +63,33 @@ function App() {
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="products" element={<Products />} />
                             <Route path="orders" element={<Orders />} />
-                            {/* <Route path="purchases" element={<div>Purchases Page</div>} />
-                            <Route path="customers" element={<div>Customers Page</div>} />
-                            <Route path="suppliers" element={<div>Suppliers Page</div>} />
-                            <Route path="categories" element={<div>Categories Page</div>} />
+                            <Route path="purchases" element={<Purchase />} />
+                            <Route
+                                path="customers"
+                                element={<div>Customers Page</div>}
+                            />
+                            <Route
+                                path="suppliers"
+                                element={<div>Suppliers Page</div>}
+                            />
+                            <Route
+                                path="categories"
+                                element={<div>Categories Page</div>}
+                            />
                             <Route path="reports">
-                                <Route path="stock" element={<div>Stock Report</div>} />
-                                <Route path="sales" element={<div>Sales Report</div>} />
-                                <Route path="purchases" element={<div>Purchase Report</div>} />
-                            </Route> */}
+                                <Route
+                                    path="stock"
+                                    element={<div>Stock Report</div>}
+                                />
+                                <Route
+                                    path="sales"
+                                    element={<div>Sales Report</div>}
+                                />
+                                <Route
+                                    path="purchases"
+                                    element={<div>Purchase Report</div>}
+                                />
+                            </Route>
                         </Route>
 
                         {/* catch all */}
