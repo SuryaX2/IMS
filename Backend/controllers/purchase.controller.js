@@ -1,5 +1,6 @@
 import { Purchase } from "../models/purchase.model.js";
 import { PurchaseDetail } from "../models/purchase-detail.model.js";
+import { Product } from "../models/product.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -165,6 +166,29 @@ const updatePurchaseStatus = asyncHandler(async (req, res, next) => {
             );
         }
 
+        // Handle different status changes
+        let returnInfo = null;
+
+        if (purchase_status === "returned") {
+            // Handle return logic
+            returnInfo = await handlePurchaseReturn(id, purchase);
+        } else if (
+            purchase_status === "completed" ||
+            purchase_status === "approved"
+        ) {
+            // If purchase is being approved/completed from pending
+            if (purchase.purchase_status === "pending") {
+                const purchaseDetails = await PurchaseDetail.find({
+                    purchase_id: id,
+                });
+
+                // Add stock for each purchase detail
+                for (const detail of purchaseDetails) {
+                    await detail.addStockProduct();
+                }
+            }
+        }
+
         const updatedPurchase = await Purchase.findByIdAndUpdate(
             id,
             {
@@ -174,28 +198,124 @@ const updatePurchaseStatus = asyncHandler(async (req, res, next) => {
             { new: true }
         );
 
-        // If purchase is now approved/completed, update stock levels
-        if (purchase_status === "completed" || purchase_status === "approved") {
-            // Get all purchase details for this purchase
-            const purchaseDetails = await PurchaseDetail.find({
-                purchase_id: id,
-            });
-
-            // For each purchase detail, manually call addStockProduct
-            for (const detail of purchaseDetails) {
-                await detail.addStockProduct();
-            }
-        }
+        const responseData = {
+            purchase: updatedPurchase,
+            ...(returnInfo && { returnInfo }),
+        };
 
         return res
             .status(200)
             .json(
                 new ApiResponse(
                     200,
-                    updatedPurchase,
-                    "Purchase status updated successfully"
+                    responseData,
+                    `Purchase status updated to ${purchase_status} successfully`
                 )
             );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
+// Helper function to handle purchase returns
+const handlePurchaseReturn = async (purchaseId, purchase) => {
+    try {
+        // Use the static method from PurchaseDetail model to process all returns
+        const returnInfo = await PurchaseDetail.processAllReturns(purchaseId);
+
+        return returnInfo;
+    } catch (error) {
+        throw new Error(`Return processing failed: ${error.message}`);
+    }
+};
+
+// New endpoint to get return information before processing
+const getReturnPreview = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        // First find the purchase to check ownership
+        const purchase = await Purchase.findById(id);
+
+        if (!purchase) {
+            return next(new ApiError(404, "Purchase not found"));
+        }
+
+        // Check if user is admin or the creator of the purchase
+        if (
+            req.user.role !== "admin" &&
+            !purchase.created_by.equals(req.user._id)
+        ) {
+            return next(
+                new ApiError(
+                    403,
+                    "You don't have permission to view this purchase"
+                )
+            );
+        }
+
+        // Check if purchase is already returned
+        if (purchase.purchase_status === "returned") {
+            return next(new ApiError(400, "Purchase is already returned"));
+        }
+
+        // Check if purchase was completed/approved (you can only return completed purchases)
+        if (
+            purchase.purchase_status !== "completed" &&
+            purchase.purchase_status !== "approved"
+        ) {
+            return next(
+                new ApiError(
+                    400,
+                    "Only completed/approved purchases can be returned"
+                )
+            );
+        }
+
+        // Get purchase details with current stock information
+        const purchaseDetails = await PurchaseDetail.find({
+            purchase_id: id,
+        }).populate("product_id", "product_name stock");
+
+        const returnPreview = [];
+        let totalPotentialRefund = 0;
+
+        for (const detail of purchaseDetails) {
+            const product = detail.product_id;
+            const purchasedQuantity = detail.quantity;
+            const currentStock = product.stock;
+
+            const returnableQuantity = Math.min(
+                purchasedQuantity,
+                currentStock
+            );
+            const refundAmount = returnableQuantity * detail.unitcost;
+            totalPotentialRefund += refundAmount;
+
+            returnPreview.push({
+                product_id: product._id,
+                product_name: product.product_name,
+                purchased_quantity: purchasedQuantity,
+                current_stock: currentStock,
+                returnable_quantity: returnableQuantity,
+                unit_cost: detail.unitcost,
+                potential_refund: refundAmount,
+                can_fully_return: returnableQuantity === purchasedQuantity,
+            });
+        }
+
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    purchase_id: id,
+                    purchase_no: purchase.purchase_no,
+                    total_potential_refund: totalPotentialRefund,
+                    return_preview: returnPreview,
+                },
+                "Return preview generated successfully"
+            )
+        );
     } catch (error) {
         return next(new ApiError(500, error.message));
     }
@@ -206,4 +326,5 @@ export {
     getAllPurchases,
     getPurchaseDetails,
     updatePurchaseStatus,
+    getReturnPreview,
 };
