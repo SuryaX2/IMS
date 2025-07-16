@@ -19,6 +19,9 @@ import {
     Typography,
     Statistic,
     Badge,
+    Alert,
+    Descriptions,
+    message,
 } from "antd";
 import {
     PlusOutlined,
@@ -31,6 +34,9 @@ import {
     ClockCircleOutlined,
     UndoOutlined,
     MinusCircleOutlined,
+    ExclamationCircleOutlined,
+    InfoCircleOutlined,
+    WarningOutlined,
 } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
@@ -46,8 +52,11 @@ const Purchase = () => {
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [detailModalVisible, setDetailModalVisible] = useState(false);
+    const [returnPreviewModalVisible, setReturnPreviewModalVisible] =
+        useState(false);
     const [selectedPurchase, setSelectedPurchase] = useState(null);
     const [purchaseDetails, setPurchaseDetails] = useState([]);
+    const [returnPreviewData, setReturnPreviewData] = useState(null);
     const [searchText, setSearchText] = useState("");
     const [form] = Form.useForm();
 
@@ -137,6 +146,26 @@ const Purchase = () => {
         }
     };
 
+    // Fetch return preview
+    const fetchReturnPreview = async (purchaseId) => {
+        try {
+            const response = await api.get(
+                `/purchases/${purchaseId}/return-preview`
+            );
+            if (response.data.success) {
+                setReturnPreviewData(response.data.data);
+                setReturnPreviewModalVisible(true);
+            } else {
+                toast.error(
+                    response.data.message || "Failed to fetch return preview"
+                );
+            }
+        } catch (error) {
+            toast.error("Error fetching return preview");
+            console.error("Error:", error);
+        }
+    };
+
     // Create purchase
     const createPurchase = async (values) => {
         try {
@@ -166,6 +195,14 @@ const Purchase = () => {
             if (response.data.success) {
                 toast.success("Purchase status updated successfully");
                 fetchPurchases();
+
+                // Show return information if status is returned
+                if (status === "returned" && response.data.data.returnInfo) {
+                    const returnInfo = response.data.data.returnInfo;
+                    message.success(
+                        `Purchase returned successfully! Total refund: ₹${returnInfo.total_refund_amount.toFixed(2)}`
+                    );
+                }
             } else {
                 toast.error(
                     response.data.message || "Failed to update purchase status"
@@ -217,6 +254,8 @@ const Purchase = () => {
                 return "orange";
             case "completed":
                 return "green";
+            case "approved":
+                return "green";
             case "returned":
                 return "red";
             default:
@@ -230,6 +269,7 @@ const Purchase = () => {
             case "pending":
                 return <ClockCircleOutlined />;
             case "completed":
+            case "approved":
                 return <CheckCircleOutlined />;
             case "returned":
                 return <UndoOutlined />;
@@ -305,6 +345,7 @@ const Purchase = () => {
                         <Tooltip title="Mark as Completed">
                             <Popconfirm
                                 title="Mark this purchase as completed?"
+                                description="This will update the stock for all products in this purchase."
                                 onConfirm={() =>
                                     updatePurchaseStatus(
                                         record._id,
@@ -321,21 +362,37 @@ const Purchase = () => {
                         </Tooltip>
                     )}
 
-                    {record.purchase_status === "completed" && (
-                        <Tooltip title="Mark as Returned">
-                            <Popconfirm
-                                title="Mark this purchase as returned?"
-                                onConfirm={() =>
-                                    updatePurchaseStatus(record._id, "returned")
-                                }
-                            >
+                    {(record.purchase_status === "completed" ||
+                        record.purchase_status === "approved") && (
+                        <>
+                            <Tooltip title="Preview Return">
                                 <Button
-                                    icon={<UndoOutlined />}
+                                    icon={<InfoCircleOutlined />}
                                     size="small"
-                                    danger
+                                    onClick={() =>
+                                        fetchReturnPreview(record._id)
+                                    }
                                 />
-                            </Popconfirm>
-                        </Tooltip>
+                            </Tooltip>
+                            <Tooltip title="Process Return">
+                                <Popconfirm
+                                    title="Process return for this purchase?"
+                                    description="This will reduce stock and calculate refund amounts."
+                                    onConfirm={() =>
+                                        updatePurchaseStatus(
+                                            record._id,
+                                            "returned"
+                                        )
+                                    }
+                                >
+                                    <Button
+                                        icon={<UndoOutlined />}
+                                        size="small"
+                                        danger
+                                    />
+                                </Popconfirm>
+                            </Tooltip>
+                        </>
                     )}
                 </Space>
             ),
@@ -372,6 +429,80 @@ const Purchase = () => {
             dataIndex: "total",
             key: "total",
             render: (total) => `₹${total.toFixed(2)}`,
+        },
+        {
+            title: "Return Status",
+            key: "return_status",
+            render: (_, record) => {
+                if (record.return_processed) {
+                    return (
+                        <div>
+                            <Tag color="red">Returned</Tag>
+                            <div className="text-xs text-gray-500">
+                                Qty: {record.returned_quantity || 0} | Refund: ₹
+                                {(record.refund_amount || 0).toFixed(2)}
+                            </div>
+                        </div>
+                    );
+                }
+                return <Tag color="default">Not Returned</Tag>;
+            },
+        },
+    ];
+
+    // Return preview columns
+    const returnPreviewColumns = [
+        {
+            title: "Product",
+            dataIndex: "product_name",
+            key: "product_name",
+        },
+        {
+            title: "Purchased Qty",
+            dataIndex: "purchased_quantity",
+            key: "purchased_quantity",
+        },
+        {
+            title: "Current Stock",
+            dataIndex: "current_stock",
+            key: "current_stock",
+        },
+        {
+            title: "Returnable Qty",
+            dataIndex: "returnable_quantity",
+            key: "returnable_quantity",
+            render: (qty, record) => (
+                <span
+                    className={
+                        record.can_fully_return
+                            ? "text-green-600"
+                            : "text-red-600"
+                    }
+                >
+                    {qty}
+                </span>
+            ),
+        },
+        {
+            title: "Unit Cost",
+            dataIndex: "unit_cost",
+            key: "unit_cost",
+            render: (cost) => `₹${cost.toFixed(2)}`,
+        },
+        {
+            title: "Potential Refund",
+            dataIndex: "potential_refund",
+            key: "potential_refund",
+            render: (refund) => `₹${refund.toFixed(2)}`,
+        },
+        {
+            title: "Status",
+            key: "status",
+            render: (_, record) => (
+                <Tag color={record.can_fully_return ? "green" : "orange"}>
+                    {record.can_fully_return ? "Full Return" : "Partial Return"}
+                </Tag>
+            ),
         },
     ];
 
@@ -546,7 +677,7 @@ const Purchase = () => {
                         <Select placeholder="Select status">
                             <Option value="pending">Pending</Option>
                             <Option value="completed">Completed</Option>
-                            <Option value="returned">Returned</Option>
+                            <Option value="approved">Approved</Option>
                         </Select>
                     </Form.Item>
 
@@ -675,29 +806,23 @@ const Purchase = () => {
                 open={detailModalVisible}
                 onCancel={() => setDetailModalVisible(false)}
                 footer={null}
-                width={800}
+                width={900}
             >
                 {selectedPurchase && (
                     <div className="mb-4">
-                        <Row gutter={16}>
-                            <Col span={12}>
-                                <Text strong>Supplier: </Text>
-                                <Text>
-                                    {selectedPurchase.supplier_id?.name}
-                                </Text>
-                            </Col>
-                            <Col span={12}>
-                                <Text strong>Purchase Date: </Text>
-                                <Text>
-                                    {dayjs(
-                                        selectedPurchase.purchase_date
-                                    ).format("DD/MM/YYYY")}
-                                </Text>
-                            </Col>
-                        </Row>
-                        <Row gutter={16} className="mt-2">
-                            <Col span={12}>
-                                <Text strong>Status: </Text>
+                        <Descriptions column={2} bordered>
+                            <Descriptions.Item label="Purchase Number">
+                                {selectedPurchase.purchase_no}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Supplier">
+                                {selectedPurchase.supplier_id?.name}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Purchase Date">
+                                {dayjs(selectedPurchase.purchase_date).format(
+                                    "DD/MM/YYYY"
+                                )}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Status">
                                 <Tag
                                     color={getStatusColor(
                                         selectedPurchase.purchase_status
@@ -708,14 +833,16 @@ const Purchase = () => {
                                 >
                                     {selectedPurchase.purchase_status.toUpperCase()}
                                 </Tag>
-                            </Col>
-                            <Col span={12}>
-                                <Text strong>Created By: </Text>
-                                <Text>
-                                    {selectedPurchase.created_by?.username}
-                                </Text>
-                            </Col>
-                        </Row>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Created By">
+                                {selectedPurchase.created_by?.username}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Created At">
+                                {dayjs(selectedPurchase.createdAt).format(
+                                    "DD/MM/YYYY HH:mm"
+                                )}
+                            </Descriptions.Item>
+                        </Descriptions>
                     </div>
                 )}
 
@@ -726,10 +853,14 @@ const Purchase = () => {
                     dataSource={purchaseDetails}
                     rowKey="_id"
                     pagination={false}
-                    scroll={{ x: 600 }}
+                    scroll={{ x: 800 }}
                     summary={(pageData) => {
                         const total = pageData.reduce(
                             (sum, record) => sum + (record.total || 0),
+                            0
+                        );
+                        const totalRefund = pageData.reduce(
+                            (sum, record) => sum + (record.refund_amount || 0),
                             0
                         );
                         return (
@@ -741,11 +872,128 @@ const Purchase = () => {
                                     <Table.Summary.Cell index={4}>
                                         <Text strong>₹{total.toFixed(2)}</Text>
                                     </Table.Summary.Cell>
+                                    <Table.Summary.Cell index={5}>
+                                        {totalRefund > 0 && (
+                                            <Text strong type="danger">
+                                                Total Refund: ₹
+                                                {totalRefund.toFixed(2)}
+                                            </Text>
+                                        )}
+                                    </Table.Summary.Cell>
                                 </Table.Summary.Row>
                             </Table.Summary>
                         );
                     }}
                 />
+            </Modal>
+
+            {/* Return Preview Modal */}
+            <Modal
+                title={`Return Preview - ${returnPreviewData?.purchase_no}`}
+                open={returnPreviewModalVisible}
+                onCancel={() => setReturnPreviewModalVisible(false)}
+                footer={[
+                    <Button
+                        key="cancel"
+                        onClick={() => setReturnPreviewModalVisible(false)}
+                    >
+                        Cancel
+                    </Button>,
+                    <Button
+                        key="proceed"
+                        type="primary"
+                        danger
+                        onClick={() => {
+                            setReturnPreviewModalVisible(false);
+                            const purchase = purchases.find(
+                                (p) => p._id === returnPreviewData?.purchase_id
+                            );
+                            if (purchase) {
+                                updatePurchaseStatus(purchase._id, "returned");
+                            }
+                        }}
+                    >
+                        Proceed with Return
+                    </Button>,
+                ]}
+                width={1000}
+            >
+                {returnPreviewData && (
+                    <>
+                        <Alert
+                            message="Return Preview"
+                            description={`Total potential refund: ₹${returnPreviewData.total_potential_refund.toFixed(2)}`}
+                            type="info"
+                            showIcon
+                            className="mb-4"
+                        />
+
+                        <Alert
+                            message="Important Notice"
+                            description="Items with insufficient stock will be partially returned. Only the available stock quantity will be processed for return."
+                            type="warning"
+                            showIcon
+                            className="mb-4"
+                        />
+
+                        <Table
+                            columns={returnPreviewColumns}
+                            dataSource={returnPreviewData.return_preview}
+                            rowKey="product_id"
+                            pagination={false}
+                            scroll={{ x: 800 }}
+                            summary={(pageData) => {
+                                const totalRefund = pageData.reduce(
+                                    (sum, record) =>
+                                        sum + (record.potential_refund || 0),
+                                    0
+                                );
+                                const fullReturns = pageData.filter(
+                                    (item) => item.can_fully_return
+                                ).length;
+                                const partialReturns = pageData.filter(
+                                    (item) => !item.can_fully_return
+                                ).length;
+
+                                return (
+                                    <Table.Summary fixed>
+                                        <Table.Summary.Row>
+                                            <Table.Summary.Cell
+                                                index={0}
+                                                colSpan={5}
+                                            >
+                                                <div className="text-right">
+                                                    <Text strong>
+                                                        Total Potential
+                                                        Refund:{" "}
+                                                    </Text>
+                                                    <Text strong type="danger">
+                                                        ₹
+                                                        {totalRefund.toFixed(2)}
+                                                    </Text>
+                                                    <br />
+                                                    <Text type="success">
+                                                        Full Returns:{" "}
+                                                        {fullReturns}
+                                                    </Text>
+                                                    {partialReturns > 0 && (
+                                                        <>
+                                                            <Text> | </Text>
+                                                            <Text type="warning">
+                                                                Partial Returns:{" "}
+                                                                {partialReturns}
+                                                            </Text>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </Table.Summary.Cell>
+                                        </Table.Summary.Row>
+                                    </Table.Summary>
+                                );
+                            }}
+                        />
+                    </>
+                )}
             </Modal>
         </div>
     );
