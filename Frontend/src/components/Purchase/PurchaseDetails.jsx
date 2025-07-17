@@ -1,7 +1,8 @@
 import React from "react";
 import { Modal, Table, Descriptions, Divider, Tag, Typography } from "antd";
 import dayjs from "dayjs";
-import { getStatusColor, getStatusIcon } from "../../utils/purchaseUtils";
+import { getStatusColor } from "../../utils/purchaseUtils";
+import { getStatusIconPurchase } from "../../data";
 
 const { Text } = Typography;
 
@@ -79,7 +80,7 @@ const PurchaseDetails = ({ visible, onCancel, purchase, details }) => {
                         <Descriptions.Item label="Status">
                             <Tag
                                 color={getStatusColor(purchase.purchase_status)}
-                                icon={getStatusIcon(purchase.purchase_status)}
+                                icon={getStatusIconPurchase(purchase.purchase_status)}
                             >
                                 {purchase.purchase_status.toUpperCase()}
                             </Tag>

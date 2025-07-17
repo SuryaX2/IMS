@@ -32,19 +32,19 @@ export const getStatusColor = (status) => {
 };
 
 // Get status icon
-export const getStatusIcon = (status) => {
-    switch (status) {
-        case "pending":
-            return <ClockCircleOutlined />;
-        case "completed":
-        case "approved":
-            return <CheckCircleOutlined />;
-        case "returned":
-            return <UndoOutlined />;
-        default:
-            return null;
-    }
-};
+// export const getStatusIcon = (status) => {
+//     switch (status) {
+//         case "pending":
+//             return <ClockCircleOutlined />;
+//         case "completed":
+//         case "approved":
+//             return <CheckCircleOutlined />;
+//         case "returned":
+//             return <UndoOutlined />;
+//         default:
+//             return null;
+//     }
+// };
 
 // Calculate stats
 export const calculateStats = (purchaseData) => {

@@ -9,6 +9,7 @@ import {
     UserSwitchOutlined,
     CheckCircleOutlined,
     ClockCircleOutlined,
+    UndoOutlined
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
@@ -146,4 +147,18 @@ export const getStatusIcon = (status) => {
         cancelled: <ClockCircleOutlined />,
     };
     return icons[status];
+};
+
+export const getStatusIconPurchase = (status) => {
+    switch (status) {
+        case "pending":
+            return <ClockCircleOutlined />;
+        case "completed":
+        case "approved":
+            return <CheckCircleOutlined />;
+        case "returned":
+            return <UndoOutlined />;
+        default:
+            return null;
+    }
 };

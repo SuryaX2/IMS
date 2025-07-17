@@ -7,7 +7,8 @@ import {
     UndoOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getStatusColor, getStatusIcon } from "../../utils/purchaseUtils";
+import { getStatusColor } from "../../utils/purchaseUtils";
+import { getStatusIconPurchase } from "../../data";
 
 const PurchaseTable = ({
     purchases,
@@ -50,7 +51,7 @@ const PurchaseTable = ({
             render: (status) => (
                 <Tag
                     color={getStatusColor(status)}
-                    icon={getStatusIcon(status)}
+                    icon={getStatusIconPurchase(status)}
                 >
                     {status.toUpperCase()}
                 </Tag>
