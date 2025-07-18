@@ -58,7 +58,7 @@ const PurchaseForm = ({
             open={visible}
             onCancel={onCancel}
             footer={null}
-            width={900}
+            width={950}
             className="purchase-form-modal"
         >
             <Form
@@ -66,9 +66,9 @@ const PurchaseForm = ({
                 layout="vertical"
                 onFinish={handleSubmit}
                 initialValues={initialValues}
-                className="mt-4"
+                className="mt-2"
             >
-                <Card className="mb-6 bg-gray-50 border-0">
+                <Card className="mb-1 bg-gray-50 border-0">
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12}>
                             <Form.Item
@@ -241,7 +241,7 @@ const PurchaseForm = ({
                                         <Col xs={24} sm={3}>
                                             <Form.Item label=" ">
                                                 <Button
-                                                    type="dashed"
+                                                    type="default"
                                                     onClick={() => remove(name)}
                                                     icon={
                                                         <MinusCircleOutlined />
