@@ -10,7 +10,7 @@ import {
 const PurchaseStats = ({ stats }) => {
     const statsData = [
         {
-            title: "Total Purchases",
+            title: "Purchases",
             value: stats.total,
             color: "#1890ff",
             bgColor: "bg-blue-50",
@@ -49,7 +49,7 @@ const PurchaseStats = ({ stats }) => {
                 <Col key={index} xs={12} sm={12} md={6} lg={6}>
                     <Card
                         className={`${stat.bgColor} border-0 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer`}
-                        body={{ padding: "20px" }}
+                        bodyStyle={{ padding: "20px" }}
                     >
                         <div className="flex items-center justify-between">
                             <div>
