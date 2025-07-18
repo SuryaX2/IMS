@@ -62,11 +62,11 @@ const PurchaseList = ({
     };
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="p-6 bg-white min-h-screen">
             <div className="mb-6">
-                <Title level={2} className="flex items-center gap-2 mb-4">
+                <h2 className="text-4xl font-bold flex items-center gap-2 mb-4">
                     Purchase Management
-                </Title>
+                </h2>
 
                 <PurchaseStats stats={stats} />
 
