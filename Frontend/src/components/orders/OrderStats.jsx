@@ -40,7 +40,7 @@ const OrderStats = ({ stats }) => {
         <Row gutter={[12, 12]} className="mb-4 sm:mb-6 sm:gutter-16">
             {statsConfig.map((stat, index) => (
                 <Col xs={12} sm={12} md={6} key={index}>
-                    <Card className="border-0 shadow-sm h-full">
+                    <Card className="border-0 shadow-md h-full">
                         <Statistic
                             title={
                                 <span className="text-xs sm:text-sm text-gray-600">
