@@ -16,6 +16,8 @@ import {
     Col,
     Statistic,
     Empty,
+    Descriptions,
+    Typography,
 } from "antd";
 import {
     PlusOutlined,
@@ -28,18 +30,22 @@ import {
     MailOutlined,
     HomeOutlined,
     ShopOutlined,
+    EyeOutlined,
 } from "@ant-design/icons";
 import { toast } from "react-hot-toast";
 import { api } from "../api/api";
 
 const { Option } = Select;
 const { TextArea } = Input;
+const { Title, Text } = Typography;
 
 const Customers = () => {
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [viewModalVisible, setViewModalVisible] = useState(false);
     const [editingCustomer, setEditingCustomer] = useState(null);
+    const [viewingCustomer, setViewingCustomer] = useState(null);
     const [form] = Form.useForm();
     const [searchText, setSearchText] = useState("");
     const [fileList, setFileList] = useState([]);
@@ -153,6 +159,11 @@ const Customers = () => {
         setModalVisible(true);
     };
 
+    const handleView = (customer) => {
+        setViewingCustomer(customer);
+        setViewModalVisible(true);
+    };
+
     const handleDelete = async (id) => {
         try {
             const response = await api.delete(`/customers/${id}`);
@@ -172,6 +183,11 @@ const Customers = () => {
         setEditingCustomer(null);
         form.resetFields();
         setFileList([]);
+    };
+
+    const handleViewCancel = () => {
+        setViewModalVisible(false);
+        setViewingCustomer(null);
     };
 
     const uploadProps = {
@@ -208,34 +224,41 @@ const Customers = () => {
             title: "Name",
             dataIndex: "name",
             key: "name",
+            width: 150,
             sorter: (a, b) => a.name.localeCompare(b.name),
-        },
-        {
-            title: "Email",
-            dataIndex: "email",
-            key: "email",
-            render: (email) => (
-                <Space>
-                    <MailOutlined />
-                    {email}
-                </Space>
+            render: (name) => (
+                <Text strong style={{ fontSize: "14px" }}>
+                    {name}
+                </Text>
             ),
         },
         {
-            title: "Phone",
-            dataIndex: "phone",
-            key: "phone",
-            render: (phone) => (
-                <Space>
-                    <PhoneOutlined />
-                    {phone}
-                </Space>
+            title: "Contact",
+            key: "contact",
+            width: 200,
+            render: (_, record) => (
+                <div className="space-y-1">
+                    <div className="flex items-center text-xs text-gray-600">
+                        <MailOutlined className="mr-1" />
+                        <span
+                            className="truncate max-w-[140px]"
+                            title={record.email}
+                        >
+                            {record.email}
+                        </span>
+                    </div>
+                    <div className="flex items-center text-xs text-gray-600">
+                        <PhoneOutlined className="mr-1" />
+                        <span>{record.phone}</span>
+                    </div>
+                </div>
             ),
         },
         {
             title: "Type",
             dataIndex: "type",
             key: "type",
+            width: 100,
             render: (type) => {
                 const colors = {
                     regular: "blue",
@@ -243,7 +266,7 @@ const Customers = () => {
                     retail: "orange",
                 };
                 return (
-                    <Tag color={colors[type] || "default"}>
+                    <Tag color={colors[type] || "default"} className="text-xs">
                         {type?.toUpperCase()}
                     </Tag>
                 );
@@ -256,45 +279,59 @@ const Customers = () => {
             onFilter: (value, record) => record.type === value,
         },
         {
-            title: "Address",
-            dataIndex: "address",
-            key: "address",
-            ellipsis: true,
-            render: (address) =>
-                address ? (
-                    <Space>
-                        <HomeOutlined />
-                        {address}
-                    </Space>
-                ) : (
-                    "-"
-                ),
-        },
-        {
-            title: "Store Name",
-            dataIndex: "store_name",
-            key: "store_name",
-            render: (storeName) =>
-                storeName ? (
-                    <Space>
-                        <ShopOutlined />
-                        {storeName}
-                    </Space>
-                ) : (
-                    "-"
-                ),
+            title: "Location",
+            key: "location",
+            width: 180,
+            render: (_, record) => (
+                <div className="space-y-1">
+                    {record.address && (
+                        <div className="flex items-center text-xs text-gray-600">
+                            <HomeOutlined className="mr-1 flex-shrink-0" />
+                            <span
+                                className="truncate max-w-[130px]"
+                                title={record.address}
+                            >
+                                {record.address}
+                            </span>
+                        </div>
+                    )}
+                    {record.store_name && (
+                        <div className="flex items-center text-xs text-gray-600">
+                            <ShopOutlined className="mr-1 flex-shrink-0" />
+                            <span
+                                className="truncate max-w-[130px]"
+                                title={record.store_name}
+                            >
+                                {record.store_name}
+                            </span>
+                        </div>
+                    )}
+                    {!record.address && !record.store_name && (
+                        <span className="text-gray-400 text-xs">-</span>
+                    )}
+                </div>
+            ),
         },
         {
             title: "Actions",
             key: "actions",
-            width: 120,
+            width: 150,
+            fixed: "right",
             render: (_, record) => (
-                <Space>
+                <Space size="small">
+                    <Button
+                        type="default"
+                        icon={<EyeOutlined />}
+                        size="small"
+                        onClick={() => handleView(record)}
+                        title="View Details"
+                    />
                     <Button
                         type="primary"
                         icon={<EditOutlined />}
                         size="small"
                         onClick={() => handleEdit(record)}
+                        title="Edit Customer"
                     />
                     <Popconfirm
                         title="Are you sure you want to delete this customer?"
@@ -302,7 +339,12 @@ const Customers = () => {
                         okText="Yes"
                         cancelText="No"
                     >
-                        <Button danger icon={<DeleteOutlined />} size="small" />
+                        <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            size="small"
+                            title="Delete Customer"
+                        />
                     </Popconfirm>
                 </Space>
             ),
@@ -384,6 +426,7 @@ const Customers = () => {
                     dataSource={filteredCustomers}
                     rowKey="_id"
                     loading={loading}
+                    scroll={{ x: 800 }}
                     pagination={{
                         total: filteredCustomers.length,
                         pageSize: 10,
@@ -402,6 +445,120 @@ const Customers = () => {
                     }}
                 />
             </Card>
+
+            {/* View Customer Modal */}
+            <Modal
+                title={
+                    <div className="flex items-center space-x-3">
+                        <Avatar
+                            size={70}
+                            src={
+                                viewingCustomer?.photo !==
+                                "default-customer.png"
+                                    ? viewingCustomer?.photo
+                                    : null
+                            }
+                            icon={<UserOutlined />}
+                        />
+                        <div>
+                            <Title level={4} className="m-0">
+                                Customer Details
+                            </Title>
+                            <Text type="secondary" className="text-sm">
+                                {viewingCustomer?.name}
+                            </Text>
+                        </div>
+                    </div>
+                }
+                open={viewModalVisible}
+                onCancel={handleViewCancel}
+                footer={[
+                    <Button
+                        key="edit"
+                        type="primary"
+                        onClick={() => {
+                            handleViewCancel();
+                            handleEdit(viewingCustomer);
+                        }}
+                    >
+                        <EditOutlined /> Edit Customer
+                    </Button>,
+                    <Button key="close" onClick={handleViewCancel}>
+                        Close
+                    </Button>,
+                ]}
+                width={700}
+            >
+                {viewingCustomer && (
+                    <Descriptions
+                        bordered
+                        column={2}
+                        size="middle"
+                        className="mt-4"
+                    >
+                        <Descriptions.Item label="Name" span={2}>
+                            <Text strong>{viewingCustomer.name}</Text>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Email">
+                            <Space>
+                                <MailOutlined className="text-blue-500" />
+                                {viewingCustomer.email}
+                            </Space>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Phone">
+                            <Space>
+                                <PhoneOutlined className="text-green-500" />
+                                {viewingCustomer.phone}
+                            </Space>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Customer Type">
+                            <Tag
+                                color={
+                                    viewingCustomer.type === "regular"
+                                        ? "blue"
+                                        : viewingCustomer.type === "wholesale"
+                                          ? "green"
+                                          : viewingCustomer.type === "retail"
+                                            ? "orange"
+                                            : "default"
+                                }
+                            >
+                                {viewingCustomer.type?.toUpperCase()}
+                            </Tag>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Address" span={2}>
+                            {viewingCustomer.address ? (
+                                <Space>
+                                    <HomeOutlined className="text-purple-500" />
+                                    {viewingCustomer.address}
+                                </Space>
+                            ) : (
+                                <Text type="secondary">Not provided</Text>
+                            )}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Store Name">
+                            {viewingCustomer.store_name ? (
+                                <Space>
+                                    <ShopOutlined className="text-orange-500" />
+                                    {viewingCustomer.store_name}
+                                </Space>
+                            ) : (
+                                <Text type="secondary">Not provided</Text>
+                            )}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Account Holder">
+                            {viewingCustomer.account_holder || (
+                                <Text type="secondary">Not provided</Text>
+                            )}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Account Number" span={2}>
+                            {viewingCustomer.account_number || (
+                                <Text type="secondary">Not provided</Text>
+                            )}
+                        </Descriptions.Item>
+                    </Descriptions>
+                )}
+            </Modal>
 
             {/* Add/Edit Modal */}
             <Modal
