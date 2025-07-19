@@ -15,6 +15,7 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 import Products from "./pages/Products";
 import Orders from "./pages/Orders";
 import Purchase from "./pages/Purchase";
+import Customers from "./pages/Customers";
 
 function App() {
     return (
@@ -64,10 +65,7 @@ function App() {
                             <Route path="products" element={<Products />} />
                             <Route path="orders" element={<Orders />} />
                             <Route path="purchases" element={<Purchase />} />
-                            <Route
-                                path="customers"
-                                element={<div>Customers Page</div>}
-                            />
+                            <Route path="customers" element={<Customers />} />
                             <Route
                                 path="suppliers"
                                 element={<div>Suppliers Page</div>}
