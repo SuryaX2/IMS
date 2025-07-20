@@ -147,7 +147,7 @@ const Customers = () => {
         <div className="p-6">
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-800 mb-4">
-                    Customer Management
+                    Customers
                 </h1>
 
                 <CustomerStats stats={stats} />
