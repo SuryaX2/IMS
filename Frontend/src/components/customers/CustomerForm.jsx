@@ -8,7 +8,7 @@ import {
     Col,
     Button,
     Space,
-    Divider,
+    Card,
 } from "antd";
 import {
     UploadOutlined,
@@ -16,6 +16,9 @@ import {
     MailOutlined,
     PhoneOutlined,
     ShopOutlined,
+    HomeOutlined,
+    BankOutlined,
+    IdcardOutlined,
 } from "@ant-design/icons";
 
 const { Option } = Select;
@@ -41,25 +44,38 @@ const CustomerForm = ({
     };
 
     return (
-        <div className="p-6 bg-gray-50 min-h-full">
+        <div className="min-h-full">
             <Form
                 form={form}
                 layout="vertical"
                 onFinish={onSubmit}
-                className="bg-white p-6 rounded-lg shadow-sm"
                 scrollToFirstError
+                className="space-y-6"
             >
                 {/* Personal Information Section */}
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <UserOutlined className="mr-2 text-blue-600" />
-                        Personal Information
-                    </h3>
-
-                    <Row gutter={[16, 0]}>
+                <Card
+                    title={
+                        <div className="flex items-center text-gray-800">
+                            <UserOutlined className="mr-3 text-blue-600 text-lg" />
+                            <span className="text-lg font-semibold">
+                                Personal Information
+                            </span>
+                        </div>
+                    }
+                    className="shadow-sm border-0"
+                    headStyle={{
+                        borderBottom: "2px solid #f0f0f0",
+                        background: "#fafafa",
+                    }}
+                >
+                    <Row gutter={[24, 16]}>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                                label="Customer Name"
+                                label={
+                                    <span className="font-medium text-gray-700">
+                                        Customer Name
+                                    </span>
+                                }
                                 name="name"
                                 rules={[
                                     {
@@ -79,18 +95,24 @@ const CustomerForm = ({
                                     prefix={
                                         <UserOutlined className="text-gray-400" />
                                     }
+                                    className="rounded-lg"
                                 />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                                label="Customer Type"
+                                label={
+                                    <span className="font-medium text-gray-700">
+                                        Customer Type
+                                    </span>
+                                }
                                 name="type"
                                 initialValue="regular"
                             >
                                 <Select
                                     placeholder="Select customer type"
                                     size="large"
+                                    className="rounded-lg"
                                 >
                                     <Option value="regular">
                                         Regular Customer
@@ -105,21 +127,32 @@ const CustomerForm = ({
                             </Form.Item>
                         </Col>
                     </Row>
-                </div>
-
-                <Divider />
+                </Card>
 
                 {/* Contact Information Section */}
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <PhoneOutlined className="mr-2 text-green-600" />
-                        Contact Information
-                    </h3>
-
-                    <Row gutter={[16, 0]}>
+                <Card
+                    title={
+                        <div className="flex items-center text-gray-800">
+                            <MailOutlined className="mr-3 text-green-600 text-lg" />
+                            <span className="text-lg font-semibold">
+                                Contact Information
+                            </span>
+                        </div>
+                    }
+                    className="shadow-sm border-0"
+                    headStyle={{
+                        borderBottom: "2px solid #f0f0f0",
+                        background: "#fafafa",
+                    }}
+                >
+                    <Row gutter={[24, 16]}>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                                label="Email Address"
+                                label={
+                                    <span className="font-medium text-gray-700">
+                                        Email Address
+                                    </span>
+                                }
                                 name="email"
                                 rules={[
                                     {
@@ -144,12 +177,17 @@ const CustomerForm = ({
                                     prefix={
                                         <MailOutlined className="text-gray-400" />
                                     }
+                                    className="rounded-lg"
                                 />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                                label="Phone Number"
+                                label={
+                                    <span className="font-medium text-gray-700">
+                                        Phone Number
+                                    </span>
+                                }
                                 name="phone"
                                 rules={[
                                     {
@@ -169,45 +207,66 @@ const CustomerForm = ({
                                     prefix={
                                         <PhoneOutlined className="text-gray-400" />
                                     }
+                                    className="rounded-lg"
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24}>
+                            <Form.Item
+                                label={
+                                    <span className="font-medium text-gray-700">
+                                        Address
+                                    </span>
+                                }
+                                name="address"
+                                rules={[
+                                    {
+                                        max: 100,
+                                        message:
+                                            "Address cannot exceed 100 characters",
+                                    },
+                                ]}
+                            >
+                                <TextArea
+                                    placeholder="Enter complete address"
+                                    rows={3}
+                                    size="large"
+                                    className="rounded-lg"
                                 />
                             </Form.Item>
                         </Col>
                     </Row>
-
-                    <Form.Item
-                        label="Address"
-                        name="address"
-                        rules={[
-                            {
-                                max: 100,
-                                message: "Address cannot exceed 100 characters",
-                            },
-                        ]}
-                    >
-                        <TextArea
-                            placeholder="Enter complete address"
-                            rows={3}
-                            size="large"
-                        />
-                    </Form.Item>
-                </div>
-
-                <Divider />
+                </Card>
 
                 {/* Business Information Section */}
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <ShopOutlined className="mr-2 text-purple-600" />
-                        Business Information
-                        <span className="text-sm font-normal text-gray-500 ml-2">
-                            (Optional)
-                        </span>
-                    </h3>
-
-                    <Row gutter={[16, 0]}>
+                <Card
+                    title={
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center text-gray-800">
+                                <ShopOutlined className="mr-3 text-purple-600 text-lg" />
+                                <span className="text-lg font-semibold">
+                                    Business Information
+                                </span>
+                            </div>
+                            <span className="text-sm font-normal text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                                Optional
+                            </span>
+                        </div>
+                    }
+                    className="shadow-sm border-0"
+                    headStyle={{
+                        borderBottom: "2px solid #f0f0f0",
+                        background: "#fafafa",
+                    }}
+                >
+                    <Row gutter={[24, 16]}>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                                label="Store Name"
+                                label={
+                                    <span className="font-medium text-gray-700">
+                                        Store Name
+                                    </span>
+                                }
                                 name="store_name"
                                 rules={[
                                     {
@@ -223,12 +282,17 @@ const CustomerForm = ({
                                     prefix={
                                         <ShopOutlined className="text-gray-400" />
                                     }
+                                    className="rounded-lg"
                                 />
                             </Form.Item>
                         </Col>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                                label="Account Holder"
+                                label={
+                                    <span className="font-medium text-gray-700">
+                                        Account Holder
+                                    </span>
+                                }
                                 name="account_holder"
                                 rules={[
                                     {
@@ -241,87 +305,120 @@ const CustomerForm = ({
                                 <Input
                                     placeholder="Enter account holder name"
                                     size="large"
+                                    prefix={
+                                        <IdcardOutlined className="text-gray-400" />
+                                    }
+                                    className="rounded-lg"
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24}>
+                            <Form.Item
+                                label={
+                                    <span className="font-medium text-gray-700">
+                                        Account Number
+                                    </span>
+                                }
+                                name="account_number"
+                                rules={[
+                                    {
+                                        max: 50,
+                                        message:
+                                            "Account number cannot exceed 50 characters",
+                                    },
+                                ]}
+                            >
+                                <Input
+                                    placeholder="Enter account number"
+                                    size="large"
+                                    prefix={
+                                        <BankOutlined className="text-gray-400" />
+                                    }
+                                    className="rounded-lg"
                                 />
                             </Form.Item>
                         </Col>
                     </Row>
-
-                    <Form.Item
-                        label="Account Number"
-                        name="account_number"
-                        rules={[
-                            {
-                                max: 50,
-                                message:
-                                    "Account number cannot exceed 50 characters",
-                            },
-                        ]}
-                    >
-                        <Input
-                            placeholder="Enter account number"
-                            size="large"
-                        />
-                    </Form.Item>
-                </div>
-
-                <Divider />
+                </Card>
 
                 {/* Photo Upload Section */}
-                <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                        Customer Photo
-                    </h3>
-
-                    <Form.Item label="">
+                <Card
+                    title={
+                        <div className="flex items-center text-gray-800">
+                            <UploadOutlined className="mr-3 text-indigo-600 text-lg" />
+                            <span className="text-lg font-semibold">
+                                Customer Photo
+                            </span>
+                        </div>
+                    }
+                    className="shadow-sm border-0"
+                    headStyle={{
+                        borderBottom: "2px solid #f0f0f0",
+                        background: "#fafafa",
+                    }}
+                >
+                    <Form.Item>
                         <Upload {...uploadProps}>
                             {fileList.length === 0 && (
-                                <div className="text-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors">
-                                    <UploadOutlined className="text-2xl text-gray-400 mb-2" />
-                                    <div className="text-gray-600">
-                                        Upload Photo
+                                <div className="text-center md:p-2 mt-2 border-2 border-dashed border-gray-300 rounded-xl hover:border-indigo-400 transition-all duration-200 cursor-pointer bg-gray-50 hover:bg-indigo-50">
+                                    <UploadOutlined className="text-3xl text-gray-400 mb-3 block" />
+                                    <div className="text-gray-700 font-medium mb-1">
+                                        Click to upload photo
                                     </div>
-                                    <div className="text-xs text-gray-400 mt-1">
-                                        JPG, PNG up to 5MB
+                                    <div className="text-sm text-gray-500">
+                                        JPG, PNG files up to 5MB
                                     </div>
                                 </div>
                             )}
                         </Upload>
                     </Form.Item>
-                </div>
+                </Card>
 
                 {/* Form Actions */}
-                <Form.Item className="mb-0 text-right bg-gray-50 -mx-6 -mb-6 px-6 py-4 rounded-b-lg">
-                    <Space size="middle">
-                        <Button
-                            size="large"
-                            onClick={onCancel}
-                            className="min-w-20"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            loading={loading}
-                            size="large"
-                            className="min-w-28"
-                        >
-                            {editingCustomer
-                                ? "Update Customer"
-                                : "Add Customer"}
-                        </Button>
-                    </Space>
-                </Form.Item>
+                <div className="flex justify-end pt-6 border-t bg-gray-50 -mx-6 px-6 py-4 space-x-3">
+                    <Button
+                        size="large"
+                        onClick={onCancel}
+                        className="min-w-24 h-10 rounded-lg font-medium"
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={loading}
+                        size="large"
+                        className="min-w-32 h-10 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 border-blue-600"
+                    >
+                        {editingCustomer ? "Update Customer" : "Add Customer"}
+                    </Button>
+                </div>
             </Form>
 
             <style jsx>{`
                 .avatar-uploader .ant-upload-select {
                     width: 120px !important;
                     height: 120px !important;
+                    border-radius: 12px !important;
+                }
+                .ant-card-head {
+                    min-height: auto;
+                    padding: 16px 24px;
+                }
+                .ant-card-body {
+                    padding: 24px;
                 }
                 .ant-form-item-label > label {
-                    font-weight: 600;
-                    color: #262626;
+                    height: auto;
+                }
+                .ant-input-affix-wrapper {
+                    border-radius: 8px;
+                }
+                .ant-select-selector {
+                    border-radius: 8px !important;
+                }
+                .ant-input {
+                    border-radius: 8px;
                 }
             `}</style>
         </div>
