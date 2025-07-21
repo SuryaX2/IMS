@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
     Table,
     Button,
@@ -15,6 +15,7 @@ import {
     Col,
     Divider,
     Typography,
+    Statistic,
 } from "antd";
 import {
     PlusOutlined,
@@ -28,6 +29,7 @@ import {
     MailOutlined,
     EnvironmentOutlined,
     BankOutlined,
+    EyeOutlined,
 } from "@ant-design/icons";
 import { toast } from "react-hot-toast";
 import { api } from "../api/api.js";
@@ -36,121 +38,191 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const Suppliers = () => {
-    const [suppliers, setSuppliers] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [editingSupplier, setEditingSupplier] = useState(null);
-    const [form] = Form.useForm();
-    const [searchText, setSearchText] = useState("");
-    const [fileList, setFileList] = useState([]);
+    // State management - similar to Customers.jsx structure
+    const [state, setState] = useState({
+        suppliers: [],
+        loading: false,
+        modalVisible: false,
+        viewModalVisible: false,
+        searchText: "",
+        stats: { total: 0, wholesale: 0, manufacturer: 0, distributor: 0 },
+    });
 
-    // Fetch suppliers on component mount
+    const [editing, setEditing] = useState({
+        supplier: null,
+        fileList: [],
+    });
+
+    const [viewing, setViewing] = useState({
+        supplier: null,
+    });
+
+    const [form] = Form.useForm();
+
+    // Initialize component
     useEffect(() => {
         fetchSuppliers();
     }, []);
 
+    // Utility functions
+    const updateState = (updates) => {
+        setState((prev) => ({ ...prev, ...updates }));
+    };
+
+    const calculateStats = useCallback((data) => {
+        const total = data.length;
+        const wholesale = data.filter((s) => s.type?.toLowerCase() === "wholesale").length;
+        const manufacturer = data.filter((s) => s.type?.toLowerCase() === "manufacturer").length;
+        const distributor = data.filter((s) => s.type?.toLowerCase() === "distributor").length;
+        return { total, wholesale, manufacturer, distributor };
+    }, []);
+
+    const getFilteredSuppliers = useCallback(() => {
+        const { suppliers, searchText } = state;
+        if (!searchText) return suppliers;
+
+        return suppliers.filter((supplier) => {
+            const searchLower = searchText.toLowerCase();
+            return (
+                supplier.name.toLowerCase().includes(searchLower) ||
+                supplier.email.toLowerCase().includes(searchLower) ||
+                supplier.phone.includes(searchText) ||
+                (supplier.shopname &&
+                    supplier.shopname.toLowerCase().includes(searchLower))
+            );
+        });
+    }, [state.suppliers, state.searchText]);
+
+    // API functions
     const fetchSuppliers = async () => {
-        setLoading(true);
+        updateState({ loading: true });
         try {
             const response = await api.get("/suppliers");
-            setSuppliers(response.data.data);
-            toast.success("Suppliers loaded successfully");
+            if (response.data.success) {
+                const suppliers = response.data.data;
+                const stats = calculateStats(suppliers);
+                updateState({ suppliers, stats });
+            }
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to fetch suppliers");
+            toast.error(
+                error.response?.data?.message || "Failed to fetch suppliers"
+            );
         } finally {
-            setLoading(false);
+            updateState({ loading: false });
         }
     };
 
     const handleSubmit = async (values) => {
+        updateState({ loading: true });
         try {
-            const formData = new FormData();
-            
-            // Append all form fields to FormData
-            Object.keys(values).forEach(key => {
-                if (values[key] !== undefined && values[key] !== null) {
-                    formData.append(key, values[key]);
-                }
-            });
+            const formData = createFormData(values);
+            const response = await submitSupplierData(formData);
 
-            // Append photo if exists
-            if (fileList.length > 0 && fileList[0].originFileObj) {
-                formData.append('photo', fileList[0].originFileObj);
+            if (response.data.success) {
+                toast.success(response.data.message);
+                await fetchSuppliers();
+                handleCancel();
             }
-
-            if (editingSupplier) {
-                // Update supplier
-                const response = await api.patch(`/suppliers/${editingSupplier._id}`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                toast.success("Supplier updated successfully");
-            } else {
-                // Create new supplier
-                const response = await api.post("/suppliers", formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                toast.success("Supplier created successfully");
-            }
-
-            fetchSuppliers();
-            handleCancel();
         } catch (error) {
             toast.error(error.response?.data?.message || "Operation failed");
+        } finally {
+            updateState({ loading: false });
         }
     };
 
-    const handleEdit = (supplier) => {
-        setEditingSupplier(supplier);
-        form.setFieldsValue({
-            name: supplier.name,
-            email: supplier.email,
-            phone: supplier.phone,
-            address: supplier.address,
-            shopname: supplier.shopname,
-            type: supplier.type,
-            bank_name: supplier.bank_name,
-            account_holder: supplier.account_holder,
-            account_number: supplier.account_number,
+    const createFormData = (values) => {
+        const formData = new FormData();
+
+        Object.keys(values).forEach((key) => {
+            if (
+                values[key] !== undefined &&
+                values[key] !== null &&
+                values[key] !== ""
+            ) {
+                formData.append(key, values[key]);
+            }
         });
-        
-        // Set existing photo for display
-        if (supplier.photo && supplier.photo !== "default-supplier.png") {
-            setFileList([
-                {
-                    uid: '-1',
-                    name: 'current-photo.jpg',
-                    status: 'done',
-                    url: supplier.photo,
-                }
-            ]);
+
+        if (editing.fileList.length > 0 && editing.fileList[0].originFileObj) {
+            formData.append("photo", editing.fileList[0].originFileObj);
         }
-        
-        setModalVisible(true);
+
+        return formData;
+    };
+
+    const submitSupplierData = (formData) => {
+        const config = { headers: { "Content-Type": "multipart/form-data" } };
+
+        return editing.supplier
+            ? api.patch(`/suppliers/${editing.supplier._id}`, formData, config)
+            : api.post("/suppliers", formData, config);
     };
 
     const handleDelete = async (id) => {
         try {
-            await api.delete(`/suppliers/${id}`);
-            toast.success("Supplier deleted successfully");
-            fetchSuppliers();
+            const response = await api.delete(`/suppliers/${id}`);
+            if (response.data.success) {
+                toast.success("Supplier deleted successfully");
+                await fetchSuppliers();
+            }
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to delete supplier");
+            toast.error(
+                error.response?.data?.message || "Failed to delete supplier"
+            );
         }
     };
 
+    // Modal handlers
+    const handleEdit = (supplier) => {
+        setEditing({ supplier, fileList: getExistingFileList(supplier) });
+        form.setFieldsValue({ ...supplier });
+        updateState({ modalVisible: true });
+    };
+
+    const getExistingFileList = (supplier) => {
+        if (supplier.photo && supplier.photo !== "default-supplier.png") {
+            return [
+                {
+                    uid: "-1",
+                    name: "current-photo.jpg",
+                    status: "done",
+                    url: supplier.photo,
+                },
+            ];
+        }
+        return [];
+    };
+
+    const handleView = (supplier) => {
+        setViewing({ supplier });
+        updateState({ viewModalVisible: true });
+    };
+
     const handleCancel = () => {
-        setModalVisible(false);
-        setEditingSupplier(null);
+        updateState({ modalVisible: false });
+        setEditing({ supplier: null, fileList: [] });
         form.resetFields();
-        setFileList([]);
+    };
+
+    const handleViewCancel = () => {
+        updateState({ viewModalVisible: false });
+        setViewing({ supplier: null });
+    };
+
+    const handleSearch = (e) => {
+        updateState({ searchText: e.target.value });
+    };
+
+    const openAddModal = () => {
+        updateState({ modalVisible: true });
+    };
+
+    const handleFileListChange = (newFileList) => {
+        setEditing((prev) => ({ ...prev, fileList: newFileList }));
     };
 
     const uploadProps = {
-        fileList,
+        fileList: editing.fileList,
         beforeUpload: (file) => {
             const isImage = file.type.startsWith('image/');
             if (!isImage) {
@@ -165,21 +237,157 @@ const Suppliers = () => {
             return false; // Prevent auto upload
         },
         onChange: ({ fileList }) => {
-            setFileList(fileList.slice(-1)); // Keep only the last file
+            handleFileListChange(fileList.slice(-1)); // Keep only the last file
         },
         onRemove: () => {
-            setFileList([]);
+            handleFileListChange([]);
         },
     };
 
-    // Filter suppliers based on search text
-    const filteredSuppliers = suppliers.filter(supplier =>
-        supplier.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        supplier.email.toLowerCase().includes(searchText.toLowerCase()) ||
-        supplier.phone.includes(searchText) ||
-        (supplier.shopname && supplier.shopname.toLowerCase().includes(searchText.toLowerCase()))
+    // Stats Component
+    const SupplierStats = ({ stats }) => (
+        <Card className="shadow-sm mb-6">
+            <Row gutter={16}>
+                <Col xs={12} sm={6}>
+                    <Statistic
+                        title="Total Suppliers"
+                        value={stats.total}
+                        valueStyle={{ color: "#1677ff" }}
+                        prefix={<ShopOutlined />}
+                    />
+                </Col>
+                <Col xs={12} sm={6}>
+                    <Statistic
+                        title="Wholesale"
+                        value={stats.wholesale}
+                        valueStyle={{ color: "#52c41a" }}
+                    />
+                </Col>
+                <Col xs={12} sm={6}>
+                    <Statistic
+                        title="Manufacturer"
+                        value={stats.manufacturer}
+                        valueStyle={{ color: "#faad14" }}
+                    />
+                </Col>
+                <Col xs={12} sm={6}>
+                    <Statistic
+                        title="Distributor"
+                        value={stats.distributor}
+                        valueStyle={{ color: "#f759ab" }}
+                    />
+                </Col>
+            </Row>
+        </Card>
     );
 
+    // View Modal Component
+    const SupplierViewModal = ({ visible, onCancel, supplier, onEdit }) => {
+        if (!supplier) return null;
+
+        return (
+            <Modal
+                title={
+                    <Space>
+                        <ShopOutlined />
+                        Supplier Details
+                    </Space>
+                }
+                open={visible}
+                onCancel={onCancel}
+                footer={[
+                    <Button key="close" onClick={onCancel}>
+                        Close
+                    </Button>,
+                    <Button
+                        key="edit"
+                        type="primary"
+                        icon={<EditOutlined />}
+                        onClick={() => {
+                            onCancel();
+                            onEdit(supplier);
+                        }}
+                    >
+                        Edit Supplier
+                    </Button>,
+                ]}
+                width={600}
+            >
+                <div className="space-y-4">
+                    <div className="flex items-center space-x-4 mb-6">
+                        <Avatar
+                            size={80}
+                            src={supplier.photo && supplier.photo !== "default-supplier.png" ? supplier.photo : null}
+                            icon={<UserOutlined />}
+                        />
+                        <div>
+                            <Title level={4} className="!mb-1">
+                                {supplier.name}
+                            </Title>
+                            {supplier.shopname && (
+                                <Text type="secondary">{supplier.shopname}</Text>
+                            )}
+                            {supplier.type && (
+                                <div className="mt-1">
+                                    <Tag color="blue">{supplier.type}</Tag>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <Divider />
+
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <Text strong>Email:</Text>
+                            <br />
+                            <Text>{supplier.email}</Text>
+                        </Col>
+                        <Col span={12}>
+                            <Text strong>Phone:</Text>
+                            <br />
+                            <Text>{supplier.phone}</Text>
+                        </Col>
+                        <Col span={24}>
+                            <Text strong>Address:</Text>
+                            <br />
+                            <Text>{supplier.address || "Not provided"}</Text>
+                        </Col>
+                    </Row>
+
+                    {(supplier.bank_name || supplier.account_holder || supplier.account_number) && (
+                        <>
+                            <Divider>Banking Information</Divider>
+                            <Row gutter={[16, 16]}>
+                                <Col span={12}>
+                                    <Text strong>Bank Name:</Text>
+                                    <br />
+                                    <Text>{supplier.bank_name || "Not provided"}</Text>
+                                </Col>
+                                <Col span={12}>
+                                    <Text strong>Account Holder:</Text>
+                                    <br />
+                                    <Text>{supplier.account_holder || "Not provided"}</Text>
+                                </Col>
+                                <Col span={24}>
+                                    <Text strong>Account Number:</Text>
+                                    <br />
+                                    <Text>{supplier.account_number || "Not provided"}</Text>
+                                </Col>
+                            </Row>
+                        </>
+                    )}
+
+                    <Divider />
+                    <Text type="secondary">
+                        Created: {new Date(supplier.createdAt).toLocaleDateString()}
+                    </Text>
+                </div>
+            </Modal>
+        );
+    };
+
+    // Table columns
     const columns = [
         {
             title: "Photo",
@@ -238,9 +446,17 @@ const Suppliers = () => {
         {
             title: "Actions",
             key: "actions",
-            width: 150,
+            width: 200,
             render: (_, record) => (
                 <Space size="small">
+                    <Button
+                        type="default"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleView(record)}
+                        size="small"
+                    >
+                        View
+                    </Button>
                     <Button
                         type="primary"
                         icon={<EditOutlined />}
@@ -269,44 +485,63 @@ const Suppliers = () => {
         },
     ];
 
+    // Component render
+    const filteredSuppliers = getFilteredSuppliers();
+
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            <Card className="shadow-md">
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <Title level={2} className="!mb-2">
-                            <ShopOutlined className="mr-2" />
-                            Suppliers Management
-                        </Title>
-                        <Text type="secondary">
-                            Manage your suppliers and their information
-                        </Text>
-                    </div>
-                    <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={() => setModalVisible(true)}
-                        size="large"
-                    >
-                        Add New Supplier
-                    </Button>
+        <div className="p-6 space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-4">
+                <div className="flex-1 min-w-0">
+                    <h1 className="truncate mb-1 text-4xl font-bold flex items-center gap-2">
+                        Suppliers
+                        <ShopOutlined className="text-blue-600 inline-block ml-2" />
+                    </h1>
+                    <p className="text-gray-500 text-base md:text-sm hidden sm:block">
+                        Manage your suppliers and their information
+                    </p>
                 </div>
+            </div>
+            
+            <SupplierStats stats={state.stats} />
 
-                <div className="mb-4">
-                    <Input
-                        placeholder="Search suppliers by name, email, phone, or shop name..."
-                        prefix={<SearchOutlined />}
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        size="large"
-                        style={{ maxWidth: 400 }}
-                    />
+            {/* Search and Add Section */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-lg shadow-sm">
+                <Input
+                    placeholder="Search suppliers by name, email, phone, or shop name..."
+                    prefix={<SearchOutlined className="text-gray-400" />}
+                    value={state.searchText}
+                    onChange={handleSearch}
+                    className="max-w-lg"
+                    size="large"
+                    allowClear
+                />
+                <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={openAddModal}
+                    size="large"
+                    className="min-w-40"
+                >
+                    Add Supplier
+                </Button>
+            </div>
+
+            {/* Results Summary */}
+            {state.searchText && (
+                <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                    Found {filteredSuppliers.length} supplier
+                    {filteredSuppliers.length !== 1 ? "s" : ""}
+                    {state.searchText && ` matching "${state.searchText}"`}
                 </div>
+            )}
 
+            {/* Supplier Table */}
+            <Card className="shadow-sm">
                 <Table
                     columns={columns}
                     dataSource={filteredSuppliers}
-                    loading={loading}
+                    loading={state.loading}
                     rowKey="_id"
                     pagination={{
                         pageSize: 10,
@@ -318,14 +553,23 @@ const Suppliers = () => {
                 />
             </Card>
 
+            {/* View Modal */}
+            <SupplierViewModal
+                visible={state.viewModalVisible}
+                onCancel={handleViewCancel}
+                supplier={viewing.supplier}
+                onEdit={handleEdit}
+            />
+
+            {/* Add/Edit Modal */}
             <Modal
                 title={
                     <Space>
                         <UserOutlined />
-                        {editingSupplier ? "Edit Supplier" : "Add New Supplier"}
+                        {editing.supplier ? "Edit Supplier" : "Add New Supplier"}
                     </Space>
                 }
-                open={modalVisible}
+                open={state.modalVisible}
                 onCancel={handleCancel}
                 footer={null}
                 width={800}
@@ -484,8 +728,8 @@ const Suppliers = () => {
                             <Button onClick={handleCancel}>
                                 Cancel
                             </Button>
-                            <Button type="primary" htmlType="submit">
-                                {editingSupplier ? "Update Supplier" : "Create Supplier"}
+                            <Button type="primary" htmlType="submit" loading={state.loading}>
+                                {editing.supplier ? "Update Supplier" : "Create Supplier"}
                             </Button>
                         </Space>
                     </Form.Item>
