@@ -221,7 +221,7 @@ const Customers = () => {
                     prefix={<SearchOutlined className="text-gray-400" />}
                     value={state.searchText}
                     onChange={handleSearch}
-                    className="max-w-md"
+                    className="max-w-lg"
                     size="large"
                     allowClear
                 />
