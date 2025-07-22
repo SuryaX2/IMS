@@ -40,34 +40,11 @@ import {
 } from "@ant-design/icons";
 import { toast } from "react-hot-toast";
 import { api } from "../api/api";
+import PageHeader from "../components/common/PageHeader";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
-
-// PageHeader Component
-const PageHeader = ({ title, subtitle, icon, actionText, actionIcon, onActionClick }) => (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-            {icon}
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900 m-0">{title}</h1>
-                <p className="text-gray-600 mt-1 mb-0">{subtitle}</p>
-            </div>
-        </div>
-        {actionText && (
-            <Button
-                type="primary"
-                size="large"
-                icon={actionIcon}
-                onClick={onActionClick}
-                className="shrink-0"
-            >
-                {actionText}
-            </Button>
-        )}
-    </div>
-);
 
 // Stats Component
 const SupplierStats = ({ suppliers, loading }) => {
