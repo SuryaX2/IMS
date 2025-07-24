@@ -10,7 +10,6 @@ import {
     Statistic,
     Space,
     Dropdown,
-    Popconfirm,
     Avatar,
     Tag,
     Row,
@@ -33,6 +32,8 @@ import {
     UploadOutlined,
     SearchOutlined,
     FilterOutlined,
+    ProductFilled,
+    UsergroupAddOutlined,
 } from "@ant-design/icons";
 import { toast } from "react-hot-toast";
 import PageHeader from "../components/common/PageHeader";
@@ -55,9 +56,9 @@ const Suppliers = () => {
 
     // Statistics
     const [stats, setStats] = useState({
-        total: 0,
-        active: 0,
         individual: 0,
+        wholesale: 0,
+        retail: 0,
         company: 0,
     });
 
@@ -78,18 +79,21 @@ const Suppliers = () => {
 
     // Calculate statistics
     const calculateStats = (suppliersData) => {
-        const total = suppliersData.length;
         const individual = suppliersData.filter(
             (s) => s.type === "individual"
         ).length;
+        const wholesale = suppliersData.filter(
+            (s) => s.type === "wholesale"
+        ).length;
+        const retail = suppliersData.filter((s) => s.type === "retail").length;
         const company = suppliersData.filter(
             (s) => s.type === "company"
         ).length;
 
         setStats({
-            total,
-            active: total, // Assuming all fetched suppliers are active
             individual,
+            wholesale,
+            retail,
             company,
         });
     };
@@ -333,9 +337,19 @@ const Suppliers = () => {
                 <Col xs={24} sm={12} lg={6}>
                     <Card>
                         <Statistic
-                            title="Total Suppliers"
-                            value={stats.total}
+                            title="Individual"
+                            value={stats.individual}
                             prefix={<UserOutlined />}
+                            valueStyle={{ color: "#722ed1" }}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} sm={12} lg={6}>
+                    <Card>
+                        <Statistic
+                            title="Wholesale"
+                            value={stats.wholesale}
+                            prefix={<ProductFilled />}
                             valueStyle={{ color: "#1890ff" }}
                         />
                     </Card>
@@ -343,20 +357,10 @@ const Suppliers = () => {
                 <Col xs={24} sm={12} lg={6}>
                     <Card>
                         <Statistic
-                            title="Active Suppliers"
-                            value={stats.active}
-                            prefix={<UserOutlined />}
+                            title="Retail"
+                            value={stats.retail}
+                            prefix={<UsergroupAddOutlined />}
                             valueStyle={{ color: "#52c41a" }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <Card>
-                        <Statistic
-                            title="Individual"
-                            value={stats.individual}
-                            prefix={<UserOutlined />}
-                            valueStyle={{ color: "#722ed1" }}
                         />
                     </Card>
                 </Col>
