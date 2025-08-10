@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { api } from "../api/api";
 
-export const useSuppliers = () => {
+export const useSuppliers = (isAdmin = false) => {
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [stats, setStats] = useState({
@@ -30,7 +30,9 @@ export const useSuppliers = () => {
     const fetchSuppliers = async () => {
         setLoading(true);
         try {
-            const response = await api.get("/suppliers");
+            // Use admin route if user is admin, otherwise use regular route
+            const endpoint = isAdmin ? "/suppliers/admin/all" : "/suppliers";
+            const response = await api.get(endpoint);
             setSuppliers(response.data.data);
             calculateStats(response.data.data);
         } catch (error) {
@@ -81,7 +83,7 @@ export const useSuppliers = () => {
 
     useEffect(() => {
         fetchSuppliers();
-    }, []);
+    }, [isAdmin]);
 
     return {
         suppliers,

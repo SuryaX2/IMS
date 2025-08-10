@@ -8,7 +8,14 @@ import {
     UserOutlined,
 } from "@ant-design/icons";
 
-const SupplierTable = ({ suppliers, loading, onView, onEdit, onDelete }) => {
+const SupplierTable = ({
+    suppliers,
+    loading,
+    onView,
+    onEdit,
+    onDelete,
+    isAdmin = false,
+}) => {
     const columns = [
         {
             title: "Photo",
@@ -61,6 +68,21 @@ const SupplierTable = ({ suppliers, loading, onView, onEdit, onDelete }) => {
             key: "address",
             ellipsis: true,
         },
+        // Add Owner column for admin view
+        ...(isAdmin
+            ? [
+                  {
+                      title: "Owner",
+                      dataIndex: ["owner", "fullName"],
+                      key: "owner",
+                      render: (ownerName, record) => (
+                          <span>
+                              {ownerName || record.owner?.username || "Unknown"}
+                          </span>
+                      ),
+                  },
+              ]
+            : []),
         {
             title: "Actions",
             key: "actions",
@@ -73,28 +95,33 @@ const SupplierTable = ({ suppliers, loading, onView, onEdit, onDelete }) => {
                         icon: <EyeOutlined />,
                         onClick: () => onView(record),
                     },
-                    {
-                        key: "edit",
-                        label: "Edit",
-                        icon: <EditOutlined />,
-                        onClick: () => onEdit(record),
-                    },
-                    {
-                        key: "delete",
-                        label: "Delete",
-                        icon: <DeleteOutlined />,
-                        danger: true,
-                        onClick: () => {
-                            Modal.confirm({
-                                title: "Delete Supplier",
-                                content: `Are you sure you want to delete ${record.name}?`,
-                                okText: "Yes",
-                                okType: "danger",
-                                cancelText: "No",
-                                onOk: () => onDelete(record._id),
-                            });
-                        },
-                    },
+                    // Only show edit/delete for non-admin or if user owns the supplier
+                    ...(!isAdmin || record.canEdit
+                        ? [
+                              {
+                                  key: "edit",
+                                  label: "Edit",
+                                  icon: <EditOutlined />,
+                                  onClick: () => onEdit(record),
+                              },
+                              {
+                                  key: "delete",
+                                  label: "Delete",
+                                  icon: <DeleteOutlined />,
+                                  danger: true,
+                                  onClick: () => {
+                                      Modal.confirm({
+                                          title: "Delete Supplier",
+                                          content: `Are you sure you want to delete ${record.name}?`,
+                                          okText: "Yes",
+                                          okType: "danger",
+                                          cancelText: "No",
+                                          onOk: () => onDelete(record._id),
+                                      });
+                                  },
+                              },
+                          ]
+                        : []),
                 ];
 
                 return (

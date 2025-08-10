@@ -8,6 +8,7 @@ import SupplierForm from "../components/suppliers/SupplierForm";
 import SupplierViewModal from "../components/suppliers/SupplierViewModal";
 import { useSuppliers } from "../hooks/useSuppliers";
 import { useSupplierForm } from "../hooks/useSupplierForm";
+import { useAuth } from "../hooks/useAuth";
 import { filterSuppliers } from "../utils/supplierUtils";
 
 const Suppliers = () => {
@@ -17,6 +18,9 @@ const Suppliers = () => {
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
 
+    // Get admin status from auth context
+    const { isAdmin } = useAuth();
+
     // Custom hooks
     const {
         suppliers,
@@ -25,7 +29,7 @@ const Suppliers = () => {
         createSupplier,
         updateSupplier,
         deleteSupplier,
-    } = useSuppliers();
+    } = useSuppliers(isAdmin);
 
     const {
         modalVisible,
@@ -77,8 +81,12 @@ const Suppliers = () => {
         <div className="p-6">
             {/* Page Header */}
             <PageHeader
-                title="Suppliers"
-                subtitle="Manage your suppliers and their information"
+                title={isAdmin ? "All Suppliers (Admin)" : "Suppliers"}
+                subtitle={
+                    isAdmin
+                        ? "Manage all suppliers across the system"
+                        : "Manage your suppliers and their information"
+                }
                 icon={<UserOutlined />}
                 actionText="Add Supplier"
                 actionIcon={<PlusOutlined />}
@@ -103,6 +111,7 @@ const Suppliers = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                isAdmin={isAdmin}
             />
 
             {/* Add/Edit Modal */}
