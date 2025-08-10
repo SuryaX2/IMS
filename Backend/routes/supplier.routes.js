@@ -14,6 +14,8 @@ const router = Router();
 
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
+router.route("/admin/all").get(isAdmin, getAllSuppliers);
+
 // Regular user routes
 router
     .route("/")
@@ -24,8 +26,5 @@ router
     .route("/:id")
     .patch(upload.single("photo"), updateSupplier)
     .delete(deleteSupplier);
-
-// Admin only routes
-router.route("/all").get(isAdmin, getAllSuppliers);
 
 export default router;
