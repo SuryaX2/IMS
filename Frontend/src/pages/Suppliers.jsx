@@ -81,7 +81,7 @@ const Suppliers = () => {
         <div className="p-6">
             {/* Page Header */}
             <PageHeader
-                title={isAdmin ? "All Suppliers (Admin)" : "Suppliers"}
+                title={isAdmin ? "Suppliers (Admin)" : "Suppliers"}
                 subtitle={
                     isAdmin
                         ? "Manage all suppliers across the system"
