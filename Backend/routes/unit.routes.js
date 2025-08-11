@@ -18,6 +18,6 @@ router.route("/").post(createUnit).get(getAllUnits); // This will now return onl
 router.route("/:id").patch(updateUnit).delete(deleteUnit);
 
 // Admin only routes
-router.route("/all").get(isAdmin, getAllUnits); // This will get all units for admin
+router.route("/admin/all").get(isAdmin, getAllUnits); // This will get all units for admin
 
 export default router;

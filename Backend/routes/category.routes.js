@@ -23,7 +23,7 @@ router.route("/user/:id").patch(updateCategory).delete(deleteCategory);
 
 // Admin-only routes
 router.use(isAdmin); // Apply isAdmin middleware to all routes below
-router.route("/all").get(getAllCategories); // Admin can get all categories
-router.route("/:id").patch(updateCategory).delete(deleteCategory); // Admin can update/delete any category
+router.route("/admin/all").get(getAllCategories); // Admin can get all categories
+router.route("/admin/:id").patch(updateCategory).delete(deleteCategory); // Admin can update/delete any category
 
 export default router;
