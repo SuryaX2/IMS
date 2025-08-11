@@ -17,6 +17,7 @@ import Orders from "./pages/Orders";
 import Purchase from "./pages/Purchase";
 import Customers from "./pages/Customers";
 import Suppliers from "./pages/Suppliers";
+import Category from "./pages/Category";
 
 function App() {
     return (
@@ -70,7 +71,7 @@ function App() {
                             <Route path="suppliers" element={<Suppliers />} />
                             <Route
                                 path="categories"
-                                element={<div>Categories Page</div>}
+                                element={<Category />}
                             />
                             <Route path="reports">
                                 <Route
