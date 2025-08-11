@@ -35,6 +35,7 @@ import {
     EyeOutlined,
     UserOutlined,
     CalendarOutlined,
+    InboxOutlined,
 } from "@ant-design/icons";
 import { api } from "../api/api";
 import { useAuth } from "../hooks/useAuth";
@@ -556,17 +557,21 @@ const CategoryUnit = () => {
     ];
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="p-6 bg-white min-h-screen">
             {/* Header */}
-            <div className="mb-6">
-                <Title level={2} className="mb-2">
-                    Category & Unit Management
-                </Title>
-                <Text type="secondary">
-                    Manage your product categories and units
-                </Text>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                <div className="mb-4 sm:mb-0">
+                    <div className="flex-1 min-w-0">
+                        <h1 className="truncate mb-1 text-4xl font-bold flex items-center gap-2">
+                            Categories & Units
+                            <InboxOutlined className="text-blue-600 inline-block ml-2" />
+                        </h1>
+                    </div>
+                    <p className="text-gray-600 text-sm sm:text-base">
+                        Manage your purchase orders and supplier relationships
+                    </p>
+                </div>
             </div>
-
             {/* Stats Cards */}
             <Row gutter={[16, 16]} className="mb-6">
                 <Col xs={24} sm={12} md={6}>
