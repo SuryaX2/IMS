@@ -10,9 +10,9 @@ import ProductFilters from "../components/products/ProductFilters";
 import ProductDetailsDrawer from "../components/products/ProductDetailsDrawer";
 
 // Hooks
-import { useProducts } from "../hooks/useProducts";
-import { useCategories } from "../hooks/useCategories";
-import { useUnits } from "../hooks/useUnits";
+import { useProducts } from "../hooks/products/useProducts";
+import { useCategories } from "../hooks/products/useCategories";
+import { useUnits } from "../hooks/products/useUnits";
 
 // Utils
 import {
