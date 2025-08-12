@@ -33,7 +33,9 @@ categorySchema.statics.createCategory = async function (categoryData) {
 
 categorySchema.statics.getAllCategories = async function () {
     try {
-        const categories = await this.find({});
+        const categories = await this.find({})
+            .populate("created_by", "username email")
+            .populate("updated_by", "username email");
         return categories;
     } catch (error) {
         throw new Error(error.message);
@@ -43,7 +45,9 @@ categorySchema.statics.getAllCategories = async function () {
 // Get categories by user
 categorySchema.statics.getCategoriesByUser = async function (userId) {
     try {
-        const categories = await this.find({ created_by: userId });
+        const categories = await this.find({ created_by: userId })
+            .populate("created_by", "username email")
+            .populate("updated_by", "username email");
         return categories;
     } catch (error) {
         throw new Error(error.message);
