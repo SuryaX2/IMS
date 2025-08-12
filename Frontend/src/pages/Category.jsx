@@ -568,7 +568,7 @@ const CategoryUnit = () => {
                         </h1>
                     </div>
                     <p className="text-gray-600 text-sm sm:text-base">
-                        Manage your purchase orders and supplier relationships
+                        Manage your Categories and Units
                     </p>
                 </div>
             </div>
