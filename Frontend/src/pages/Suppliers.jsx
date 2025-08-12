@@ -6,8 +6,8 @@ import SupplierFilters from "../components/suppliers/SupplierFilters";
 import SupplierTable from "../components/suppliers/SupplierTable";
 import SupplierForm from "../components/suppliers/SupplierForm";
 import SupplierViewModal from "../components/suppliers/SupplierViewModal";
-import { useSuppliers } from "../hooks/useSuppliers";
-import { useSupplierForm } from "../hooks/useSupplierForm";
+import { useSuppliers } from "../hooks/suppliers/useSuppliers";
+import { useSupplierForm } from "../hooks/suppliers/useSupplierForm";
 import { useAuth } from "../hooks/useAuth";
 import { filterSuppliers } from "../utils/supplierUtils";
 
