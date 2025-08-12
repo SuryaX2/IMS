@@ -33,7 +33,9 @@ unitSchema.statics.createUnit = async function (unitData) {
 
 unitSchema.statics.getAllUnits = async function () {
     try {
-        const units = await this.find({});
+        const units = await this.find({})
+            .populate("created_by", "username email")
+            .populate("updated_by", "username email");
         return units;
     } catch (error) {
         throw new Error(error.message);
@@ -43,7 +45,9 @@ unitSchema.statics.getAllUnits = async function () {
 // Units created by a specific user
 unitSchema.statics.getUnitsByUser = async function (userId) {
     try {
-        const units = await this.find({ created_by: userId });
+        const units = await this.find({ created_by: userId })
+            .populate("created_by", "username email")
+            .populate("updated_by", "username email");
         return units;
     } catch (error) {
         throw new Error(error.message);
