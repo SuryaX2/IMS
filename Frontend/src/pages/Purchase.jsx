@@ -1,7 +1,7 @@
 import React from "react";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import { PurchaseList } from "../components/Purchase";
-import { usePurchase } from "../hooks/usePurchase";
+import { usePurchase } from "../hooks/purchase/usePurchase";
 
 const Purchase = () => {
     const {
