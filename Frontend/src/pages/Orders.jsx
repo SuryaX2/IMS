@@ -11,8 +11,8 @@ import CreateOrderModal from "../components/orders/CreateOrderModal";
 import OrderDetailsDrawer from "../components/orders/OrderDetailsDrawer";
 
 // Hooks
-import { useOrders } from "../hooks/useOrders";
-import { useOrderOperations } from "../hooks/useOrderOperations";
+import { useOrders } from "../hooks/orders/useOrders";
+import { useOrderOperations } from "../hooks/orders/useOrderOperations";
 
 const Orders = () => {
     const [createModalVisible, setCreateModalVisible] = useState(false);

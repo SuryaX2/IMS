@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { api } from "../api/api";
-import { calculateStats } from "../utils/orderHelpers";
+import { api } from "../../api/api";
+import { calculateStats } from "../../utils/orderHelpers";
 
 export const useOrders = () => {
     const [orders, setOrders] = useState([]);
