@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { message } from "antd";
 import toast from "react-hot-toast";
-import { api } from "../api/api";
-import { calculateStats } from "../utils/purchaseUtils";
+import { api } from "../../api/api.js";
+import { calculateStats } from "../../utils/purchaseUtils.js";
 
 export const usePurchase = () => {
     const [purchases, setPurchases] = useState([]);
