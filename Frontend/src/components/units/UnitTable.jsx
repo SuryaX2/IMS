@@ -77,7 +77,7 @@ const UnitTable = ({
                             <Button
                                 type="text"
                                 size="small"
-                                icon={<EyeOutlined />}
+                                icon={<EyeOutlined className="text-blue-500" />}
                                 onClick={() => onView(record)}
                                 className="text-gray-500 hover:text-blue-500 hover:bg-blue-50 rounded-md"
                             />
@@ -90,7 +90,9 @@ const UnitTable = ({
                             <Button
                                 type="text"
                                 size="small"
-                                icon={<EditOutlined />}
+                                icon={
+                                    <EditOutlined className="text-green-500" />
+                                }
                                 disabled={!canEditRecord}
                                 onClick={() => onEdit(record)}
                                 className={
@@ -110,7 +112,9 @@ const UnitTable = ({
                             <Button
                                 type="text"
                                 size="small"
-                                icon={<DeleteOutlined />}
+                                icon={
+                                    <DeleteOutlined className="text-red-500" />
+                                }
                                 disabled={!canEditRecord}
                                 onClick={() => {
                                     Modal.confirm({
