@@ -33,6 +33,7 @@ const UnitTable = ({
             title: "Unit Name",
             dataIndex: "unit_name",
             key: "unit_name",
+            align: "center",
             sorter: (a, b) => a.unit_name.localeCompare(b.unit_name),
             render: (text) => (
                 <div className="flex items-center space-x-3">
@@ -47,6 +48,7 @@ const UnitTable = ({
             title: "Actions",
             key: "actions",
             width: 120,
+            align: "center",
             render: (_, record) => {
                 const canEditRecord = canEdit(record, user, isAdmin);
 

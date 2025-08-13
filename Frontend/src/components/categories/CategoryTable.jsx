@@ -47,6 +47,7 @@ const CategoryTable = ({
             title: "Actions",
             key: "actions",
             width: 120,
+            align: "center",
             render: (_, record) => {
                 const canEditRecord = canEdit(record, user, isAdmin);
 
