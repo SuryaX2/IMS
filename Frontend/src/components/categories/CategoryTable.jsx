@@ -43,31 +43,6 @@ const CategoryTable = ({
             ),
         },
         {
-            title: "Created By",
-            dataIndex: "created_by",
-            key: "created_by",
-            render: (createdBy, record) => (
-                <Tag
-                    color={getOwnershipTag(record, user)}
-                    icon={<UserOutlined />}
-                >
-                    {getOwnershipText(record, user)}
-                </Tag>
-            ),
-        },
-        {
-            title: "Created At",
-            dataIndex: "createdAt",
-            key: "createdAt",
-            render: (date) => (
-                <div className="flex items-center space-x-1">
-                    <CalendarOutlined className="text-gray-400" />
-                    <span>{formatDate(date)}</span>
-                </div>
-            ),
-            sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
-        },
-        {
             title: "Actions",
             key: "actions",
             fixed: "right",
