@@ -23,40 +23,66 @@ const UnitModal = ({ visible, onClose, onSubmit, editingUnit, form }) => {
     return (
         <Modal
             title={
-                <div className="flex items-center space-x-2">
-                    <AppstoreOutlined />
-                    <span>{editingUnit ? "Edit Unit" : "Add New Unit"}</span>
+                <div className="text-lg font-medium text-gray-800">
+                    {editingUnit ? "Edit Unit" : "Add New Unit"}
                 </div>
             }
             open={visible}
             onCancel={onClose}
             footer={null}
-            width={MODAL_WIDTH.FORM}
+            width={Math.min(480, window.innerWidth * 0.9)}
+            centered
+            className="unit-modal"
+            styles={{
+                body: { padding: "24px" },
+                header: {
+                    borderBottom: "1px solid #f0f0f0",
+                    paddingBottom: "16px",
+                },
+            }}
         >
             <Form
                 form={form}
                 layout="vertical"
                 onFinish={handleSubmit}
-                className="mt-4"
+                className="space-y-6"
+                size="large"
             >
                 <Form.Item
                     name="unit_name"
-                    label="Unit Name"
+                    label={
+                        <span className="text-sm font-medium text-gray-700">
+                            Unit Name
+                        </span>
+                    }
                     rules={FORM_RULES.UNIT_NAME}
+                    className="mb-6"
                 >
                     <Input
                         placeholder="Enter unit name (e.g., kg, pcs, ltr)"
-                        prefix={<AppstoreOutlined />}
+                        className="h-11 rounded-md border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all duration-200"
+                        prefix={
+                            <AppstoreOutlined className="text-gray-400 text-sm" />
+                        }
                     />
                 </Form.Item>
 
-                <Form.Item className="mb-0 flex justify-end">
-                    <Space>
-                        <Button onClick={onClose}>Cancel</Button>
-                        <Button type="primary" htmlType="submit">
-                            {editingUnit ? "Update" : "Create"}
+                <Form.Item className="mb-0">
+                    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t border-gray-100">
+                        <Button
+                            onClick={onClose}
+                            className="h-10 px-6 rounded-md border-gray-300 hover:border-gray-400 transition-colors duration-200"
+                        >
+                            Cancel
                         </Button>
-                    </Space>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            className="h-10 px-6 rounded-md bg-green-600 hover:bg-green-700 border-green-600 hover:border-green-700 transition-colors duration-200"
+                        >
+                            {editingUnit ? "Update Unit" : "Create Unit"}
+                        </Button>
+                    </div>
                 </Form.Item>
             </Form>
         </Modal>
