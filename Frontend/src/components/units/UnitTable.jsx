@@ -9,13 +9,16 @@ import {
     UserOutlined,
     CalendarOutlined,
 } from "@ant-design/icons";
-import { formatDate } from "../../utils/dateUtils";
+import { formatDate } from "../../utils/category_units/dateUtils";
 import {
     canEdit,
     getOwnershipTag,
     getOwnershipText,
-} from "../../utils/permissionUtils";
-import { PAGINATION_CONFIG, TABLE_SCROLL_CONFIG } from "../../utils/constants";
+} from "../../utils/category_units/permissionUtils";
+import {
+    PAGINATION_CONFIG,
+    TABLE_SCROLL_CONFIG,
+} from "../../utils/category_units/constants";
 
 const UnitTable = ({
     units,

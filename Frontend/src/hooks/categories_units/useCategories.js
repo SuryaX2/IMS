@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import { api } from "../api/api";
-import { useAuth } from "./useAuth";
+import { api } from "../../api/api";
+import { useAuth } from "../useAuth";
 import toast from "react-hot-toast";
 
 export const useCategories = () => {

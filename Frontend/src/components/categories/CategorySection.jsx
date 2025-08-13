@@ -4,7 +4,7 @@ import { TagsOutlined, ReloadOutlined, PlusOutlined } from "@ant-design/icons";
 import CategoryTable from "./CategoryTable";
 import CategoryModal from "./CategoryModal";
 import CategoryViewModal from "./CategoryViewModal";
-import SearchFilter from "../shared/SearchFilter";
+import SearchFilter from "../common/SearchFilter";
 import { useCategories } from "../../hooks/categories_units/useCategories";
 
 const CategorySection = ({ user, isAdmin }) => {

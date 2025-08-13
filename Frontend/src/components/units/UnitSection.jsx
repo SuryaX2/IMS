@@ -8,7 +8,7 @@ import {
 import UnitTable from "./UnitTable";
 import UnitModal from "./UnitModal";
 import UnitViewModal from "./UnitViewModal";
-import SearchFilter from "../shared/SearchFilter";
+import SearchFilter from "../common/SearchFilter";
 import { useUnits } from "../../hooks/categories_units/useUnits";
 
 const UnitSection = ({ user, isAdmin }) => {

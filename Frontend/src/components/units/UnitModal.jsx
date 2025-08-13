@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Modal, Form, Input, Button, Space } from "antd";
 import { AppstoreOutlined } from "@ant-design/icons";
-import { FORM_RULES, MODAL_WIDTH } from "../../utils/constants";
+import { FORM_RULES, MODAL_WIDTH } from "../../utils/category_units/constants";
 
 const UnitModal = ({ visible, onClose, onSubmit, editingUnit, form }) => {
     useEffect(() => {
