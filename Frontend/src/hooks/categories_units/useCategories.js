@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { api } from "../../api/api";
 import { useAuth } from "../useAuth";
 import toast from "react-hot-toast";
@@ -32,6 +32,10 @@ export const useCategories = () => {
             setLoading(false);
         }
     }, [isAdmin]);
+
+    useEffect(() => {
+        loadCategories();
+    }, []);
 
     const createCategory = useCallback(
         async (values) => {
