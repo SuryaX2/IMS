@@ -68,77 +68,51 @@ const UnitSection = ({ user, isAdmin }) => {
     return (
         <>
             <Card
-                className="h-full border-0 shadow-none"
                 title={
-                    <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-green-100 rounded-lg">
-                                <AppstoreOutlined className="text-green-600 text-lg" />
-                            </div>
-                            <div>
-                                <span className="text-lg font-semibold text-gray-800">
-                                    Units
-                                </span>
-                                <Badge
-                                    count={units.length}
-                                    showZero
-                                    className="ml-2"
-                                    style={{ backgroundColor: "#52c41a" }}
-                                />
-                            </div>
-                        </div>
+                    <div className="flex items-center space-x-2">
+                        <AppstoreOutlined className="text-green-500" />
+                        <span>Units</span>
+                        <Badge count={units.length} showZero />
                     </div>
                 }
                 extra={
-                    <Space size="small">
-                        <Tooltip title="Refresh Units">
+                    <Space>
+                        <Tooltip title="Refresh">
                             <Button
                                 icon={<ReloadOutlined />}
                                 onClick={loadUnits}
                                 loading={loading}
-                                className="border-gray-300 hover:border-green-400 hover:text-green-600"
-                                size="small"
                             />
                         </Tooltip>
                         <Button
                             type="primary"
                             icon={<PlusOutlined />}
                             onClick={() => openModal()}
-                            className="bg-green-600 hover:bg-green-700 border-green-600 hover:border-green-700 shadow-sm"
-                            size="small"
                         >
-                            <span className="hidden sm:inline">Add Unit</span>
-                            <span className="sm:hidden">Add</span>
+                            Add Unit
                         </Button>
                     </Space>
                 }
-                bodyStyle={{ padding: "20px" }}
             >
-                <div className="space-y-4">
-                    <div className="bg-gray-50/50 p-4 rounded-lg border">
-                        <SearchFilter
-                            searchText={searchText}
-                            setSearchText={setSearchText}
-                            filter={filter}
-                            setFilter={setFilter}
-                            onClear={clearFilters}
-                            placeholder="Search units..."
-                            isAdmin={isAdmin}
-                        />
-                    </div>
+                <SearchFilter
+                    searchText={searchText}
+                    setSearchText={setSearchText}
+                    filter={filter}
+                    setFilter={setFilter}
+                    onClear={clearFilters}
+                    placeholder="Search units..."
+                    isAdmin={isAdmin}
+                />
 
-                    <div className="bg-white rounded-lg border border-gray-100">
-                        <UnitTable
-                            units={units}
-                            loading={loading}
-                            user={user}
-                            isAdmin={isAdmin}
-                            onEdit={handleEdit}
-                            onView={handleView}
-                            onDelete={deleteUnit}
-                        />
-                    </div>
-                </div>
+                <UnitTable
+                    units={units}
+                    loading={loading}
+                    user={user}
+                    isAdmin={isAdmin}
+                    onEdit={handleEdit}
+                    onView={handleView}
+                    onDelete={deleteUnit}
+                />
             </Card>
 
             <UnitModal
