@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import { Row, Col } from "antd";
+import { Row, Col, Card, Divider } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import { useAuth } from "../hooks/useAuth";
 import { useCategories } from "../hooks/categories_units/useCategories";
 import { useUnits } from "../hooks/categories_units/useUnits";
+import PageHeader from "../components/common/PageHeader";
 import StatsSection from "../components/common/StatsSection";
 import CategorySection from "../components/categories/CategorySection";
 import UnitSection from "../components/units/UnitSection";
@@ -19,34 +20,48 @@ const CategoryUnit = () => {
     }, [loadCategories, loadUnits]);
 
     return (
-        <div className="p-6 bg-white min-h-screen">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-                <div className="mb-4 sm:mb-0">
-                    <div className="flex-1 min-w-0">
-                        <h1 className="truncate mb-1 text-4xl font-bold flex items-center gap-2">
-                            Categories & Units
-                            <InboxOutlined className="text-blue-600 inline-block ml-2" />
-                        </h1>
-                    </div>
-                    <p className="text-gray-600 text-sm sm:text-base">
-                        Manage your Categories and Units
-                    </p>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+                {/* Enhanced Header */}
+                <div className="mb-8">
+                    <PageHeader
+                        title="Categories & Units"
+                        subtitle="Manage your inventory categories and units"
+                        icon={<InboxOutlined />}
+                    />
                 </div>
+
+                <div className="mb-8">
+                    <StatsSection
+                        categoryStats={categoryStats}
+                        unitStats={unitStats}
+                    />
+                </div>
+
+                {/* Main Content with Enhanced Layout */}
+                <Row gutter={[24, 24]}>
+                    <Col xs={24} xl={12}>
+                        <div className="h-full">
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-100 h-full">
+                                <CategorySection
+                                    user={user}
+                                    isAdmin={isAdmin}
+                                />
+                            </div>
+                        </div>
+                    </Col>
+                    <Col xs={24} xl={12}>
+                        <div className="h-full">
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-100 h-full">
+                                <UnitSection user={user} isAdmin={isAdmin} />
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
+
+                {/* Optional Divider for Visual Separation */}
+                
             </div>
-
-            {/* Stats Section */}
-            <StatsSection categoryStats={categoryStats} unitStats={unitStats} />
-
-            {/* Main Content */}
-            <Row gutter={[16, 16]}>
-                <Col xs={24} lg={12}>
-                    <CategorySection user={user} isAdmin={isAdmin} />
-                </Col>
-                <Col xs={24} lg={12}>
-                    <UnitSection user={user} isAdmin={isAdmin} />
-                </Col>
-            </Row>
         </div>
     );
 };
