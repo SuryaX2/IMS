@@ -1,7 +1,7 @@
 import React from "react";
 import { Input, Select, Button, Space } from "antd";
 import { FilterOutlined, ClearOutlined } from "@ant-design/icons";
-import { FILTER_OPTIONS } from "../../utils/constants";
+import { FILTER_OPTIONS } from "../../utils/category_units/constants";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -13,7 +13,7 @@ const SearchFilter = ({
     setFilter,
     onClear,
     placeholder = "Search...",
-    showOthersFilter = false,
+    isAdmin = false,
 }) => {
     return (
         <div className="mb-4 space-y-2">
@@ -33,7 +33,7 @@ const SearchFilter = ({
                 >
                     <Option value={FILTER_OPTIONS.ALL}>All</Option>
                     <Option value={FILTER_OPTIONS.MINE}>Mine</Option>
-                    {showOthersFilter && (
+                    {isAdmin && (
                         <Option value={FILTER_OPTIONS.OTHERS}>Others</Option>
                     )}
                 </Select>

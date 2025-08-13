@@ -1,16 +1,18 @@
 import React from "react";
-import { Card, Statistic } from "antd";
+import { Card, Statistic, Col } from "antd";
 
-const StatsCard = ({ title, value, prefix, color = "#1890ff" }) => {
+const StatsCard = ({ title, value, prefix, valueStyle, span = 6 }) => {
     return (
-        <Card>
-            <Statistic
-                title={title}
-                value={value}
-                prefix={prefix}
-                valueStyle={{ color }}
-            />
-        </Card>
+        <Col xs={24} sm={12} md={span}>
+            <Card>
+                <Statistic
+                    title={title}
+                    value={value}
+                    prefix={prefix}
+                    valueStyle={valueStyle}
+                />
+            </Card>
+        </Col>
     );
 };
 
