@@ -44,27 +44,6 @@ const CategoryTable = ({
             ),
         },
         {
-            title: "Created By",
-            dataIndex: "created_by",
-            key: "created_by",
-            responsive: ["md"],
-            render: (_, record) => (
-                <span className="text-gray-600">
-                    {getOwnershipText(record, user)}
-                </span>
-            ),
-        },
-        {
-            title: "Created Date",
-            dataIndex: "createdAt",
-            key: "createdAt",
-            responsive: ["lg"],
-            sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
-            render: (date) => (
-                <span className="text-gray-600">{formatDate(date)}</span>
-            ),
-        },
-        {
             title: "Actions",
             key: "actions",
             width: 120,
