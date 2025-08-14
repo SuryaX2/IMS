@@ -18,6 +18,7 @@ import Purchase from "./pages/Purchase";
 import Customers from "./pages/Customers";
 import Suppliers from "./pages/Suppliers";
 import Category from "./pages/Category";
+import Reports from "./pages/Reports";
 
 function App() {
     return (
@@ -70,24 +71,7 @@ function App() {
                             <Route path="customers" element={<Customers />} />
                             <Route path="suppliers" element={<Suppliers />} />
                             <Route path="categories" element={<Category />} />
-                            <Route path="reports">
-                                <Route
-                                    path="stock"
-                                    element={<div>Stock Report</div>}
-                                />
-                                <Route
-                                    path="sales"
-                                    element={<div>Sales Report</div>}
-                                />
-                                <Route
-                                    path="purchases"
-                                    element={<div>Purchase Report</div>}
-                                />
-                                <Route
-                                    path="sales-vs-purchases"
-                                    element={<div>Sales vs Purchases</div>}
-                                />
-                            </Route>
+                            <Route path="reports/*" element={<Reports />} />
                         </Route>
 
                         {/* catch all */}

@@ -28,7 +28,7 @@ import {
     DollarOutlined,
     ShoppingCartOutlined,
     DownloadOutlined,
-    TrendingUpOutlined,
+    RiseOutlined,
 } from "@ant-design/icons";
 import { api } from "../../api/api";
 import toast from "react-hot-toast";
@@ -226,7 +226,7 @@ const SalesReport = () => {
                                 prefix="₹"
                                 precision={2}
                                 valueStyle={{ color: "#fa8c16" }}
-                                suffix={<TrendingUpOutlined />}
+                                suffix={<RiseOutlined />}
                             />
                         </Card>
                     </Col>
