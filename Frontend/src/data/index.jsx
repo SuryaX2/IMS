@@ -135,6 +135,10 @@ export const menuItems = [
                 key: "reports/purchases",
                 label: <Link to="/reports/purchases">Purchase Report</Link>,
             },
+            {
+                key: "reports/sales-vs-purchases",
+                label: <Link to="/reports/sales-vs-purchases">Sales vs Purchases</Link>,
+            }
         ],
     },
 ];

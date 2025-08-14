@@ -83,6 +83,10 @@ function App() {
                                     path="purchases"
                                     element={<div>Purchase Report</div>}
                                 />
+                                <Route
+                                    path="sales-vs-purchases"
+                                    element={<div>Sales vs Purchases</div>}
+                                />
                             </Route>
                         </Route>
 
