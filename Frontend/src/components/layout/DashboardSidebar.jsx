@@ -53,7 +53,7 @@ const SidebarLogo = ({ collapsed }) => (
         {collapsed ? (
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-800 bg-clip-text text-transparent">
-                    IP
+                    IPro
                 </span>
             </div>
         ) : (

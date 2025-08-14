@@ -69,10 +69,7 @@ function App() {
                             <Route path="purchases" element={<Purchase />} />
                             <Route path="customers" element={<Customers />} />
                             <Route path="suppliers" element={<Suppliers />} />
-                            <Route
-                                path="categories"
-                                element={<Category />}
-                            />
+                            <Route path="categories" element={<Category />} />
                             <Route path="reports">
                                 <Route
                                     path="stock"
