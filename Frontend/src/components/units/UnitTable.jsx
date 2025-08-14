@@ -65,7 +65,7 @@ const UnitTable = ({
                             <Button
                                 type="text"
                                 size="middle"
-                                icon={<EyeOutlined />}
+                                icon={<EyeOutlined className="text-blue-600" />}
                                 onClick={() => onView(record)}
                                 className="h-9 w-9 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 border-0 rounded-lg transition-all duration-200"
                             />
@@ -78,7 +78,9 @@ const UnitTable = ({
                             <Button
                                 type="text"
                                 size="middle"
-                                icon={<EditOutlined />}
+                                icon={
+                                    <EditOutlined className="text-emerald-600" />
+                                }
                                 disabled={!canEditRecord}
                                 onClick={() => onEdit(record)}
                                 className={
@@ -98,7 +100,9 @@ const UnitTable = ({
                             <Button
                                 type="text"
                                 size="middle"
-                                icon={<DeleteOutlined />}
+                                icon={
+                                    <DeleteOutlined className="text-red-600" />
+                                }
                                 disabled={!canEditRecord}
                                 onClick={() => {
                                     Modal.confirm({
@@ -141,7 +145,7 @@ const UnitTable = ({
                 }}
                 locale={{
                     emptyText: (
-                        <div className="py-16">
+                        <div className="py-10">
                             <Empty
                                 description={
                                     <div className="text-center">
