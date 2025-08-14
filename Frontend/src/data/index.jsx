@@ -9,7 +9,7 @@ import {
     UserSwitchOutlined,
     CheckCircleOutlined,
     ClockCircleOutlined,
-    UndoOutlined
+    UndoOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
@@ -121,25 +121,7 @@ export const menuItems = [
     {
         key: "reports",
         icon: <BarChartOutlined />,
-        label: "Reports",
-        children: [
-            {
-                key: "reports/stock",
-                label: <Link to="/reports/stock">Stock Report</Link>,
-            },
-            {
-                key: "reports/sales",
-                label: <Link to="/reports/sales">Sales Report</Link>,
-            },
-            {
-                key: "reports/purchases",
-                label: <Link to="/reports/purchases">Purchase Report</Link>,
-            },
-            {
-                key: "reports/sales-vs-purchases",
-                label: <Link to="/reports/sales-vs-purchases">Sales vs Purchases</Link>,
-            }
-        ],
+        label: <Link to="/reports">Reports</Link>,
     },
 ];
 
