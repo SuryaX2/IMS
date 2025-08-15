@@ -294,43 +294,6 @@ const SalesReport = () => {
                     )}
                 </Card>
 
-                {/* Top Products Chart */}
-                <Card title="Top Selling Products" className="chart-card">
-                    {productChartData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={350}>
-                            <BarChart
-                                data={productChartData}
-                                layout="horizontal"
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis type="number" tick={{ fontSize: 12 }} />
-                                <YAxis
-                                    dataKey="name"
-                                    type="category"
-                                    tick={{ fontSize: 11 }}
-                                    width={120}
-                                />
-                                <Tooltip
-                                    formatter={(value, name) => [
-                                        name === "sales"
-                                            ? formatCurrency(value)
-                                            : value,
-                                        name === "sales" ? "Sales" : "Quantity",
-                                    ]}
-                                />
-                                <Legend />
-                                <Bar
-                                    dataKey="sales"
-                                    fill="#52c41a"
-                                    name="Sales"
-                                />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    ) : (
-                        <Empty description="No product sales data available" />
-                    )}
-                </Card>
-
                 {/* Sales by Product Table */}
                 <Card title="Sales by Product - Detailed View">
                     {salesData.salesByProduct.length > 0 ? (

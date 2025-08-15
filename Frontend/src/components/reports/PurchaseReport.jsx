@@ -292,48 +292,6 @@ const PurchaseReport = () => {
                     )}
                 </Card>
 
-                {/* Purchases by Supplier Chart */}
-                <Card
-                    title="Top Suppliers by Purchase Value"
-                    className="chart-card"
-                >
-                    {supplierChartData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={350}>
-                            <BarChart
-                                data={supplierChartData}
-                                layout="horizontal"
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis type="number" tick={{ fontSize: 12 }} />
-                                <YAxis
-                                    dataKey="name"
-                                    type="category"
-                                    tick={{ fontSize: 11 }}
-                                    width={120}
-                                />
-                                <Tooltip
-                                    formatter={(value, name) => [
-                                        name === "purchases"
-                                            ? formatCurrency(value)
-                                            : value,
-                                        name === "purchases"
-                                            ? "Purchase Value"
-                                            : "Order Count",
-                                    ]}
-                                />
-                                <Legend />
-                                <Bar
-                                    dataKey="purchases"
-                                    fill="#1890ff"
-                                    name="Purchase Value"
-                                />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    ) : (
-                        <Empty description="No supplier purchase data available" />
-                    )}
-                </Card>
-
                 {/* Purchases by Supplier Table */}
                 <Card title="Purchases by Supplier - Detailed View">
                     {purchaseData.purchasesBySupplier.length > 0 ? (

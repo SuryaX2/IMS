@@ -10,7 +10,6 @@ import PageHeader from "../components/common/PageHeader";
 import StockReport from "../components/reports/StockReport";
 import SalesReport from "../components/reports/SalesReport";
 import PurchaseReport from "../components/reports/PurchaseReport";
-import SalesVsPurchasesReport from "../components/reports/SalesVsPurchasesReport";
 
 const Reports = () => {
     const tabItems = [
@@ -43,16 +42,6 @@ const Reports = () => {
                 </span>
             ),
             children: <PurchaseReport />,
-        },
-        {
-            key: "comparison",
-            label: (
-                <span>
-                    <BarChartOutlined />
-                    Sales vs Purchases
-                </span>
-            ),
-            children: <SalesVsPurchasesReport />,
         },
     ];
 
