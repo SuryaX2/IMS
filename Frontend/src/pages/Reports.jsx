@@ -4,12 +4,13 @@ import {
     FileTextOutlined,
     ShoppingCartOutlined,
     InboxOutlined,
-    BarChartOutlined,
+    TrophyOutlined,
 } from "@ant-design/icons";
 import PageHeader from "../components/common/PageHeader";
 import StockReport from "../components/reports/StockReport";
 import SalesReport from "../components/reports/SalesReport";
 import PurchaseReport from "../components/reports/PurchaseReport";
+import TopProductsReport from "../components/reports/TopProductsReport";
 
 const Reports = () => {
     const tabItems = [
@@ -42,6 +43,16 @@ const Reports = () => {
                 </span>
             ),
             children: <PurchaseReport />,
+        },
+        {
+            key: "top-products",
+            label: (
+                <span>
+                    <TrophyOutlined />
+                    Top Products Report
+                </span>
+            ),
+            children: <TopProductsReport />,
         },
     ];
 
