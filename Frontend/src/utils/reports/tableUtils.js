@@ -198,11 +198,7 @@ export const createTableSummary = (pageData, summaryFields, type = "") => {
             </Table.Summary.Cell>
             {summaryFields.map((field) => (
                 <Table.Summary.Cell key={field}>
-                    {renderSummaryCell(
-                        field,
-                        totals[field],
-                        getSummaryClass(field)
-                    )}
+                    {renderSummaryCell(field,totals[field],getSummaryClass(field))}
                 </Table.Summary.Cell>
             ))}
         </Table.Summary.Row>
