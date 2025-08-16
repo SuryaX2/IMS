@@ -1,10 +1,13 @@
-import { Tag } from "antd";
+import React from "react";
+import { Tag, Table } from "antd";
 import {
     CheckCircleOutlined,
     WarningOutlined,
     CloseCircleOutlined,
     InboxOutlined,
     TrophyOutlined,
+    ShoppingOutlined,
+    Avatar,
 } from "@ant-design/icons";
 import { formatCurrency } from "./reportUtils";
 
@@ -162,6 +165,7 @@ export const createTableConfig = (type) => {
                     ),
                 },
             ],
+            summaryFields: ["stock", "inventory_value"],
         },
         topProducts: {
             columns: [
@@ -191,12 +195,26 @@ export const createTableConfig = (type) => {
                     title: "Product",
                     key: "product",
                     render: (_, record) => (
-                        <div>
-                            <div className="font-medium">
-                                {record.product_name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                                {record.product_code}
+                        <div className="flex items-center gap-3">
+                            {record.product_image ? (
+                                <Avatar src={record.product_image} size={40} />
+                            ) : (
+                                <Avatar
+                                    icon={<ShoppingOutlined />}
+                                    size={40}
+                                    style={{
+                                        backgroundColor: "#f0f0f0",
+                                        color: "#666",
+                                    }}
+                                />
+                            )}
+                            <div>
+                                <div className="font-medium">
+                                    {record.product_name}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                    {record.product_code}
+                                </div>
                             </div>
                         </div>
                     ),
@@ -243,11 +261,12 @@ export const getStatusColor = (status) => {
 
 export const getStatusIcon = (status) => {
     const icons = {
-        "In Stock": CheckCircleOutlined,
-        "Low Stock": WarningOutlined,
-        "Out of Stock": CloseCircleOutlined,
+        "In Stock": () => <CheckCircleOutlined />,
+        "Low Stock": () => <WarningOutlined />,
+        "Out of Stock": () => <CloseCircleOutlined />,
     };
-    return icons[status] || InboxOutlined;
+    const IconComponent = icons[status] || (() => <InboxOutlined />);
+    return <IconComponent />;
 };
 
 // Common pagination configuration
@@ -260,9 +279,10 @@ export const getPaginationConfig = () => ({
 });
 
 // Table summary generator
-export const createTableSummary = (pageData, summaryFields, type) => {
-    const totals = {};
+export const createTableSummary = (pageData, summaryFields, type = "") => {
+    if (!pageData || pageData.length === 0) return null;
 
+    const totals = {};
     summaryFields.forEach((field) => {
         totals[field] = pageData.reduce(
             (sum, item) => sum + (item[field] || 0),
@@ -270,33 +290,42 @@ export const createTableSummary = (pageData, summaryFields, type) => {
         );
     });
 
+    const getSummaryClass = (field) => {
+        if (field.includes("sales") || field.includes("total"))
+            return "text-green-600";
+        if (field.includes("purchases")) return "text-blue-600";
+        return "";
+    };
+
+    const formatSummaryValue = (field, value) => {
+        const currencyFields = [
+            "total",
+            "sales",
+            "purchases",
+            "value",
+            "buying_price",
+            "selling_price",
+            "inventory_value",
+        ];
+        return currencyFields.some((cf) => field.includes(cf))
+            ? formatCurrency(value)
+            : value;
+    };
+
     return (
         <Table.Summary.Row className="bg-gray-50">
             <Table.Summary.Cell>
                 <strong>Page Total</strong>
             </Table.Summary.Cell>
-            {summaryFields.map((field, index) => (
+            {summaryFields.map((field) => (
                 <Table.Summary.Cell key={field}>
                     <strong className={getSummaryClass(field)}>
-                        {field.includes("total") ||
-                        field.includes("sales") ||
-                        field.includes("purchases") ||
-                        field.includes("value")
-                            ? formatCurrency(totals[field])
-                            : totals[field]}
+                        {formatSummaryValue(field, totals[field])}
                     </strong>
                 </Table.Summary.Cell>
             ))}
         </Table.Summary.Row>
     );
-};
-
-// Summary cell class helper
-const getSummaryClass = (field) => {
-    if (field.includes("sales") || field.includes("total"))
-        return "text-green-600";
-    if (field.includes("purchases")) return "text-blue-600";
-    return "";
 };
 
 // Common table props
