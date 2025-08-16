@@ -57,21 +57,21 @@ const ReportChart = ({
             );
         }
 
-        if (chartType === "bar") {
+        if (type === "bar") {
             return (
                 <BarChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
-                        dataKey={xAxisKey}
+                        dataKey="date"
                         tick={{ fontSize: 12 }}
                         angle={-45}
                         textAnchor="end"
                         height={80}
                     />
                     <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip formatter={bars[0]?.formatter} />
+                    <Tooltip formatter={config.bars?.[0]?.formatter} />
                     <Legend />
-                    {bars.map((bar, index) => (
+                    {config.bars?.map((bar, index) => (
                         <Bar
                             key={index}
                             dataKey={bar.dataKey}
@@ -84,7 +84,33 @@ const ReportChart = ({
             );
         }
 
-        return null;
+        return (
+            <LineChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip formatter={config.lines?.[0]?.formatter} />
+                <Legend />
+                {config.lines?.map((line, index) => (
+                    <Line
+                        key={index}
+                        type="monotone"
+                        dataKey={line.dataKey}
+                        stroke={line.color}
+                        strokeWidth={line.strokeWidth || 2}
+                        name={line.name}
+                        dot={{ fill: line.color, strokeWidth: 2 }}
+                    />
+                ))}
+            </LineChart>
+        );
+
     };
 
     return (
