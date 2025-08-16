@@ -1,15 +1,18 @@
-import React from "react";
-import { Tag, Table } from "antd";
-import {
-    CheckCircleOutlined,
-    WarningOutlined,
-    CloseCircleOutlined,
-    InboxOutlined,
-    TrophyOutlined,
-    ShoppingOutlined,
-    Avatar,
-} from "@ant-design/icons";
+import { Table } from "antd";
 import { formatCurrency } from "./reportUtils";
+import {
+    renderProductName,
+    renderSupplierName,
+    renderQuantity,
+    renderStock,
+    renderTotalSales,
+    renderTotalPurchases,
+    renderQuantitySold,
+    renderStatus,
+    renderRank,
+    renderTopProduct,
+    renderSummaryCell,
+} from "../../components/common/reports/TableComponents";
 
 // Common table configurations
 export const createTableConfig = (type) => {
@@ -28,20 +31,14 @@ export const createTableConfig = (type) => {
                     dataIndex: "quantity",
                     key: "quantity",
                     sorter: (a, b) => a.quantity - b.quantity,
-                    render: (quantity) => (
-                        <span className="font-medium">{quantity}</span>
-                    ),
+                    render: renderQuantity,
                 },
                 {
                     title: "Total Sales",
                     dataIndex: "total",
                     key: "total",
                     sorter: (a, b) => a.total - b.total,
-                    render: (total) => (
-                        <span className="text-green-600 font-medium">
-                            {formatCurrency(total)}
-                        </span>
-                    ),
+                    render: renderTotalSales,
                 },
             ],
             summaryFields: ["quantity", "total"],
@@ -54,34 +51,21 @@ export const createTableConfig = (type) => {
                     key: "supplier_name",
                     sorter: (a, b) =>
                         a.supplier_name.localeCompare(b.supplier_name),
-                    render: (text, record) => (
-                        <div>
-                            <div className="font-medium">{text}</div>
-                            <div className="text-sm text-gray-500">
-                                {record.shopname}
-                            </div>
-                        </div>
-                    ),
+                    render: renderSupplierName,
                 },
                 {
                     title: "Purchase Count",
                     dataIndex: "count",
                     key: "count",
                     sorter: (a, b) => a.count - b.count,
-                    render: (count) => (
-                        <span className="font-medium">{count}</span>
-                    ),
+                    render: renderQuantity,
                 },
                 {
                     title: "Total Purchases",
                     dataIndex: "total_purchases",
                     key: "total_purchases",
                     sorter: (a, b) => a.total_purchases - b.total_purchases,
-                    render: (total) => (
-                        <span className="text-blue-600 font-medium">
-                            {formatCurrency(total)}
-                        </span>
-                    ),
+                    render: renderTotalPurchases,
                 },
             ],
             summaryFields: ["count", "total_purchases"],
@@ -94,14 +78,7 @@ export const createTableConfig = (type) => {
                     key: "product_name",
                     sorter: (a, b) =>
                         a.product_name.localeCompare(b.product_name),
-                    render: (text, record) => (
-                        <div>
-                            <div className="font-medium">{text}</div>
-                            <div className="text-sm text-gray-500">
-                                {record.product_code}
-                            </div>
-                        </div>
-                    ),
+                    render: renderProductName,
                 },
                 {
                     title: "Category",
@@ -120,49 +97,34 @@ export const createTableConfig = (type) => {
                     dataIndex: "stock",
                     key: "stock",
                     sorter: (a, b) => a.stock - b.stock,
-                    render: (stock) => (
-                        <span
-                            className={
-                                stock < 10 ? "text-red-500 font-medium" : ""
-                            }
-                        >
-                            {stock}
-                        </span>
-                    ),
+                    render: renderStock,
                 },
                 {
                     title: "Buying Price",
                     dataIndex: "buying_price",
                     key: "buying_price",
                     sorter: (a, b) => a.buying_price - b.buying_price,
-                    render: (price) => formatCurrency(price),
+                    render: formatCurrency,
                 },
                 {
                     title: "Selling Price",
                     dataIndex: "selling_price",
                     key: "selling_price",
                     sorter: (a, b) => a.selling_price - b.selling_price,
-                    render: (price) => formatCurrency(price),
+                    render: formatCurrency,
                 },
                 {
                     title: "Inventory Value",
                     dataIndex: "inventory_value",
                     key: "inventory_value",
                     sorter: (a, b) => a.inventory_value - b.inventory_value,
-                    render: (value) => formatCurrency(value),
+                    render: formatCurrency,
                 },
                 {
                     title: "Status",
                     dataIndex: "status",
                     key: "status",
-                    render: (status) => (
-                        <Tag
-                            color={getStatusColor(status)}
-                            icon={getStatusIcon(status)}
-                        >
-                            {status}
-                        </Tag>
-                    ),
+                    render: renderStatus,
                 },
             ],
             summaryFields: ["stock", "inventory_value"],
@@ -172,74 +134,26 @@ export const createTableConfig = (type) => {
                 {
                     title: "Rank",
                     key: "rank",
-                    render: (_, __, index) => (
-                        <div className="flex items-center gap-2">
-                            {index < 3 && (
-                                <TrophyOutlined
-                                    style={{
-                                        color:
-                                            index === 0
-                                                ? "#FFD700"
-                                                : index === 1
-                                                  ? "#C0C0C0"
-                                                  : "#CD7F32",
-                                        fontSize: "16px",
-                                    }}
-                                />
-                            )}
-                            <span className="font-medium">#{index + 1}</span>
-                        </div>
-                    ),
+                    render: renderRank,
                 },
                 {
                     title: "Product",
                     key: "product",
-                    render: (_, record) => (
-                        <div className="flex items-center gap-3">
-                            {record.product_image ? (
-                                <Avatar src={record.product_image} size={40} />
-                            ) : (
-                                <Avatar
-                                    icon={<ShoppingOutlined />}
-                                    size={40}
-                                    style={{
-                                        backgroundColor: "#f0f0f0",
-                                        color: "#666",
-                                    }}
-                                />
-                            )}
-                            <div>
-                                <div className="font-medium">
-                                    {record.product_name}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                    {record.product_code}
-                                </div>
-                            </div>
-                        </div>
-                    ),
+                    render: renderTopProduct,
                 },
                 {
                     title: "Quantity Sold",
                     dataIndex: "quantity_sold",
                     key: "quantity_sold",
                     sorter: (a, b) => a.quantity_sold - b.quantity_sold,
-                    render: (quantity) => (
-                        <span className="font-medium text-blue-600">
-                            {quantity}
-                        </span>
-                    ),
+                    render: renderQuantitySold,
                 },
                 {
                     title: "Total Sales",
                     dataIndex: "total_sales",
                     key: "total_sales",
                     sorter: (a, b) => a.total_sales - b.total_sales,
-                    render: (total) => (
-                        <span className="text-green-600 font-medium">
-                            {formatCurrency(total)}
-                        </span>
-                    ),
+                    render: renderTotalSales,
                 },
             ],
             summaryFields: ["quantity_sold", "total_sales"],
@@ -247,26 +161,6 @@ export const createTableConfig = (type) => {
     };
 
     return configs[type] || {};
-};
-
-// Status utilities
-export const getStatusColor = (status) => {
-    const colors = {
-        "In Stock": "green",
-        "Low Stock": "orange",
-        "Out of Stock": "red",
-    };
-    return colors[status] || "default";
-};
-
-export const getStatusIcon = (status) => {
-    const icons = {
-        "In Stock": () => <CheckCircleOutlined />,
-        "Low Stock": () => <WarningOutlined />,
-        "Out of Stock": () => <CloseCircleOutlined />,
-    };
-    const IconComponent = icons[status] || (() => <InboxOutlined />);
-    return <IconComponent />;
 };
 
 // Common pagination configuration
@@ -297,21 +191,6 @@ export const createTableSummary = (pageData, summaryFields, type = "") => {
         return "";
     };
 
-    const formatSummaryValue = (field, value) => {
-        const currencyFields = [
-            "total",
-            "sales",
-            "purchases",
-            "value",
-            "buying_price",
-            "selling_price",
-            "inventory_value",
-        ];
-        return currencyFields.some((cf) => field.includes(cf))
-            ? formatCurrency(value)
-            : value;
-    };
-
     return (
         <Table.Summary.Row className="bg-gray-50">
             <Table.Summary.Cell>
@@ -319,9 +198,11 @@ export const createTableSummary = (pageData, summaryFields, type = "") => {
             </Table.Summary.Cell>
             {summaryFields.map((field) => (
                 <Table.Summary.Cell key={field}>
-                    <strong className={getSummaryClass(field)}>
-                        {formatSummaryValue(field, totals[field])}
-                    </strong>
+                    {renderSummaryCell(
+                        field,
+                        totals[field],
+                        getSummaryClass(field)
+                    )}
                 </Table.Summary.Cell>
             ))}
         </Table.Summary.Row>
