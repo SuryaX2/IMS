@@ -173,7 +173,7 @@ export const getPaginationConfig = () => ({
 });
 
 // Table summary generator
-export const createTableSummary = (pageData, summaryFields, type = "") => {
+export const calculateSummary = (pageData, summaryFields) => {
     if (!pageData || pageData.length === 0) return null;
 
     const totals = {};
@@ -184,25 +184,14 @@ export const createTableSummary = (pageData, summaryFields, type = "") => {
         );
     });
 
-    const getSummaryClass = (field) => {
-        if (field.includes("sales") || field.includes("total"))
-            return "text-green-600";
-        if (field.includes("purchases")) return "text-blue-600";
-        return "";
-    };
+    return totals;
+};
 
-    return (
-        <Table.Summary.Row className="bg-gray-50">
-            <Table.Summary.Cell>
-                <strong>Page Total</strong>
-            </Table.Summary.Cell>
-            {summaryFields.map((field) => (
-                <Table.Summary.Cell key={field}>
-                    {renderSummaryCell(field,totals[field],getSummaryClass(field))}
-                </Table.Summary.Cell>
-            ))}
-        </Table.Summary.Row>
-    );
+export const getSummaryClass = (field) => {
+    if (field.includes("sales") || field.includes("total"))
+        return "text-green-600";
+    if (field.includes("purchases")) return "text-blue-600";
+    return "";
 };
 
 // Common table props

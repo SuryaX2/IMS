@@ -8,7 +8,7 @@ import {
     TrophyOutlined,
     ShoppingOutlined,
 } from "@ant-design/icons";
-import { formatCurrency } from "../utils/reports/reportUtils";
+import { formatCurrency } from "../../../utils/reports/reportUtils";
 
 // Status utilities
 export const getStatusColor = (status) => {
