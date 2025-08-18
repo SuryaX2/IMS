@@ -266,7 +266,7 @@ const TopProductsReport = () => {
                                     <XAxis
                                         dataKey="product_name"
                                         tick={{ fontSize: 10 }}
-                                        angle={-45}
+                                        angle={-30}
                                         textAnchor="end"
                                         height={120}
                                         interval={0}
@@ -305,7 +305,7 @@ const TopProductsReport = () => {
                                     <XAxis
                                         dataKey="product_name"
                                         tick={{ fontSize: 10 }}
-                                        angle={-45}
+                                        angle={-30}
                                         textAnchor="end"
                                         height={120}
                                         interval={0}
