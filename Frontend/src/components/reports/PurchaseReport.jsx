@@ -26,6 +26,7 @@ import {
     CalendarOutlined,
     ShoppingOutlined,
     UserOutlined,
+    FileExcelOutlined,
 } from "@ant-design/icons";
 import { api } from "../../api/api";
 import AuthContext from "../../context/AuthContext";
@@ -92,6 +93,76 @@ const PurchaseReport = () => {
         }
     };
 
+    const exportToCSV = () => {
+        if (!purchaseData) {
+            toast.error("No data to export");
+            return;
+        }
+
+        // Prepare CSV data
+        const csvData = [];
+
+        // Add summary
+        csvData.push(["Purchase Report Summary"]);
+        const summary = calculateSummary();
+        csvData.push([
+            "Total Purchases",
+            `₹${summary.totalPurchases.toFixed(2)}`,
+        ]);
+        csvData.push(["Total Suppliers", summary.totalSuppliers]);
+        csvData.push(["Total Transactions", summary.totalTransactions]);
+        csvData.push([""]);
+
+        // Add purchases by date
+        csvData.push(["Purchases by Date"]);
+        csvData.push(["Date", "Number of Purchases"]);
+        purchaseData.purchasesByDate.forEach((item) => {
+            csvData.push([item._id, item.count]);
+        });
+        csvData.push([""]);
+
+        // Add purchases by supplier
+        csvData.push(["Purchases by Supplier"]);
+        csvData.push([
+            "Supplier Name",
+            "Shop Name",
+            "Total Purchases",
+            "Purchase Count",
+        ]);
+        purchaseData.purchasesBySupplier.forEach((item) => {
+            csvData.push([
+                item.supplier_name,
+                item.shopname || "N/A",
+                `₹${item.total_purchases.toFixed(2)}`,
+                item.count,
+            ]);
+        });
+
+        // Convert to CSV string
+        const csvContent = csvData
+            .map((row) => row.map((field) => `"${field}"`).join(","))
+            .join("\n");
+
+        // Download CSV
+        const blob = new Blob([csvContent], {
+            type: "text/csv;charset=utf-8;",
+        });
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute(
+                "download",
+                `purchase-report-${dayjs().format("YYYY-MM-DD")}.csv`
+            );
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        toast.success("Purchase report exported successfully!");
+    };
+
     const supplierColumns = [
         {
             title: "Supplier Name",
@@ -154,24 +225,34 @@ const PurchaseReport = () => {
 
     return (
         <div className="space-y-6">
-            {/* Date Range Filter */}
-            <Card title="Filter by Date Range">
-                <Space>
-                    <RangePicker
-                        value={dateRange}
-                        onChange={handleDateRangeChange}
-                        format="YYYY-MM-DD"
-                        allowClear={false}
-                    />
+            {/* Date Range Filter and Export */}
+            <Card title="Filter and Export Options">
+                <div className="flex justify-between items-center flex-wrap gap-4">
+                    <Space>
+                        <RangePicker
+                            value={dateRange}
+                            onChange={handleDateRangeChange}
+                            format="YYYY-MM-DD"
+                            allowClear={false}
+                        />
+                        <Button
+                            type="primary"
+                            icon={<CalendarOutlined />}
+                            onClick={() => fetchPurchaseReport()}
+                            loading={loading}
+                        >
+                            Refresh Report
+                        </Button>
+                    </Space>
                     <Button
-                        type="primary"
-                        icon={<CalendarOutlined />}
-                        onClick={() => fetchPurchaseReport()}
-                        loading={loading}
+                        icon={<FileExcelOutlined />}
+                        onClick={exportToCSV}
+                        disabled={!purchaseData}
+                        className="bg-green-500 text-white hover:bg-green-600"
                     >
-                        Generate Report
+                        Export to CSV
                     </Button>
-                </Space>
+                </div>
             </Card>
 
             {purchaseData && (

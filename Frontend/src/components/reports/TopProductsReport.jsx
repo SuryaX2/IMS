@@ -28,10 +28,12 @@ import {
     ShoppingCartOutlined,
     DollarOutlined,
     ReloadOutlined,
+    FileExcelOutlined,
 } from "@ant-design/icons";
 import { api } from "../../api/api";
 import AuthContext from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -75,6 +77,74 @@ const TopProductsReport = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const exportToCSV = () => {
+        if (topProducts.length === 0) {
+            toast.error("No data to export");
+            return;
+        }
+
+        // Prepare CSV data
+        const csvData = [];
+
+        // Add summary
+        csvData.push(["Top Products Report Summary"]);
+        const summary = calculateSummary();
+        csvData.push(["Total Products", summary.totalProducts]);
+        csvData.push(["Total Quantity Sold", summary.totalQuantitySold]);
+        csvData.push(["Total Revenue (in rupees)", `${summary.totalRevenue.toFixed(2)}`]);
+        csvData.push([""]);
+
+        // Add headers
+        csvData.push([
+            "Rank",
+            "Product Code",
+            "Product Name",
+            "Quantity Sold",
+            "Total Sales (in rupees)",
+            "Average Price (in rupees)",
+        ]);
+
+        // Add product data
+        topProducts.forEach((item, index) => {
+            const avgPrice =
+                item.quantity_sold > 0
+                    ? item.total_sales / item.quantity_sold
+                    : 0;
+            csvData.push([
+                index + 1,
+                item.product_code,
+                item.product_name,
+                item.quantity_sold,
+                `${item.total_sales.toFixed(2)}`,
+                `${avgPrice.toFixed(2)}`,
+            ]);
+        });
+
+        // Convert to CSV string
+        const csvContent = csvData
+            .map((row) => row.map((field) => `"${field}"`).join(","))
+            .join("\n");
+
+        // Download CSV
+        const blob = new Blob([csvContent], {
+            type: "text/csv;charset=utf-8;",
+        });
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute(
+                "download",
+                `top-products-report-${dayjs().format("YYYY-MM-DD")}.csv`
+            );
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        toast.success("Top products report exported successfully!");
     };
 
     const columns = [
@@ -190,28 +260,38 @@ const TopProductsReport = () => {
         <div className="space-y-6">
             {/* Controls */}
             <Card title="Top Products Configuration">
-                <Space>
-                    <span>Show top:</span>
-                    <Select
-                        value={limit}
-                        onChange={setLimit}
-                        style={{ width: 120 }}
-                    >
-                        <Option value={5}>5 Products</Option>
-                        <Option value={10}>10 Products</Option>
-                        <Option value={15}>15 Products</Option>
-                        <Option value={20}>20 Products</Option>
-                        <Option value={25}>25 Products</Option>
-                    </Select>
+                <div className="flex justify-between items-center flex-wrap gap-4">
+                    <Space>
+                        <span>Show top:</span>
+                        <Select
+                            value={limit}
+                            onChange={setLimit}
+                            style={{ width: 120 }}
+                        >
+                            <Option value={5}>5 Products</Option>
+                            <Option value={10}>10 Products</Option>
+                            <Option value={15}>15 Products</Option>
+                            <Option value={20}>20 Products</Option>
+                            <Option value={25}>25 Products</Option>
+                        </Select>
+                        <Button
+                            type="primary"
+                            icon={<ReloadOutlined />}
+                            onClick={fetchTopProducts}
+                            loading={loading}
+                        >
+                            Refresh
+                        </Button>
+                    </Space>
                     <Button
-                        type="primary"
-                        icon={<ReloadOutlined />}
-                        onClick={fetchTopProducts}
-                        loading={loading}
+                        icon={<FileExcelOutlined />}
+                        onClick={exportToCSV}
+                        disabled={topProducts.length === 0}
+                        className="bg-green-500 text-white hover:bg-green-600"
                     >
-                        Refresh
+                        Export to CSV
                     </Button>
-                </Space>
+                </div>
             </Card>
 
             {/* Summary Cards */}
