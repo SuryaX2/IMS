@@ -96,8 +96,10 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
         if (active && payload && payload.length) {
             return (
                 <div className="bg-white p-3 border border-gray-200 shadow-lg rounded-lg">
-                    <p className="text-gray-600 font-medium text-sm">{label}</p>
-                    <p className="text-blue-600 font-bold">
+                    <p className="text-gray-600 font-medium text-xs sm:text-sm">
+                        {label}
+                    </p>
+                    <p className="text-blue-600 font-bold text-sm sm:text-base">
                         ${Number(payload[0].value).toLocaleString()}
                     </p>
                 </div>
@@ -121,37 +123,40 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
     }, [salesData, totalSales, totalOrders]);
 
     return (
-        <div className="h-full p-6 bg-white rounded-xl border border-gray-100">
-            <div className="flex items-center mb-6">
-                <LineChartOutlined className="text-blue-600 mr-3 text-xl" />
-                <h1 className="m-0 text-gray-800 font-bold text-xl">
+        <div className="h-full p-3 sm:p-6 bg-white rounded-xl border border-gray-100">
+            <div className="flex items-center mb-4 sm:mb-6">
+                <LineChartOutlined className="text-blue-600 mr-2 sm:mr-3 text-lg sm:text-xl" />
+                <h1 className="m-0 text-gray-800 font-bold text-lg sm:text-xl">
                     Sales Performance
                 </h1>
             </div>
 
             {loading ? (
-                <div className="flex justify-center items-center h-80">
+                <div className="flex justify-center items-center h-60 sm:h-80">
                     <Spin size="large" />
                 </div>
             ) : hasSalesData ? (
                 <>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl shadow-sm border border-blue-100">
-                            <Text className="text-blue-700 text-sm font-medium">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 sm:p-4 rounded-xl shadow-sm border border-blue-100">
+                            <Text className="text-blue-700 text-xs sm:text-sm font-medium">
                                 Total Sales
                             </Text>
-                            <Title level={3} className="m-0 text-blue-800 mt-1">
+                            <Title
+                                level={4}
+                                className="m-0 text-blue-800 mt-1 text-lg sm:text-xl"
+                            >
                                 ${summaryData.totalSales.toLocaleString()}
                             </Title>
                         </div>
 
-                        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 rounded-xl shadow-sm border border-indigo-100">
-                            <Text className="text-indigo-700 text-sm font-medium">
+                        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 sm:p-4 rounded-xl shadow-sm border border-indigo-100">
+                            <Text className="text-indigo-700 text-xs sm:text-sm font-medium">
                                 Total Orders
                             </Text>
                             <Title
-                                level={3}
-                                className="m-0 text-indigo-800 mt-1"
+                                level={4}
+                                className="m-0 text-indigo-800 mt-1 text-lg sm:text-xl"
                             >
                                 {summaryData.totalOrders}
                             </Title>
@@ -164,7 +169,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                     : trend < 0
                                       ? "from-red-50 to-red-100 border-red-100"
                                       : "from-gray-50 to-gray-100 border-gray-100"
-                            } p-4 rounded-xl shadow-sm border`}
+                            } p-3 sm:p-4 rounded-xl shadow-sm border`}
                         >
                             <Text
                                 className={`${
@@ -173,13 +178,13 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                         : trend < 0
                                           ? "text-red-700"
                                           : "text-gray-700"
-                                } text-sm font-medium`}
+                                } text-xs sm:text-sm font-medium`}
                             >
                                 Growth Trend
                             </Text>
                             <Title
-                                level={3}
-                                className={`m-0 flex items-center mt-1 ${
+                                level={4}
+                                className={`m-0 flex items-center mt-1 text-lg sm:text-xl ${
                                     trend > 0
                                         ? "text-green-800"
                                         : trend < 0
@@ -188,9 +193,9 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                 }`}
                             >
                                 {trend > 0 ? (
-                                    <ArrowUpOutlined className="mr-2 text-green-600" />
+                                    <ArrowUpOutlined className="mr-1 sm:mr-2 text-green-600 text-sm" />
                                 ) : trend < 0 ? (
-                                    <ArrowDownOutlined className="mr-2 text-red-600" />
+                                    <ArrowDownOutlined className="mr-1 sm:mr-2 text-red-600 text-sm" />
                                 ) : null}
                                 {trend > 0 ? "+" : ""}
                                 {trend.toFixed(1)}%
@@ -199,15 +204,17 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                     </div>
 
                     <div
-                        className="bg-white rounded-xl border border-gray-100 p-4"
-                        style={{ height: 450 }}
+                        className="bg-white rounded-xl border border-gray-100 p-2 sm:p-4"
+                        style={{
+                            height: window.innerWidth < 768 ? "300px" : "400px",
+                        }}
                     >
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart
                                 data={chartData}
                                 margin={{
                                     top: 10,
-                                    right: 30,
+                                    right: window.innerWidth < 768 ? 10 : 30,
                                     left: 0,
                                     bottom: 0,
                                 }}
@@ -237,14 +244,24 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                     axisLine={false}
                                     tickLine={false}
                                     tickMargin={10}
-                                    tick={{ fill: "#6b7280", fontSize: 11 }}
+                                    tick={{
+                                        fill: "#6b7280",
+                                        fontSize:
+                                            window.innerWidth < 768 ? 9 : 11,
+                                    }}
+                                    interval={window.innerWidth < 768 ? 1 : 0}
                                 />
                                 <YAxis
                                     tickFormatter={formatDollar}
                                     axisLine={false}
                                     tickLine={false}
                                     tickMargin={10}
-                                    tick={{ fill: "#6b7280", fontSize: 11 }}
+                                    tick={{
+                                        fill: "#6b7280",
+                                        fontSize:
+                                            window.innerWidth < 768 ? 9 : 11,
+                                    }}
+                                    width={window.innerWidth < 768 ? 50 : 60}
                                 />
                                 <CartesianGrid
                                     strokeDasharray="3 3"
@@ -256,17 +273,19 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                     type="monotone"
                                     dataKey="sales"
                                     stroke="#1890ff"
-                                    strokeWidth={2.5}
+                                    strokeWidth={
+                                        window.innerWidth < 768 ? 2 : 2.5
+                                    }
                                     fillOpacity={1}
                                     fill="url(#colorSales)"
                                     activeDot={{
-                                        r: 6,
+                                        r: window.innerWidth < 768 ? 4 : 6,
                                         strokeWidth: 2,
                                         stroke: "#fff",
                                         fill: "#1890ff",
                                     }}
                                     dot={{
-                                        r: 3,
+                                        r: window.innerWidth < 768 ? 2 : 3,
                                         strokeWidth: 2,
                                         stroke: "#1890ff",
                                         fill: "#fff",
@@ -276,7 +295,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="text-xs text-gray-500 mt-3 text-right">
+                    <div className="text-xs text-gray-500 mt-2 sm:mt-3 text-right">
                         Average daily sales: ${averageSales.toLocaleString()}
                     </div>
                 </>
@@ -288,11 +307,11 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                             <div className="text-center">
                                 <Title
                                     level={5}
-                                    className="text-gray-500 mt-0 mb-2"
+                                    className="text-gray-500 mt-0 mb-2 text-sm sm:text-base"
                                 >
                                     No Sales Data Available
                                 </Title>
-                                <p className="text-sm text-gray-400 mb-0">
+                                <p className="text-xs sm:text-sm text-gray-400 mb-0">
                                     Sales data will appear here once you have
                                     recorded orders.
                                 </p>

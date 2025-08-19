@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Empty, List, Typography, Badge, Avatar } from "antd";
+import { Card, Empty, List, Typography, Badge, Avatar, Tooltip } from "antd";
 import { Pie } from "@ant-design/plots";
 import { TrophyOutlined, ArrowUpOutlined } from "@ant-design/icons";
 
@@ -22,14 +22,21 @@ const CHART_COLORS = [
 const ProductDistribution = ({ topProducts }) => {
     const hasData = topProducts && topProducts.length > 0;
 
+    // Prepare data for pie chart with proper validation
+    const chartData = hasData
+        ? topProducts
+              .filter(
+                  (product) => product.product_name && product.quantity_sold > 0
+              )
+              .map((product) => ({
+                  type: product.product_name || "Unknown Product",
+                  value: product.quantity_sold || 0,
+              }))
+        : [];
+
     // Pie chart configuration for top products distribution
     const pieConfig = {
-        data: hasData
-            ? topProducts.map((product) => ({
-                  type: product.product_name,
-                  value: product.quantity_sold,
-              }))
-            : [],
+        data: chartData,
         angleField: "value",
         colorField: "type",
         radius: 0.8,
@@ -41,7 +48,7 @@ const ProductDistribution = ({ topProducts }) => {
             content: "{percentage}",
             style: {
                 fill: "#fff",
-                fontSize: 12,
+                fontSize: 11,
                 textAlign: "center",
                 fontWeight: "bold",
                 textShadow: "0 0 3px rgba(0,0,0,0.3)",
@@ -54,25 +61,26 @@ const ProductDistribution = ({ topProducts }) => {
         statistic: {
             title: {
                 style: {
-                    fontSize: "12px",
-                    lineHeight: "12px",
+                    fontSize: "11px",
+                    lineHeight: "11px",
                     color: "#666",
                 },
                 content: "Total\nSold",
             },
             content: {
                 style: {
-                    fontSize: "20px",
-                    lineHeight: "20px",
+                    fontSize: "18px",
+                    lineHeight: "18px",
                     fontWeight: "bold",
                     color: "#1890FF",
                 },
-                content: hasData
-                    ? topProducts.reduce(
-                          (acc, item) => acc + item.quantity_sold,
-                          0
-                      )
-                    : 0,
+                content:
+                    chartData.length > 0
+                        ? chartData.reduce(
+                              (acc, item) => acc + (item.value || 0),
+                              0
+                          )
+                        : 0,
             },
         },
         legend: {
@@ -82,7 +90,13 @@ const ProductDistribution = ({ topProducts }) => {
             maxRow: 2,
             itemName: {
                 style: {
-                    fontSize: "11px",
+                    fontSize: "10px",
+                },
+                formatter: (text) => {
+                    // Truncate long product names in legend
+                    return text.length > 15
+                        ? text.substring(0, 15) + "..."
+                        : text;
                 },
             },
         },
@@ -90,14 +104,6 @@ const ProductDistribution = ({ topProducts }) => {
             appear: {
                 animation: "fade-in",
                 duration: 1500,
-            },
-        },
-        tooltip: {
-            formatter: (datum) => {
-                return {
-                    name: datum.type,
-                    value: `${datum.value} units (${(datum.percent * 100).toFixed(1)}%)`,
-                };
             },
         },
     };
@@ -115,12 +121,19 @@ const ProductDistribution = ({ topProducts }) => {
         }
     };
 
+    const truncateProductName = (name, maxLength = 20) => {
+        if (!name) return "Unknown Product";
+        return name.length > maxLength
+            ? name.substring(0, maxLength) + "..."
+            : name;
+    };
+
     return (
         <Card
             title={
                 <div className="flex items-center">
                     <TrophyOutlined className="mr-2 text-yellow-500" />
-                    <span className="text-lg font-semibold text-gray-800">
+                    <span className="text-sm sm:text-lg font-semibold text-gray-800">
                         Top Products
                     </span>
                 </div>
@@ -128,35 +141,41 @@ const ProductDistribution = ({ topProducts }) => {
             extra={
                 <a
                     href="/reports/top-products"
-                    className="text-blue-600 hover:text-blue-800 transition-colors flex items-center font-medium"
+                    className="text-blue-600 hover:text-blue-800 transition-colors flex items-center font-medium text-xs sm:text-sm"
                 >
-                    View All <ArrowUpOutlined className="ml-1 rotate-45" />
+                    <span className="hidden sm:inline">View All</span>
+                    <span className="sm:hidden">All</span>
+                    <ArrowUpOutlined className="ml-1 rotate-45" />
                 </a>
             }
             className="h-full rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
             bodyStyle={{
-                padding: "16px",
-                height: "calc(100% - 60px)",
+                padding: "12px 16px",
+                height: "calc(100% - 50px)",
+                display: "flex",
+                flexDirection: "column",
             }}
             headStyle={{
                 borderBottom: "1px solid #f0f0f0",
-                padding: "12px 16px",
+                padding: "10px 16px",
                 backgroundColor: "#fafafa",
             }}
         >
-            {hasData ? (
+            {hasData && chartData.length > 0 ? (
                 <div className="h-full flex flex-col">
-                    <div className="flex-1 flex justify-center items-center">
-                        <Pie {...pieConfig} height={200} />
+                    <div className="flex-1 flex justify-center items-center min-h-0">
+                        <div className="w-full" style={{ height: "180px" }}>
+                            <Pie {...pieConfig} height={200} />
+                        </div>
                     </div>
 
-                    <div className="mt-4">
+                    <div className="mt-3 flex-shrink-0">
                         <List
                             size="small"
                             dataSource={topProducts.slice(0, 3)}
                             renderItem={(item, index) => (
-                                <List.Item className="py-2 px-2 flex justify-between border-0 hover:bg-gray-50 transition-colors rounded-lg">
-                                    <div className="flex items-center">
+                                <List.Item className="py-1.5 px-2 flex justify-between border-0 hover:bg-gray-50 transition-colors rounded-lg">
+                                    <div className="flex items-center min-w-0 flex-1">
                                         <Avatar
                                             size="small"
                                             shape="square"
@@ -166,7 +185,7 @@ const ProductDistribution = ({ topProducts }) => {
                                                 display: "flex",
                                                 alignItems: "center",
                                                 justifyContent: "center",
-                                                fontSize: "11px",
+                                                fontSize: "10px",
                                                 fontWeight: "bold",
                                                 color:
                                                     index === 0
@@ -174,27 +193,41 @@ const ProductDistribution = ({ topProducts }) => {
                                                         : index === 1
                                                           ? "#494949"
                                                           : "#3e2a15",
+                                                flexShrink: 0,
                                             }}
                                         >
                                             {index + 1}
                                         </Avatar>
-                                        <Text
-                                            ellipsis
-                                            className="max-w-xs ml-3 text-sm font-medium text-balance"
+                                        <Tooltip
+                                            title={item.product_name}
+                                            placement="topLeft"
                                         >
-                                            {item.product_name}
-                                        </Text>
+                                            <Text
+                                                className="ml-2 text-xs sm:text-sm font-medium text-gray-800 min-w-0 flex-1"
+                                                style={{
+                                                    overflow: "hidden",
+                                                    textOverflow: "ellipsis",
+                                                    whiteSpace: "nowrap",
+                                                    maxWidth: "120px",
+                                                }}
+                                            >
+                                                {truncateProductName(
+                                                    item.product_name,
+                                                    15
+                                                )}
+                                            </Text>
+                                        </Tooltip>
                                     </div>
                                     <Badge
                                         count={item.quantity_sold}
-                                        className="font-medium"
+                                        className="font-medium flex-shrink-0 ml-2"
                                         style={{
                                             backgroundColor:
                                                 CHART_COLORS[
                                                     index % CHART_COLORS.length
                                                 ],
                                             fontWeight: "600",
-                                            fontSize: "10px",
+                                            fontSize: "9px",
                                         }}
                                         overflowCount={99999}
                                         title={`${item.quantity_sold} units sold`}
@@ -212,11 +245,11 @@ const ProductDistribution = ({ topProducts }) => {
                             <div className="text-center">
                                 <Title
                                     level={5}
-                                    className="text-gray-500 mt-0 mb-2"
+                                    className="text-gray-500 mt-0 mb-2 text-sm sm:text-base"
                                 >
                                     No Product Data
                                 </Title>
-                                <p className="text-sm text-gray-400 mb-0">
+                                <p className="text-xs sm:text-sm text-gray-400 mb-0">
                                     Sales data will appear here once available.
                                 </p>
                             </div>
