@@ -20,10 +20,10 @@ const getDashboardMetrics = asyncHandler(async (req, res, next) => {
         // Get total sales (sum of all orders) - Fixed pipeline
         const salesMatchStage = isAdmin
             ? { order_status: { $ne: "cancelled" } }
-            : { 
-                order_status: { $ne: "cancelled" },
-                created_by: new mongoose.Types.ObjectId(userId),
-            };
+            : {
+                  order_status: { $ne: "cancelled" },
+                  created_by: new mongoose.Types.ObjectId(userId),
+              };
 
         const salesData = await Order.aggregate([
             { $match: salesMatchStage },
@@ -31,7 +31,9 @@ const getDashboardMetrics = asyncHandler(async (req, res, next) => {
         ]);
 
         // Get total purchase value - Fixed pipeline
-        const purchaseMatchStage = isAdmin ? {} : { created_by: new mongoose.Types.ObjectId(userId) };
+        const purchaseMatchStage = isAdmin
+            ? {}
+            : { created_by: new mongoose.Types.ObjectId(userId) };
 
         const purchaseData = await Purchase.aggregate([
             { $match: purchaseMatchStage },
@@ -147,13 +149,20 @@ const getStockReport = asyncHandler(async (req, res, next) => {
                     as: "unit",
                 },
             },
-            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+            {
+                $unwind: {
+                    path: "$category",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
             { $unwind: { path: "$unit", preserveNullAndEmptyArrays: true } },
             {
                 $project: {
                     product_name: 1,
                     product_code: 1,
-                    category_name: { $ifNull: ["$category.category_name", "N/A"] },
+                    category_name: {
+                        $ifNull: ["$category.category_name", "N/A"],
+                    },
                     unit_name: { $ifNull: ["$unit.unit_name", "N/A"] },
                     buying_price: 1,
                     selling_price: 1,
@@ -243,7 +252,12 @@ const getSalesReport = asyncHandler(async (req, res, next) => {
                     as: "details",
                 },
             },
-            { $unwind: { path: "$details", preserveNullAndEmptyArrays: false } },
+            {
+                $unwind: {
+                    path: "$details",
+                    preserveNullAndEmptyArrays: false,
+                },
+            },
             {
                 $lookup: {
                     from: "products",
@@ -252,7 +266,12 @@ const getSalesReport = asyncHandler(async (req, res, next) => {
                     as: "product",
                 },
             },
-            { $unwind: { path: "$product", preserveNullAndEmptyArrays: false } },
+            {
+                $unwind: {
+                    path: "$product",
+                    preserveNullAndEmptyArrays: false,
+                },
+            },
             {
                 $group: {
                     _id: "$product._id",
@@ -320,7 +339,12 @@ const getTopProducts = asyncHandler(async (req, res, next) => {
                     as: "details",
                 },
             },
-            { $unwind: { path: "$details", preserveNullAndEmptyArrays: false } },
+            {
+                $unwind: {
+                    path: "$details",
+                    preserveNullAndEmptyArrays: false,
+                },
+            },
             {
                 $lookup: {
                     from: "products",
@@ -329,7 +353,12 @@ const getTopProducts = asyncHandler(async (req, res, next) => {
                     as: "product",
                 },
             },
-            { $unwind: { path: "$product", preserveNullAndEmptyArrays: false } },
+            {
+                $unwind: {
+                    path: "$product",
+                    preserveNullAndEmptyArrays: false,
+                },
+            },
             {
                 $group: {
                     _id: "$product._id",
@@ -409,7 +438,12 @@ const getPurchaseReport = asyncHandler(async (req, res, next) => {
                     as: "supplier",
                 },
             },
-            { $unwind: { path: "$supplier", preserveNullAndEmptyArrays: true } },
+            {
+                $unwind: {
+                    path: "$supplier",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
             {
                 $lookup: {
                     from: "purchasedetails",
@@ -422,9 +456,15 @@ const getPurchaseReport = asyncHandler(async (req, res, next) => {
             {
                 $group: {
                     _id: "$supplier._id",
-                    supplier_name: { $first: { $ifNull: ["$supplier.name", "Unknown"] } },
-                    shopname: { $first: { $ifNull: ["$supplier.shopname", "N/A"] } },
-                    total_purchases: { $sum: { $ifNull: ["$details.total", 0] } },
+                    supplier_name: {
+                        $first: { $ifNull: ["$supplier.name", "Unknown"] },
+                    },
+                    shopname: {
+                        $first: { $ifNull: ["$supplier.shopname", "N/A"] },
+                    },
+                    total_purchases: {
+                        $sum: { $ifNull: ["$details.total", 0] },
+                    },
                     count: { $sum: 1 },
                 },
             },
