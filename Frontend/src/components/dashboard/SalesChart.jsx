@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Card, Empty, Typography, Spin } from "antd";
+import { Empty, Typography, Spin } from "antd";
 import {
     LineChartOutlined,
     ArrowUpOutlined,
@@ -95,8 +95,8 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white p-3 border border-gray-200 shadow-md rounded">
-                    <p className="text-gray-600 font-medium">{label}</p>
+                <div className="bg-white p-3 border border-gray-200 shadow-lg rounded-lg">
+                    <p className="text-gray-600 font-medium text-sm">{label}</p>
                     <p className="text-blue-600 font-bold">
                         ${Number(payload[0].value).toLocaleString()}
                     </p>
@@ -107,7 +107,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
     };
 
     // Format dollar values
-    const formatDollar = (value) => `$${Number(value).toLocaleString()}`;
+    const formatDollar = (value) => `${Number(value).toLocaleString()}`;
 
     // Get summary data directly from the API response if available
     const summaryData = useMemo(() => {
@@ -121,76 +121,76 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
     }, [salesData, totalSales, totalOrders]);
 
     return (
-        <Card
-            title={
-                <div className="flex items-center">
-                    <LineChartOutlined
-                        style={{ color: "#1890ff", marginRight: 8 }}
-                    />
-                    <span>Sales Trend</span>
-                </div>
-            }
-            className="shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200"
-            styles={{ padding: "12px 24px" }}
-            loading={loading}
-        >
+        <div className="h-full p-6 bg-white rounded-xl border border-gray-100">
+            <div className="flex items-center mb-6">
+                <LineChartOutlined className="text-blue-600 mr-3 text-xl" />
+                <h1 className="m-0 text-gray-800 font-bold text-xl">
+                    Sales Performance
+                </h1>
+            </div>
+
             {loading ? (
                 <div className="flex justify-center items-center h-80">
                     <Spin size="large" />
                 </div>
             ) : hasSalesData ? (
                 <>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 mt-2">
-                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg shadow-sm">
-                            <Text type="secondary" className="text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl shadow-sm border border-blue-100">
+                            <Text className="text-blue-700 text-sm font-medium">
                                 Total Sales
                             </Text>
-                            <Title level={3} className="m-0 text-blue-700">
+                            <Title level={3} className="m-0 text-blue-800 mt-1">
                                 ${summaryData.totalSales.toLocaleString()}
                             </Title>
                         </div>
 
-                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg shadow-sm">
-                            <Text type="secondary" className="text-sm">
-                                Orders
+                        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 rounded-xl shadow-sm border border-indigo-100">
+                            <Text className="text-indigo-700 text-sm font-medium">
+                                Total Orders
                             </Text>
-                            <Title level={3} className="m-0 text-gray-700">
+                            <Title
+                                level={3}
+                                className="m-0 text-indigo-800 mt-1"
+                            >
                                 {summaryData.totalOrders}
                             </Title>
                         </div>
 
                         <div
-                            className={`bg-gradient-to-r ${
+                            className={`bg-gradient-to-br ${
                                 trend > 0
-                                    ? "from-green-50 to-green-100"
+                                    ? "from-green-50 to-green-100 border-green-100"
                                     : trend < 0
-                                      ? "from-red-50 to-red-100"
-                                      : "from-gray-50 to-gray-100"
-                            } p-4 rounded-lg shadow-sm`}
+                                      ? "from-red-50 to-red-100 border-red-100"
+                                      : "from-gray-50 to-gray-100 border-gray-100"
+                            } p-4 rounded-xl shadow-sm border`}
                         >
-                            <Text type="secondary" className="text-sm">
-                                Trend
+                            <Text
+                                className={`${
+                                    trend > 0
+                                        ? "text-green-700"
+                                        : trend < 0
+                                          ? "text-red-700"
+                                          : "text-gray-700"
+                                } text-sm font-medium`}
+                            >
+                                Growth Trend
                             </Text>
                             <Title
                                 level={3}
-                                className={`m-0 flex items-center ${
+                                className={`m-0 flex items-center mt-1 ${
                                     trend > 0
-                                        ? "text-green-600"
+                                        ? "text-green-800"
                                         : trend < 0
-                                          ? "text-red-600"
-                                          : "text-gray-600"
+                                          ? "text-red-800"
+                                          : "text-gray-800"
                                 }`}
                             >
                                 {trend > 0 ? (
-                                    <ArrowUpOutlined
-                                        style={{ marginRight: 8 }}
-                                        className="text-green-600"
-                                    />
+                                    <ArrowUpOutlined className="mr-2 text-green-600" />
                                 ) : trend < 0 ? (
-                                    <ArrowDownOutlined
-                                        style={{ marginRight: 8 }}
-                                        className="text-red-600"
-                                    />
+                                    <ArrowDownOutlined className="mr-2 text-red-600" />
                                 ) : null}
                                 {trend > 0 ? "+" : ""}
                                 {trend.toFixed(1)}%
@@ -198,7 +198,10 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                         </div>
                     </div>
 
-                    <div style={{ height: 350, width: "100%" }}>
+                    <div
+                        className="bg-white rounded-xl border border-gray-100 p-4"
+                        style={{ height: 450 }}
+                    >
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart
                                 data={chartData}
@@ -220,7 +223,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                         <stop
                                             offset="5%"
                                             stopColor="#1890ff"
-                                            stopOpacity={0.1}
+                                            stopOpacity={0.15}
                                         />
                                         <stop
                                             offset="95%"
@@ -234,14 +237,14 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                     axisLine={false}
                                     tickLine={false}
                                     tickMargin={10}
-                                    tick={{ fill: "#6b7280", fontSize: 12 }}
+                                    tick={{ fill: "#6b7280", fontSize: 11 }}
                                 />
                                 <YAxis
                                     tickFormatter={formatDollar}
                                     axisLine={false}
                                     tickLine={false}
                                     tickMargin={10}
-                                    tick={{ fill: "#6b7280", fontSize: 12 }}
+                                    tick={{ fill: "#6b7280", fontSize: 11 }}
                                 />
                                 <CartesianGrid
                                     strokeDasharray="3 3"
@@ -263,7 +266,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                         fill: "#1890ff",
                                     }}
                                     dot={{
-                                        r: 4,
+                                        r: 3,
                                         strokeWidth: 2,
                                         stroke: "#1890ff",
                                         fill: "#fff",
@@ -273,31 +276,32 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="text-xs text-gray-500 mt-4 text-right">
-                        Average sales per day: ${averageSales.toLocaleString()}
+                    <div className="text-xs text-gray-500 mt-3 text-right">
+                        Average daily sales: ${averageSales.toLocaleString()}
                     </div>
                 </>
             ) : (
-                <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={
-                        <div className="text-center p-8">
-                            <Title
-                                level={5}
-                                className="text-gray-500 mt-0 mb-2"
-                            >
-                                No Sales Data Available
-                            </Title>
-                            <p className="text-gray-400">
-                                Sales data will appear here once you have
-                                recorded orders. Start by creating an order to
-                                see your sales trend.
-                            </p>
-                        </div>
-                    }
-                />
+                <div className="h-full flex items-center justify-center">
+                    <Empty
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        description={
+                            <div className="text-center">
+                                <Title
+                                    level={5}
+                                    className="text-gray-500 mt-0 mb-2"
+                                >
+                                    No Sales Data Available
+                                </Title>
+                                <p className="text-sm text-gray-400 mb-0">
+                                    Sales data will appear here once you have
+                                    recorded orders.
+                                </p>
+                            </div>
+                        }
+                    />
+                </div>
             )}
-        </Card>
+        </div>
     );
 };
 

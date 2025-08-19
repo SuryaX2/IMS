@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Alert, Empty, List, Typography, Badge, Avatar } from "antd";
+import { Card, Empty, List, Typography, Badge, Avatar } from "antd";
 import { Pie } from "@ant-design/plots";
 import { TrophyOutlined, ArrowUpOutlined } from "@ant-design/icons";
 
@@ -41,7 +41,7 @@ const ProductDistribution = ({ topProducts }) => {
             content: "{percentage}",
             style: {
                 fill: "#fff",
-                fontSize: 14,
+                fontSize: 12,
                 textAlign: "center",
                 fontWeight: "bold",
                 textShadow: "0 0 3px rgba(0,0,0,0.3)",
@@ -54,16 +54,16 @@ const ProductDistribution = ({ topProducts }) => {
         statistic: {
             title: {
                 style: {
-                    fontSize: "14px",
-                    lineHeight: "14px",
+                    fontSize: "12px",
+                    lineHeight: "12px",
                     color: "#666",
                 },
                 content: "Total\nSold",
             },
             content: {
                 style: {
-                    fontSize: "24px",
-                    lineHeight: "24px",
+                    fontSize: "20px",
+                    lineHeight: "20px",
                     fontWeight: "bold",
                     color: "#1890FF",
                 },
@@ -82,7 +82,7 @@ const ProductDistribution = ({ topProducts }) => {
             maxRow: 2,
             itemName: {
                 style: {
-                    fontSize: "12px",
+                    fontSize: "11px",
                 },
             },
         },
@@ -120,90 +120,109 @@ const ProductDistribution = ({ topProducts }) => {
             title={
                 <div className="flex items-center">
                     <TrophyOutlined className="mr-2 text-yellow-500" />
-                    <span className="text-lg font-medium">Top Products</span>
+                    <span className="text-lg font-semibold text-gray-800">
+                        Top Products
+                    </span>
                 </div>
             }
             extra={
                 <a
                     href="/reports/top-products"
-                    className="text-primary hover:text-primary-dark transition-colors flex items-center"
+                    className="text-blue-600 hover:text-blue-800 transition-colors flex items-center font-medium"
                 >
                     View All <ArrowUpOutlined className="ml-1 rotate-45" />
                 </a>
             }
-            className="overflow-hidden rounded-lg border-0 shadow hover:shadow-md transition-all duration-300"
+            className="h-full rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+            bodyStyle={{
+                padding: "16px",
+                height: "calc(100% - 60px)",
+            }}
             headStyle={{
                 borderBottom: "1px solid #f0f0f0",
-                padding: "16px 24px",
+                padding: "12px 16px",
                 backgroundColor: "#fafafa",
             }}
         >
             {hasData ? (
-                <div>
-                    <div className="flex justify-center">
-                        <Pie {...pieConfig} height={260} />
+                <div className="h-full flex flex-col">
+                    <div className="flex-1 flex justify-center items-center">
+                        <Pie {...pieConfig} height={200} />
                     </div>
 
-                    <List
-                        size="small"
-                        className="mt-6"
-                        dataSource={topProducts.slice(0, 3)}
-                        renderItem={(item, index) => (
-                            <List.Item className="py-3 px-2 flex justify-between border-0 hover:bg-gray-50 transition-colors rounded-md">
-                                <div className="flex items-center">
-                                    <Avatar
-                                        size="small"
+                    <div className="mt-4">
+                        <List
+                            size="small"
+                            dataSource={topProducts.slice(0, 3)}
+                            renderItem={(item, index) => (
+                                <List.Item className="py-2 px-2 flex justify-between border-0 hover:bg-gray-50 transition-colors rounded-lg">
+                                    <div className="flex items-center">
+                                        <Avatar
+                                            size="small"
+                                            shape="square"
+                                            style={{
+                                                backgroundColor:
+                                                    getMedalColor(index),
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "11px",
+                                                fontWeight: "bold",
+                                                color:
+                                                    index === 0
+                                                        ? "#5c3c00"
+                                                        : index === 1
+                                                          ? "#494949"
+                                                          : "#3e2a15",
+                                            }}
+                                        >
+                                            {index + 1}
+                                        </Avatar>
+                                        <Text
+                                            ellipsis
+                                            className="max-w-xs ml-3 text-sm font-medium text-balance"
+                                        >
+                                            {item.product_name}
+                                        </Text>
+                                    </div>
+                                    <Badge
+                                        count={item.quantity_sold}
+                                        className="font-medium"
                                         style={{
                                             backgroundColor:
-                                                getMedalColor(index),
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            fontSize: "12px",
-                                            fontWeight: "bold",
-                                            color:
-                                                index === 0
-                                                    ? "#5c3c00"
-                                                    : index === 1
-                                                      ? "#494949"
-                                                      : "#3e2a15",
+                                                CHART_COLORS[
+                                                    index % CHART_COLORS.length
+                                                ],
+                                            fontWeight: "600",
+                                            fontSize: "10px",
                                         }}
-                                    >
-                                        {index + 1}
-                                    </Avatar>
-                                    <Text ellipsis className="max-w-xs ml-3">
-                                        {item.product_name}
-                                    </Text>
-                                </div>
-                                <Badge
-                                    count={item.quantity_sold}
-                                    className="font-medium"
-                                    style={{
-                                        backgroundColor:
-                                            CHART_COLORS[
-                                                index % CHART_COLORS.length
-                                            ],
-                                        fontWeight: "bold",
-                                    }}
-                                    overflowCount={99999}
-                                    title={`${item.quantity_sold} units sold`}
-                                />
-                            </List.Item>
-                        )}
-                    />
+                                        overflowCount={99999}
+                                        title={`${item.quantity_sold} units sold`}
+                                    />
+                                </List.Item>
+                            )}
+                        />
+                    </div>
                 </div>
             ) : (
-                <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description={
-                        <div className="text-center p-8">
-                            <p className="mt-0 text-gray-500">
-                                Sales data for the last 30 days will appear here
-                                once available.
-                            </p>
-                        </div>
-                    }
-                />
+                <div className="h-full flex items-center justify-center">
+                    <Empty
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
+                        description={
+                            <div className="text-center">
+                                <Title
+                                    level={5}
+                                    className="text-gray-500 mt-0 mb-2"
+                                >
+                                    No Product Data
+                                </Title>
+                                <p className="text-sm text-gray-400 mb-0">
+                                    Sales data will appear here once available.
+                                </p>
+                            </div>
+                        }
+                    />
+                </div>
             )}
         </Card>
     );
