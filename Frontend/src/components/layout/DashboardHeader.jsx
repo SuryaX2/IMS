@@ -20,7 +20,6 @@ const DashboardHeader = ({ collapsed, setCollapsed }) => {
     // Handle logout
     const handleLogout = () => {
         logout();
-        toast.success("Successfully logged out");
         navigate("/login");
     };
 

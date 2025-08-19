@@ -23,7 +23,7 @@ import {
     InfoCircleOutlined,
     CalendarOutlined,
     AppstoreOutlined,
-    ReloadOutlined
+    ReloadOutlined,
 } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import DashboardHeader from "../components/dashboard/DashboardHeader";

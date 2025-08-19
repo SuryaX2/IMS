@@ -17,30 +17,24 @@ const getDashboardMetrics = asyncHandler(async (req, res, next) => {
         // Base query for filtering by user
         const userFilter = isAdmin ? {} : { created_by: userId };
 
-        // Get total sales (sum of all orders)
-        const salesQuery = isAdmin
-            ? [{ $match: { order_status: { $ne: "cancelled" } } }]
-            : [
-                  {
-                      $match: {
-                          order_status: { $ne: "cancelled" },
-                          created_by: userId,
-                      },
-                  },
-              ];
+        // Get total sales (sum of all orders) - Fixed pipeline
+        const salesMatchStage = isAdmin
+            ? { order_status: { $ne: "cancelled" } }
+            : { 
+                order_status: { $ne: "cancelled" },
+                created_by: new mongoose.Types.ObjectId(userId),
+            };
 
         const salesData = await Order.aggregate([
-            ...salesQuery,
+            { $match: salesMatchStage },
             { $group: { _id: null, totalSales: { $sum: "$total" } } },
         ]);
 
-        // Get total purchase value
-        const purchaseQuery = isAdmin
-            ? [{}]
-            : [{ $match: { created_by: userId } }];
+        // Get total purchase value - Fixed pipeline
+        const purchaseMatchStage = isAdmin ? {} : { created_by: new mongoose.Types.ObjectId(userId) };
 
         const purchaseData = await Purchase.aggregate([
-            ...purchaseQuery,
+            { $match: purchaseMatchStage },
             {
                 $lookup: {
                     from: "purchasedetails",
@@ -49,11 +43,11 @@ const getDashboardMetrics = asyncHandler(async (req, res, next) => {
                     as: "details",
                 },
             },
-            { $unwind: "$details" },
+            { $unwind: { path: "$details", preserveNullAndEmptyArrays: true } },
             {
                 $group: {
                     _id: null,
-                    totalPurchase: { $sum: "$details.total" },
+                    totalPurchase: { $sum: { $ifNull: ["$details.total", 0] } },
                 },
             },
         ]);
@@ -119,6 +113,7 @@ const getDashboardMetrics = asyncHandler(async (req, res, next) => {
                 )
             );
     } catch (error) {
+        console.error("Dashboard metrics error:", error);
         return next(new ApiError(500, error.message));
     }
 });
@@ -152,14 +147,14 @@ const getStockReport = asyncHandler(async (req, res, next) => {
                     as: "unit",
                 },
             },
-            { $unwind: "$category" },
-            { $unwind: "$unit" },
+            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: "$unit", preserveNullAndEmptyArrays: true } },
             {
                 $project: {
                     product_name: 1,
                     product_code: 1,
-                    category_name: "$category.category_name",
-                    unit_name: "$unit.unit_name",
+                    category_name: { $ifNull: ["$category.category_name", "N/A"] },
+                    unit_name: { $ifNull: ["$unit.unit_name", "N/A"] },
                     buying_price: 1,
                     selling_price: 1,
                     stock: 1,
@@ -192,6 +187,7 @@ const getStockReport = asyncHandler(async (req, res, next) => {
                 )
             );
     } catch (error) {
+        console.error("Stock report error:", error);
         return next(new ApiError(500, error.message));
     }
 });
@@ -247,7 +243,7 @@ const getSalesReport = asyncHandler(async (req, res, next) => {
                     as: "details",
                 },
             },
-            { $unwind: "$details" },
+            { $unwind: { path: "$details", preserveNullAndEmptyArrays: false } },
             {
                 $lookup: {
                     from: "products",
@@ -256,7 +252,7 @@ const getSalesReport = asyncHandler(async (req, res, next) => {
                     as: "product",
                 },
             },
-            { $unwind: "$product" },
+            { $unwind: { path: "$product", preserveNullAndEmptyArrays: false } },
             {
                 $group: {
                     _id: "$product._id",
@@ -294,6 +290,7 @@ const getSalesReport = asyncHandler(async (req, res, next) => {
                 )
             );
     } catch (error) {
+        console.error("Sales report error:", error);
         return next(new ApiError(500, error.message));
     }
 });
@@ -323,7 +320,7 @@ const getTopProducts = asyncHandler(async (req, res, next) => {
                     as: "details",
                 },
             },
-            { $unwind: "$details" },
+            { $unwind: { path: "$details", preserveNullAndEmptyArrays: false } },
             {
                 $lookup: {
                     from: "products",
@@ -332,7 +329,7 @@ const getTopProducts = asyncHandler(async (req, res, next) => {
                     as: "product",
                 },
             },
-            { $unwind: "$product" },
+            { $unwind: { path: "$product", preserveNullAndEmptyArrays: false } },
             {
                 $group: {
                     _id: "$product._id",
@@ -357,6 +354,7 @@ const getTopProducts = asyncHandler(async (req, res, next) => {
                 )
             );
     } catch (error) {
+        console.error("Top products error:", error);
         return next(new ApiError(500, error.message));
     }
 });
@@ -411,7 +409,7 @@ const getPurchaseReport = asyncHandler(async (req, res, next) => {
                     as: "supplier",
                 },
             },
-            { $unwind: "$supplier" },
+            { $unwind: { path: "$supplier", preserveNullAndEmptyArrays: true } },
             {
                 $lookup: {
                     from: "purchasedetails",
@@ -420,13 +418,13 @@ const getPurchaseReport = asyncHandler(async (req, res, next) => {
                     as: "details",
                 },
             },
-            { $unwind: "$details" },
+            { $unwind: { path: "$details", preserveNullAndEmptyArrays: true } },
             {
                 $group: {
                     _id: "$supplier._id",
-                    supplier_name: { $first: "$supplier.name" },
-                    shopname: { $first: "$supplier.shopname" },
-                    total_purchases: { $sum: "$details.total" },
+                    supplier_name: { $first: { $ifNull: ["$supplier.name", "Unknown"] } },
+                    shopname: { $first: { $ifNull: ["$supplier.shopname", "N/A"] } },
+                    total_purchases: { $sum: { $ifNull: ["$details.total", 0] } },
                     count: { $sum: 1 },
                 },
             },
@@ -448,6 +446,7 @@ const getPurchaseReport = asyncHandler(async (req, res, next) => {
                 )
             );
     } catch (error) {
+        console.error("Purchase report error:", error);
         return next(new ApiError(500, error.message));
     }
 });
@@ -550,6 +549,7 @@ const getLowStockAlerts = asyncHandler(async (req, res, next) => {
             )
         );
     } catch (error) {
+        console.error("Low stock alerts error:", error);
         return next(new ApiError(500, error.message));
     }
 });
@@ -641,7 +641,7 @@ const getSalesVsPurchasesReport = asyncHandler(async (req, res, next) => {
                     as: "details",
                 },
             },
-            { $unwind: "$details" },
+            { $unwind: { path: "$details", preserveNullAndEmptyArrays: true } },
             {
                 $group: {
                     _id: {
@@ -652,7 +652,7 @@ const getSalesVsPurchasesReport = asyncHandler(async (req, res, next) => {
                             },
                         },
                     },
-                    purchases: { $sum: "$details.total" },
+                    purchases: { $sum: { $ifNull: ["$details.total", 0] } },
                 },
             },
             { $sort: { "_id.date": 1 } },
@@ -709,6 +709,7 @@ const getSalesVsPurchasesReport = asyncHandler(async (req, res, next) => {
             )
         );
     } catch (error) {
+        console.error("Sales vs Purchases report error:", error);
         return next(new ApiError(500, error.message));
     }
 });
