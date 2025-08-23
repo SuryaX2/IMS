@@ -169,6 +169,8 @@ const PurchaseReport = () => {
             dataIndex: "supplier_name",
             key: "supplier_name",
             sorter: (a, b) => a.supplier_name.localeCompare(b.supplier_name),
+            width: 150,
+            ellipsis: true,
         },
         {
             title: "Shop Name",
@@ -177,6 +179,9 @@ const PurchaseReport = () => {
             sorter: (a, b) =>
                 (a.shopname || "").localeCompare(b.shopname || ""),
             render: (shopname) => shopname || "N/A",
+            width: 120,
+            ellipsis: true,
+            responsive: ['sm'],
         },
         {
             title: "Total Purchases",
@@ -188,6 +193,7 @@ const PurchaseReport = () => {
                     ₹{total.toFixed(2)}
                 </span>
             ),
+            width: 130,
         },
         {
             title: "Purchase Count",
@@ -195,6 +201,7 @@ const PurchaseReport = () => {
             key: "count",
             sorter: (a, b) => a.count - b.count,
             render: (count) => <span className="font-medium">{count}</span>,
+            width: 120,
         },
     ];
 
@@ -224,33 +231,38 @@ const PurchaseReport = () => {
     const summary = calculateSummary();
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
             {/* Date Range Filter and Export */}
             <Card title="Filter and Export Options">
-                <div className="flex justify-between items-center flex-wrap gap-4">
-                    <Space>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3">
                         <RangePicker
                             value={dateRange}
                             onChange={handleDateRangeChange}
                             format="YYYY-MM-DD"
                             allowClear={false}
+                            className="w-full sm:w-auto"
+                            size="middle"
                         />
                         <Button
                             type="primary"
                             icon={<CalendarOutlined />}
                             onClick={() => fetchPurchaseReport()}
                             loading={loading}
+                            className="w-full sm:w-auto"
                         >
-                            Refresh Report
+                            <span className="hidden sm:inline">Refresh Report</span>
+                            <span className="sm:hidden">Refresh</span>
                         </Button>
-                    </Space>
+                    </div>
                     <Button
                         icon={<FileExcelOutlined />}
                         onClick={exportToCSV}
                         disabled={!purchaseData}
-                        className="bg-green-500 text-white hover:bg-green-600"
+                        className="bg-green-500 text-white hover:bg-green-600 w-full sm:w-auto"
                     >
-                        Export to CSV
+                        <span className="hidden sm:inline">Export to CSV</span>
+                        <span className="sm:hidden">Export</span>
                     </Button>
                 </div>
             </Card>
@@ -258,35 +270,44 @@ const PurchaseReport = () => {
             {purchaseData && (
                 <>
                     {/* Summary Cards */}
-                    <Row gutter={[16, 16]}>
-                        <Col xs={24} sm={8} lg={8}>
-                            <Card>
+                    <Row gutter={[12, 12]} className="mb-4 sm:mb-6">
+                        <Col xs={24} sm={12} lg={8}>
+                            <Card className="h-full">
                                 <Statistic
                                     title="Total Purchases"
                                     value={summary.totalPurchases}
                                     precision={2}
                                     prefix="₹"
-                                    valueStyle={{ color: "#52c41a" }}
+                                    valueStyle={{ 
+                                        color: "#52c41a",
+                                        fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                    }}
                                     suffix={<ShoppingOutlined />}
                                 />
                             </Card>
                         </Col>
-                        <Col xs={24} sm={8} lg={8}>
-                            <Card>
+                        <Col xs={24} sm={12} lg={8}>
+                            <Card className="h-full">
                                 <Statistic
                                     title="Total Suppliers"
                                     value={summary.totalSuppliers}
-                                    valueStyle={{ color: "#1890ff" }}
+                                    valueStyle={{ 
+                                        color: "#1890ff",
+                                        fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                    }}
                                     suffix={<UserOutlined />}
                                 />
                             </Card>
                         </Col>
-                        <Col xs={24} sm={8} lg={8}>
-                            <Card>
+                        <Col xs={24} sm={24} lg={8}>
+                            <Card className="h-full">
                                 <Statistic
                                     title="Total Transactions"
                                     value={summary.totalTransactions}
-                                    valueStyle={{ color: "#722ed1" }}
+                                    valueStyle={{ 
+                                        color: "#722ed1",
+                                        fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                    }}
                                 />
                             </Card>
                         </Col>
@@ -295,37 +316,44 @@ const PurchaseReport = () => {
                     {/* Purchases by Date Chart */}
                     {purchaseData.purchasesByDate?.length > 0 && (
                         <Card title="Purchase Trend by Date" className="w-full">
-                            <ResponsiveContainer width="100%" height={400}>
-                                <BarChart data={purchaseData.purchasesByDate}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis
-                                        dataKey="_id"
-                                        tick={{ fontSize: 12 }}
-                                        angle={-45}
-                                        textAnchor="end"
-                                        height={80}
-                                    />
-                                    <YAxis tick={{ fontSize: 12 }} />
-                                    <Tooltip
-                                        formatter={(value, name) => [
-                                            value,
-                                            name === "count"
-                                                ? "Purchases"
-                                                : name,
-                                        ]}
-                                        labelFormatter={(label) =>
-                                            `Date: ${label}`
-                                        }
-                                    />
-                                    <Legend />
-                                    <Bar
-                                        dataKey="count"
-                                        fill="#1890ff"
-                                        name="Number of Purchases"
-                                        radius={[4, 4, 0, 0]}
-                                    />
-                                </BarChart>
-                            </ResponsiveContainer>
+                            <div className="w-full overflow-x-auto">
+                                <ResponsiveContainer 
+                                    width="100%" 
+                                    height={window.innerWidth < 768 ? 300 : 400}
+                                    minWidth={300}
+                                >
+                                    <BarChart data={purchaseData.purchasesByDate}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis
+                                            dataKey="_id"
+                                            tick={{ fontSize: window.innerWidth < 768 ? 10 : 12 }}
+                                            angle={window.innerWidth < 768 ? -90 : -45}
+                                            textAnchor="end"
+                                            height={window.innerWidth < 768 ? 100 : 80}
+                                            interval={0}
+                                        />
+                                        <YAxis tick={{ fontSize: window.innerWidth < 768 ? 10 : 12 }} />
+                                        <Tooltip
+                                            formatter={(value, name) => [
+                                                value,
+                                                name === "count"
+                                                    ? "Purchases"
+                                                    : name,
+                                            ]}
+                                            labelFormatter={(label) =>
+                                                `Date: ${label}`
+                                            }
+                                        />
+                                        <Legend />
+                                        <Bar
+                                            dataKey="count"
+                                            fill="#1890ff"
+                                            name="Number of Purchases"
+                                            radius={[4, 4, 0, 0]}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
                         </Card>
                     )}
 
@@ -335,64 +363,77 @@ const PurchaseReport = () => {
                             title="Top Suppliers by Purchase Value"
                             className="h-full"
                         >
-                            <ResponsiveContainer width="100%" height={400}>
-                                <BarChart
-                                    data={purchaseData.purchasesBySupplier.slice(
-                                        0,
-                                        8
-                                    )}
+                            <div className="w-full overflow-x-auto">
+                                <ResponsiveContainer 
+                                    width="100%" 
+                                    height={window.innerWidth < 768 ? 350 : 400}
+                                    minWidth={300}
                                 >
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis
-                                        dataKey="supplier_name"
-                                        tick={{ fontSize: 10 }}
-                                        angle={-45}
-                                        textAnchor="end"
-                                        height={120}
-                                        interval={0}
-                                    />
-                                    <YAxis
-                                        tick={{ fontSize: 12 }}
-                                        tickFormatter={(value) => `₹${value}`}
-                                    />
-                                    <Tooltip
-                                        formatter={(value, name) => [
-                                            name === "total_purchases"
-                                                ? `₹${value.toFixed(2)}`
-                                                : value,
-                                            name === "total_purchases"
-                                                ? "Total Purchases"
-                                                : "Purchase Count",
-                                        ]}
-                                    />
-                                    <Legend />
-                                    <Bar
-                                        dataKey="total_purchases"
-                                        fill="#52c41a"
-                                        name="Purchase Amount"
-                                        radius={[4, 4, 0, 0]}
-                                    />
-                                </BarChart>
-                            </ResponsiveContainer>
+                                    <BarChart
+                                        data={purchaseData.purchasesBySupplier.slice(
+                                            0,
+                                            window.innerWidth < 768 ? 5 : 8
+                                        )}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis
+                                            dataKey="supplier_name"
+                                            tick={{ fontSize: window.innerWidth < 768 ? 8 : 10 }}
+                                            angle={window.innerWidth < 768 ? -90 : -45}
+                                            textAnchor="end"
+                                            height={window.innerWidth < 768 ? 140 : 120}
+                                            interval={0}
+                                        />
+                                        <YAxis
+                                            tick={{ fontSize: window.innerWidth < 768 ? 10 : 12 }}
+                                            tickFormatter={(value) => `₹${value}`}
+                                        />
+                                        <Tooltip
+                                            formatter={(value, name) => [
+                                                name === "total_purchases"
+                                                    ? `₹${value.toFixed(2)}`
+                                                    : value,
+                                                name === "total_purchases"
+                                                    ? "Total Purchases"
+                                                    : "Purchase Count",
+                                            ]}
+                                        />
+                                        <Legend />
+                                        <Bar
+                                            dataKey="total_purchases"
+                                            fill="#52c41a"
+                                            name="Purchase Amount"
+                                            radius={[4, 4, 0, 0]}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
                         </Card>
                     )}
 
                     {/* Supplier Details Table */}
                     {purchaseData.purchasesBySupplier?.length > 0 && (
                         <Card title="Supplier Purchase Details">
-                            <Table
-                                columns={supplierColumns}
-                                dataSource={purchaseData.purchasesBySupplier}
-                                rowKey="_id"
-                                loading={loading}
-                                pagination={{
-                                    pageSize: 10,
-                                    showSizeChanger: true,
-                                    showTotal: (total, range) =>
-                                        `${range[0]}-${range[1]} of ${total} items`,
-                                }}
-                                scroll={{ x: 800 }}
-                            />
+                            <div className="overflow-x-auto">
+                                <Table
+                                    columns={supplierColumns}
+                                    dataSource={purchaseData.purchasesBySupplier}
+                                    rowKey="_id"
+                                    loading={loading}
+                                    pagination={{
+                                        pageSize: window.innerWidth < 768 ? 5 : 10,
+                                        showSizeChanger: window.innerWidth >= 768,
+                                        showQuickJumper: window.innerWidth >= 1024,
+                                        showTotal: (total, range) =>
+                                            window.innerWidth >= 768 
+                                                ? `${range[0]}-${range[1]} of ${total} items`
+                                                : `${range[0]}-${range[1]}/${total}`,
+                                        simple: window.innerWidth < 768,
+                                    }}
+                                    scroll={{ x: 500 }}
+                                    size={window.innerWidth < 768 ? "small" : "middle"}
+                                />
+                            </div>
                         </Card>
                     )}
                 </>
@@ -401,7 +442,7 @@ const PurchaseReport = () => {
             {!purchaseData && !loading && (
                 <Card>
                     <div className="text-center py-8">
-                        <p className="text-gray-500">
+                        <p className="text-gray-500 text-sm sm:text-base px-4">
                             Select a date range to generate purchase report
                         </p>
                     </div>

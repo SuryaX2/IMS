@@ -170,87 +170,101 @@ const StockReport = () => {
 
     const columns = [
         {
-            title: "Product Code",
+            title: "Code",
             dataIndex: "product_code",
             key: "product_code",
             sorter: (a, b) => a.product_code.localeCompare(b.product_code),
-            width: 120,
+            width: window.innerWidth < 768 ? 80 : 120,
+            ellipsis: true,
         },
         {
             title: "Product Name",
             dataIndex: "product_name",
             key: "product_name",
             sorter: (a, b) => a.product_name.localeCompare(b.product_name),
-            width: 200,
+            width: window.innerWidth < 768 ? 120 : 200,
+            ellipsis: true,
         },
         {
             title: "Category",
             dataIndex: "category_name",
             key: "category_name",
             sorter: (a, b) => a.category_name.localeCompare(b.category_name),
-            width: 150,
+            width: window.innerWidth < 768 ? 80 : 150,
+            ellipsis: true,
+            responsive: ['sm'],
         },
         {
             title: "Unit",
             dataIndex: "unit_name",
             key: "unit_name",
-            width: 80,
+            width: 60,
+            responsive: ['md'],
         },
         {
             title: "Stock",
             dataIndex: "stock",
             key: "stock",
             sorter: (a, b) => a.stock - b.stock,
-            width: 100,
+            width: window.innerWidth < 768 ? 70 : 100,
             render: (stock) => (
                 <span
-                    className={`font-medium ${stock <= 0 ? "text-red-500" : stock < 10 ? "text-orange-500" : "text-green-500"}`}
+                    className={`font-medium text-sm sm:text-base ${
+                        stock <= 0 
+                            ? "text-red-500" 
+                            : stock < 10 
+                                ? "text-orange-500" 
+                                : "text-green-500"
+                    }`}
                 >
                     {stock}
                 </span>
             ),
         },
         {
-            title: "Buying Price",
+            title: "Buy Price",
             dataIndex: "buying_price",
             key: "buying_price",
             sorter: (a, b) => a.buying_price - b.buying_price,
-            width: 120,
+            width: window.innerWidth < 768 ? 80 : 120,
             render: (price) => (
-                <span className="font-medium text-blue-600">
-                    ₹{price.toFixed(2)}
+                <span className="font-medium text-blue-600 text-xs sm:text-sm">
+                    ₹{price.toFixed(0)}
                 </span>
             ),
+            responsive: ['sm'],
         },
         {
-            title: "Selling Price",
+            title: "Sell Price",
             dataIndex: "selling_price",
             key: "selling_price",
             sorter: (a, b) => a.selling_price - b.selling_price,
-            width: 120,
+            width: window.innerWidth < 768 ? 80 : 120,
             render: (price) => (
-                <span className="font-medium text-green-600">
-                    ₹{price.toFixed(2)}
+                <span className="font-medium text-green-600 text-xs sm:text-sm">
+                    ₹{price.toFixed(0)}
                 </span>
             ),
+            responsive: ['md'],
         },
         {
             title: "Inventory Value",
             dataIndex: "inventory_value",
             key: "inventory_value",
             sorter: (a, b) => a.inventory_value - b.inventory_value,
-            width: 140,
+            width: window.innerWidth < 768 ? 100 : 140,
             render: (value) => (
-                <span className="font-medium text-purple-600">
-                    ₹{value.toFixed(2)}
+                <span className="font-medium text-purple-600 text-xs sm:text-sm">
+                    ₹{value.toFixed(0)}
                 </span>
             ),
+            responsive: ['lg'],
         },
         {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            width: 120,
+            width: window.innerWidth < 768 ? 90 : 120,
             filters: [
                 { text: "In Stock", value: "In Stock" },
                 { text: "Low Stock", value: "Low Stock" },
@@ -261,8 +275,12 @@ const StockReport = () => {
                 <Tag
                     color={getStatusColor(status)}
                     icon={getStatusIcon(status)}
+                    className={`text-xs ${window.innerWidth < 768 ? 'px-1' : ''}`}
                 >
-                    {status}
+                    {window.innerWidth < 768 
+                        ? status.split(' ')[0] // Show only first word on mobile
+                        : status
+                    }
                 </Tag>
             ),
         },
@@ -296,75 +314,101 @@ const StockReport = () => {
     const summary = calculateSummary();
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
             {/* Export Controls */}
             <Card title="Filter and Export Options">
-                <div className="flex justify-between items-center flex-wrap gap-4">
-                    <Space>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3">
                         <Input
                             placeholder="Search products..."
                             prefix={<SearchOutlined />}
                             value={searchText}
                             onChange={(e) => setSearchText(e.target.value)}
-                            style={{ width: 250 }}
+                            className="w-full sm:w-60"
+                            allowClear
                         />
                         <Button
                             type="primary"
                             icon={<ReloadOutlined />}
                             onClick={fetchStockReport}
                             loading={loading}
+                            className="w-full sm:w-auto"
                         >
-                            Refresh Report
+                            <span className="hidden sm:inline">Refresh Report</span>
+                            <span className="sm:hidden">Refresh</span>
                         </Button>
-                    </Space>
+                    </div>
                     <Button
                         icon={<FileExcelOutlined />}
                         onClick={exportToCSV}
                         disabled={filteredData.length === 0}
-                        className="bg-green-500 text-white hover:bg-green-600"
+                        className="bg-green-500 text-white hover:bg-green-600 w-full sm:w-auto"
                     >
-                        Export to CSV
+                        <span className="hidden sm:inline">Export to CSV</span>
+                        <span className="sm:hidden">Export</span>
                     </Button>
                 </div>
             </Card>
 
             {/* Summary Cards */}
-            <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} lg={6}>
-                    <Card>
+            <Row gutter={[8, 8]} className="mb-4 sm:mb-6">
+                <Col xs={12} sm={6} lg={6}>
+                    <Card className="h-full">
                         <Statistic
-                            title="Total Products"
+                            title={
+                                <span className="text-xs sm:text-sm">
+                                    {window.innerWidth < 768 ? "Products" : "Total Products"}
+                                </span>
+                            }
                             value={summary.totalProducts}
-                            valueStyle={{ color: "#1890ff" }}
+                            valueStyle={{ 
+                                color: "#1890ff",
+                                fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                            }}
                         />
                     </Card>
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <Card>
+                <Col xs={12} sm={6} lg={6}>
+                    <Card className="h-full">
                         <Statistic
-                            title="In Stock"
+                            title={
+                                <span className="text-xs sm:text-sm">In Stock</span>
+                            }
                             value={summary.inStock}
-                            valueStyle={{ color: "#52c41a" }}
+                            valueStyle={{ 
+                                color: "#52c41a",
+                                fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                            }}
                             prefix={<CheckCircleOutlined />}
                         />
                     </Card>
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <Card>
+                <Col xs={12} sm={6} lg={6}>
+                    <Card className="h-full">
                         <Statistic
-                            title="Low Stock"
+                            title={
+                                <span className="text-xs sm:text-sm">Low Stock</span>
+                            }
                             value={summary.lowStock}
-                            valueStyle={{ color: "#fa8c16" }}
+                            valueStyle={{ 
+                                color: "#fa8c16",
+                                fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                            }}
                             prefix={<WarningOutlined />}
                         />
                     </Card>
                 </Col>
-                <Col xs={24} sm={12} lg={6}>
-                    <Card>
+                <Col xs={12} sm={6} lg={6}>
+                    <Card className="h-full">
                         <Statistic
-                            title="Out of Stock"
+                            title={
+                                <span className="text-xs sm:text-sm">Out of Stock</span>
+                            }
                             value={summary.outOfStock}
-                            valueStyle={{ color: "#ff4d4f" }}
+                            valueStyle={{ 
+                                color: "#ff4d4f",
+                                fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                            }}
                             prefix={<StopOutlined />}
                         />
                     </Card>
@@ -374,50 +418,75 @@ const StockReport = () => {
             {/* Total Inventory Value */}
             <Card>
                 <Statistic
-                    title="Total Inventory Value"
+                    title={
+                        <span className="text-sm sm:text-base">
+                            {window.innerWidth < 768 ? "Inventory Value" : "Total Inventory Value"}
+                        </span>
+                    }
                     value={summary.totalInventoryValue}
                     precision={2}
                     prefix="₹"
-                    valueStyle={{ color: "#722ed1", fontSize: "28px" }}
+                    valueStyle={{ 
+                        color: "#722ed1", 
+                        fontSize: window.innerWidth < 768 ? "20px" : "28px"
+                    }}
                 />
             </Card>
 
             {/* Stock Report Table */}
-            <Card title={`Stock Report (${filteredData.length} products)`}>
-                <Table
-                    columns={columns}
-                    dataSource={filteredData}
-                    rowKey="_id"
-                    loading={loading}
-                    pagination={{
-                        pageSize: 15,
-                        showSizeChanger: true,
-                        showQuickJumper: true,
-                        showTotal: (total, range) =>
-                            `${range[0]}-${range[1]} of ${total} items`,
-                        pageSizeOptions: ["10", "15", "25", "50", "100"],
-                    }}
-                    scroll={{ x: 1300 }}
-                    rowClassName={(record) => {
-                        if (record.status === "Out of Stock")
-                            return "bg-red-50 border-l-4 border-red-400";
-                        if (record.status === "Low Stock")
-                            return "bg-orange-50 border-l-4 border-orange-400";
-                        return "bg-green-50 border-l-4 border-green-200";
-                    }}
-                />
+            <Card title={
+                <span className="text-sm sm:text-base">
+                    {window.innerWidth < 768 
+                        ? `Stock Report (${filteredData.length})` 
+                        : `Stock Report (${filteredData.length} products)`
+                    }
+                </span>
+            }>
+                <div className="overflow-x-auto">
+                    <Table
+                        columns={columns}
+                        dataSource={filteredData}
+                        rowKey="_id"
+                        loading={loading}
+                        pagination={{
+                            pageSize: window.innerWidth < 768 ? 8 : 15,
+                            showSizeChanger: window.innerWidth >= 768,
+                            showQuickJumper: window.innerWidth >= 1024,
+                            showTotal: (total, range) =>
+                                window.innerWidth >= 768 
+                                    ? `${range[0]}-${range[1]} of ${total} items`
+                                    : `${range[0]}-${range[1]}/${total}`,
+                            pageSizeOptions: window.innerWidth >= 768 
+                                ? ["10", "15", "25", "50", "100"]
+                                : ["5", "8", "15"],
+                            simple: window.innerWidth < 768,
+                        }}
+                        scroll={{ x: 700 }}
+                        size={window.innerWidth < 768 ? "small" : "middle"}
+                        rowClassName={(record) => {
+                            if (record.status === "Out of Stock")
+                                return "bg-red-50 border-l-4 border-red-400";
+                            if (record.status === "Low Stock")
+                                return "bg-orange-50 border-l-4 border-orange-400";
+                            return "bg-green-50 border-l-4 border-green-200";
+                        }}
+                    />
+                </div>
             </Card>
 
             {filteredData.length === 0 && !loading && stockData.length > 0 && (
                 <Card>
                     <div className="text-center py-8">
                         <SearchOutlined
-                            style={{ fontSize: "48px", color: "#d9d9d9" }}
+                            style={{ 
+                                fontSize: window.innerWidth < 768 ? "36px" : "48px", 
+                                color: "#d9d9d9" 
+                            }}
                         />
-                        <p className="text-gray-500 mt-4">
+                        <p className="text-gray-500 mt-4 text-sm sm:text-base px-4">
                             No products found matching your search criteria
                         </p>
-                        <p className="text-gray-400">
+                        <p className="text-gray-400 text-xs sm:text-sm px-4">
                             Try adjusting your search terms or clear the search
                             to see all products
                         </p>
@@ -429,12 +498,15 @@ const StockReport = () => {
                 <Card>
                     <div className="text-center py-8">
                         <StopOutlined
-                            style={{ fontSize: "48px", color: "#d9d9d9" }}
+                            style={{ 
+                                fontSize: window.innerWidth < 768 ? "36px" : "48px", 
+                                color: "#d9d9d9" 
+                            }}
                         />
-                        <p className="text-gray-500 mt-4">
+                        <p className="text-gray-500 mt-4 text-sm sm:text-base px-4">
                             No stock data available
                         </p>
-                        <p className="text-gray-400">
+                        <p className="text-gray-400 text-xs sm:text-sm px-4">
                             Add some products to your inventory to see the stock
                             report
                         </p>
