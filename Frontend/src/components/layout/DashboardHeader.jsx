@@ -31,11 +31,6 @@ const DashboardHeader = ({ collapsed, setCollapsed }) => {
             icon: <UserOutlined />,
         },
         {
-            key: "settings",
-            label: <Link to="/settings">Settings</Link>,
-            icon: <SettingOutlined />,
-        },
-        {
             key: "divider",
             type: "divider",
         },
