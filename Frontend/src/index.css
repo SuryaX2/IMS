@@ -9,41 +9,10 @@
 
 /* Dashboard specific styles */
 .dashboard-stat-card {
-    transition: all 0.3s ease;
-  }
+  transition: all 0.3s ease;
+}
   
-  .dashboard-stat-card:hover {
-    transform: translateY(-3px);
-  }
-  
-  /* Custom styles for Ant Design tables */
-  .antd-custom-table .ant-table-thead > tr > th {
-    background-color: #f0f5ff;
-    font-weight: 600;
-  }
-  
-  .antd-custom-table .ant-table-tbody > tr:hover > td {
-    background-color: #f5f8ff;
-  }
-  
-  /* Make cards look nicer on mobile */
-  @media (max-width: 640px) {
-    .ant-card-body {
-      padding: 12px !important;
-    }
-    
-    .ant-card-head-title {
-      font-size: 16px !important;
-    }
-  }
-  
-  /* Improve chart responsiveness */
-  @media (max-width: 768px) {
-    .ant-statistic-title {
-      font-size: 12px;
-    }
-    
-    .ant-statistic-content {
-      font-size: 18px !important;
-    }
-  }
+.dashboard-stat-card:hover {
+  transform: translateY(-3px);
+}
+
