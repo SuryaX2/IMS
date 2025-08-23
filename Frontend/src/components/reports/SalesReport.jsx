@@ -174,7 +174,7 @@ const SalesReport = () => {
                 <span className="font-medium text-blue-600">{quantity}</span>
             ),
             width: 100,
-            responsive: ['sm'],
+            responsive: ["sm"],
         },
         {
             title: "Total Sales",
@@ -201,7 +201,7 @@ const SalesReport = () => {
                 );
             },
             width: 100,
-            responsive: ['md'],
+            responsive: ["md"],
         },
     ];
 
@@ -226,7 +226,9 @@ const SalesReport = () => {
                             loading={loading}
                             className="w-full sm:w-auto"
                         >
-                            <span className="hidden sm:inline">Refresh Report</span>
+                            <span className="hidden sm:inline">
+                                Refresh Report
+                            </span>
                             <span className="sm:hidden">Refresh</span>
                         </Button>
                     </div>
@@ -253,9 +255,9 @@ const SalesReport = () => {
                                     value={salesData.summary.totalSales}
                                     precision={2}
                                     prefix="₹"
-                                    valueStyle={{ 
+                                    valueStyle={{
                                         color: "#52c41a",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
                                     }}
                                     suffix={<DollarOutlined />}
                                 />
@@ -266,9 +268,9 @@ const SalesReport = () => {
                                 <Statistic
                                     title="Total Orders"
                                     value={salesData.summary.totalOrders}
-                                    valueStyle={{ 
+                                    valueStyle={{
                                         color: "#1890ff",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
                                     }}
                                     suffix={<ShoppingCartOutlined />}
                                 />
@@ -280,8 +282,8 @@ const SalesReport = () => {
                     {salesData.salesByDate?.length > 0 && (
                         <Card title="Sales Trend Over Time" className="w-full">
                             <div className="w-full overflow-x-auto">
-                                <ResponsiveContainer 
-                                    width="100%" 
+                                <ResponsiveContainer
+                                    width="100%"
                                     height={window.innerWidth < 768 ? 300 : 400}
                                     minWidth={300}
                                 >
@@ -289,13 +291,33 @@ const SalesReport = () => {
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis
                                             dataKey="_id"
-                                            tick={{ fontSize: window.innerWidth < 768 ? 10 : 12 }}
-                                            angle={window.innerWidth < 768 ? -90 : -45}
+                                            tick={{
+                                                fontSize:
+                                                    window.innerWidth < 768
+                                                        ? 10
+                                                        : 12,
+                                            }}
+                                            angle={
+                                                window.innerWidth < 768
+                                                    ? -90
+                                                    : -45
+                                            }
                                             textAnchor="end"
-                                            height={window.innerWidth < 768 ? 100 : 80}
+                                            height={
+                                                window.innerWidth < 768
+                                                    ? 100
+                                                    : 80
+                                            }
                                             interval={0}
                                         />
-                                        <YAxis tick={{ fontSize: window.innerWidth < 768 ? 10 : 12 }} />
+                                        <YAxis
+                                            tick={{
+                                                fontSize:
+                                                    window.innerWidth < 768
+                                                        ? 10
+                                                        : 12,
+                                            }}
+                                        />
                                         <Tooltip
                                             formatter={(value, name) => [
                                                 name === "total"
@@ -316,7 +338,12 @@ const SalesReport = () => {
                                             stroke="#52c41a"
                                             strokeWidth={3}
                                             name="Sales (₹)"
-                                            dot={{ r: window.innerWidth < 768 ? 4 : 6 }}
+                                            dot={{
+                                                r:
+                                                    window.innerWidth < 768
+                                                        ? 4
+                                                        : 6,
+                                            }}
                                         />
                                         <Line
                                             type="monotone"
@@ -324,7 +351,12 @@ const SalesReport = () => {
                                             stroke="#1890ff"
                                             strokeWidth={2}
                                             name="Orders"
-                                            dot={{ r: window.innerWidth < 768 ? 3 : 4 }}
+                                            dot={{
+                                                r:
+                                                    window.innerWidth < 768
+                                                        ? 3
+                                                        : 4,
+                                            }}
                                         />
                                     </LineChart>
                                 </ResponsiveContainer>
@@ -343,32 +375,61 @@ const SalesReport = () => {
                                     <div className="w-full overflow-x-auto">
                                         <ResponsiveContainer
                                             width="100%"
-                                            height={window.innerWidth < 768 ? 300 : 400}
+                                            height={
+                                                window.innerWidth < 768
+                                                    ? 300
+                                                    : 400
+                                            }
                                             minWidth={280}
                                         >
                                             <BarChart
                                                 data={salesData.salesByProduct.slice(
                                                     0,
-                                                    window.innerWidth < 768 ? 5 : 8
+                                                    window.innerWidth < 768
+                                                        ? 5
+                                                        : 8
                                                 )}
                                             >
                                                 <CartesianGrid strokeDasharray="3 3" />
                                                 <XAxis
                                                     dataKey="product_name"
-                                                    tick={{ fontSize: window.innerWidth < 768 ? 8 : 10 }}
-                                                    angle={window.innerWidth < 768 ? -90 : -45}
+                                                    tick={{
+                                                        fontSize:
+                                                            window.innerWidth <
+                                                            768
+                                                                ? 8
+                                                                : 10,
+                                                    }}
+                                                    angle={
+                                                        window.innerWidth < 768
+                                                            ? -90
+                                                            : -45
+                                                    }
                                                     textAnchor="end"
-                                                    height={window.innerWidth < 768 ? 140 : 120}
+                                                    height={
+                                                        window.innerWidth < 768
+                                                            ? 140
+                                                            : 120
+                                                    }
                                                     interval={0}
                                                 />
                                                 <YAxis
-                                                    tick={{ fontSize: window.innerWidth < 768 ? 10 : 12 }}
+                                                    tick={{
+                                                        fontSize:
+                                                            window.innerWidth <
+                                                            768
+                                                                ? 10
+                                                                : 12,
+                                                    }}
                                                     tickFormatter={(value) =>
                                                         `₹${value}`
                                                     }
                                                 />
                                                 <Tooltip
-                                                    formatter={(value, name) => [
+                                                    formatter={(
+                                                        value,
+                                                        name
+                                                    ) => [
                                                         name === "total"
                                                             ? `₹${value.toFixed(2)}`
                                                             : value,
@@ -401,14 +462,20 @@ const SalesReport = () => {
                                     <div className="w-full overflow-x-auto">
                                         <ResponsiveContainer
                                             width="100%"
-                                            height={window.innerWidth < 768 ? 300 : 400}
+                                            height={
+                                                window.innerWidth < 768
+                                                    ? 300
+                                                    : 400
+                                            }
                                             minWidth={280}
                                         >
                                             <PieChart>
                                                 <Pie
                                                     data={salesData.salesByProduct.slice(
                                                         0,
-                                                        window.innerWidth < 768 ? 5 : 8
+                                                        window.innerWidth < 768
+                                                            ? 5
+                                                            : 8
                                                     )}
                                                     cx="50%"
                                                     cy="50%"
@@ -417,18 +484,34 @@ const SalesReport = () => {
                                                         product_name,
                                                         percent,
                                                     }) => {
-                                                        const maxLength = window.innerWidth < 768 ? 8 : 10;
-                                                        const displayName = product_name.length > maxLength 
-                                                            ? `${product_name.substring(0, maxLength)}...` 
-                                                            : product_name;
+                                                        const maxLength =
+                                                            window.innerWidth <
+                                                            768
+                                                                ? 8
+                                                                : 10;
+                                                        const displayName =
+                                                            product_name.length >
+                                                            maxLength
+                                                                ? `${product_name.substring(0, maxLength)}...`
+                                                                : product_name;
                                                         return `${displayName} (${(percent * 100).toFixed(1)}%)`;
                                                     }}
-                                                    outerRadius={window.innerWidth < 768 ? 80 : 120}
+                                                    outerRadius={
+                                                        window.innerWidth < 768
+                                                            ? 80
+                                                            : 120
+                                                    }
                                                     fill="#8884d8"
                                                     dataKey="total"
                                                 >
                                                     {salesData.salesByProduct
-                                                        .slice(0, window.innerWidth < 768 ? 5 : 8)
+                                                        .slice(
+                                                            0,
+                                                            window.innerWidth <
+                                                                768
+                                                                ? 5
+                                                                : 8
+                                                        )
                                                         .map((entry, index) => (
                                                             <Cell
                                                                 key={`cell-${index}`}
@@ -465,17 +548,24 @@ const SalesReport = () => {
                                     rowKey="_id"
                                     loading={loading}
                                     pagination={{
-                                        pageSize: window.innerWidth < 768 ? 5 : 10,
-                                        showSizeChanger: window.innerWidth >= 768,
-                                        showQuickJumper: window.innerWidth >= 1024,
+                                        pageSize:
+                                            window.innerWidth < 768 ? 5 : 10,
+                                        showSizeChanger:
+                                            window.innerWidth >= 768,
+                                        showQuickJumper:
+                                            window.innerWidth >= 1024,
                                         showTotal: (total, range) =>
-                                            window.innerWidth >= 768 
+                                            window.innerWidth >= 768
                                                 ? `${range[0]}-${range[1]} of ${total} items`
                                                 : `${range[0]}-${range[1]}/${total}`,
                                         simple: window.innerWidth < 768,
                                     }}
                                     scroll={{ x: 450 }}
-                                    size={window.innerWidth < 768 ? "small" : "middle"}
+                                    size={
+                                        window.innerWidth < 768
+                                            ? "small"
+                                            : "middle"
+                                    }
                                 />
                             </div>
                         </Card>

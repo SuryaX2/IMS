@@ -181,7 +181,7 @@ const PurchaseReport = () => {
             render: (shopname) => shopname || "N/A",
             width: 120,
             ellipsis: true,
-            responsive: ['sm'],
+            responsive: ["sm"],
         },
         {
             title: "Total Purchases",
@@ -251,7 +251,9 @@ const PurchaseReport = () => {
                             loading={loading}
                             className="w-full sm:w-auto"
                         >
-                            <span className="hidden sm:inline">Refresh Report</span>
+                            <span className="hidden sm:inline">
+                                Refresh Report
+                            </span>
                             <span className="sm:hidden">Refresh</span>
                         </Button>
                     </div>
@@ -278,9 +280,9 @@ const PurchaseReport = () => {
                                     value={summary.totalPurchases}
                                     precision={2}
                                     prefix="₹"
-                                    valueStyle={{ 
+                                    valueStyle={{
                                         color: "#52c41a",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
                                     }}
                                     suffix={<ShoppingOutlined />}
                                 />
@@ -291,9 +293,9 @@ const PurchaseReport = () => {
                                 <Statistic
                                     title="Total Suppliers"
                                     value={summary.totalSuppliers}
-                                    valueStyle={{ 
+                                    valueStyle={{
                                         color: "#1890ff",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
                                     }}
                                     suffix={<UserOutlined />}
                                 />
@@ -304,9 +306,9 @@ const PurchaseReport = () => {
                                 <Statistic
                                     title="Total Transactions"
                                     value={summary.totalTransactions}
-                                    valueStyle={{ 
+                                    valueStyle={{
                                         color: "#722ed1",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
                                     }}
                                 />
                             </Card>
@@ -317,22 +319,44 @@ const PurchaseReport = () => {
                     {purchaseData.purchasesByDate?.length > 0 && (
                         <Card title="Purchase Trend by Date" className="w-full">
                             <div className="w-full overflow-x-auto">
-                                <ResponsiveContainer 
-                                    width="100%" 
+                                <ResponsiveContainer
+                                    width="100%"
                                     height={window.innerWidth < 768 ? 300 : 400}
                                     minWidth={300}
                                 >
-                                    <BarChart data={purchaseData.purchasesByDate}>
+                                    <BarChart
+                                        data={purchaseData.purchasesByDate}
+                                    >
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis
                                             dataKey="_id"
-                                            tick={{ fontSize: window.innerWidth < 768 ? 10 : 12 }}
-                                            angle={window.innerWidth < 768 ? -90 : -45}
+                                            tick={{
+                                                fontSize:
+                                                    window.innerWidth < 768
+                                                        ? 10
+                                                        : 12,
+                                            }}
+                                            angle={
+                                                window.innerWidth < 768
+                                                    ? -90
+                                                    : -45
+                                            }
                                             textAnchor="end"
-                                            height={window.innerWidth < 768 ? 100 : 80}
+                                            height={
+                                                window.innerWidth < 768
+                                                    ? 100
+                                                    : 80
+                                            }
                                             interval={0}
                                         />
-                                        <YAxis tick={{ fontSize: window.innerWidth < 768 ? 10 : 12 }} />
+                                        <YAxis
+                                            tick={{
+                                                fontSize:
+                                                    window.innerWidth < 768
+                                                        ? 10
+                                                        : 12,
+                                            }}
+                                        />
                                         <Tooltip
                                             formatter={(value, name) => [
                                                 value,
@@ -364,8 +388,8 @@ const PurchaseReport = () => {
                             className="h-full"
                         >
                             <div className="w-full overflow-x-auto">
-                                <ResponsiveContainer 
-                                    width="100%" 
+                                <ResponsiveContainer
+                                    width="100%"
                                     height={window.innerWidth < 768 ? 350 : 400}
                                     minWidth={300}
                                 >
@@ -378,15 +402,35 @@ const PurchaseReport = () => {
                                         <CartesianGrid strokeDasharray="3 3" />
                                         <XAxis
                                             dataKey="supplier_name"
-                                            tick={{ fontSize: window.innerWidth < 768 ? 8 : 10 }}
-                                            angle={window.innerWidth < 768 ? -90 : -45}
+                                            tick={{
+                                                fontSize:
+                                                    window.innerWidth < 768
+                                                        ? 8
+                                                        : 10,
+                                            }}
+                                            angle={
+                                                window.innerWidth < 768
+                                                    ? -90
+                                                    : -45
+                                            }
                                             textAnchor="end"
-                                            height={window.innerWidth < 768 ? 140 : 120}
+                                            height={
+                                                window.innerWidth < 768
+                                                    ? 140
+                                                    : 120
+                                            }
                                             interval={0}
                                         />
                                         <YAxis
-                                            tick={{ fontSize: window.innerWidth < 768 ? 10 : 12 }}
-                                            tickFormatter={(value) => `₹${value}`}
+                                            tick={{
+                                                fontSize:
+                                                    window.innerWidth < 768
+                                                        ? 10
+                                                        : 12,
+                                            }}
+                                            tickFormatter={(value) =>
+                                                `₹${value}`
+                                            }
                                         />
                                         <Tooltip
                                             formatter={(value, name) => [
@@ -417,21 +461,30 @@ const PurchaseReport = () => {
                             <div className="overflow-x-auto">
                                 <Table
                                     columns={supplierColumns}
-                                    dataSource={purchaseData.purchasesBySupplier}
+                                    dataSource={
+                                        purchaseData.purchasesBySupplier
+                                    }
                                     rowKey="_id"
                                     loading={loading}
                                     pagination={{
-                                        pageSize: window.innerWidth < 768 ? 5 : 10,
-                                        showSizeChanger: window.innerWidth >= 768,
-                                        showQuickJumper: window.innerWidth >= 1024,
+                                        pageSize:
+                                            window.innerWidth < 768 ? 5 : 10,
+                                        showSizeChanger:
+                                            window.innerWidth >= 768,
+                                        showQuickJumper:
+                                            window.innerWidth >= 1024,
                                         showTotal: (total, range) =>
-                                            window.innerWidth >= 768 
+                                            window.innerWidth >= 768
                                                 ? `${range[0]}-${range[1]} of ${total} items`
                                                 : `${range[0]}-${range[1]}/${total}`,
                                         simple: window.innerWidth < 768,
                                     }}
                                     scroll={{ x: 500 }}
-                                    size={window.innerWidth < 768 ? "small" : "middle"}
+                                    size={
+                                        window.innerWidth < 768
+                                            ? "small"
+                                            : "middle"
+                                    }
                                 />
                             </div>
                         </Card>

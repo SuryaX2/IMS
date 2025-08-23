@@ -192,14 +192,14 @@ const StockReport = () => {
             sorter: (a, b) => a.category_name.localeCompare(b.category_name),
             width: window.innerWidth < 768 ? 80 : 150,
             ellipsis: true,
-            responsive: ['sm'],
+            responsive: ["sm"],
         },
         {
             title: "Unit",
             dataIndex: "unit_name",
             key: "unit_name",
             width: 60,
-            responsive: ['md'],
+            responsive: ["md"],
         },
         {
             title: "Stock",
@@ -210,11 +210,11 @@ const StockReport = () => {
             render: (stock) => (
                 <span
                     className={`font-medium text-sm sm:text-base ${
-                        stock <= 0 
-                            ? "text-red-500" 
-                            : stock < 10 
-                                ? "text-orange-500" 
-                                : "text-green-500"
+                        stock <= 0
+                            ? "text-red-500"
+                            : stock < 10
+                              ? "text-orange-500"
+                              : "text-green-500"
                     }`}
                 >
                     {stock}
@@ -232,7 +232,7 @@ const StockReport = () => {
                     ₹{price.toFixed(0)}
                 </span>
             ),
-            responsive: ['sm'],
+            responsive: ["sm"],
         },
         {
             title: "Sell Price",
@@ -245,7 +245,7 @@ const StockReport = () => {
                     ₹{price.toFixed(0)}
                 </span>
             ),
-            responsive: ['md'],
+            responsive: ["md"],
         },
         {
             title: "Inventory Value",
@@ -258,7 +258,7 @@ const StockReport = () => {
                     ₹{value.toFixed(0)}
                 </span>
             ),
-            responsive: ['lg'],
+            responsive: ["lg"],
         },
         {
             title: "Status",
@@ -275,12 +275,11 @@ const StockReport = () => {
                 <Tag
                     color={getStatusColor(status)}
                     icon={getStatusIcon(status)}
-                    className={`text-xs ${window.innerWidth < 768 ? 'px-1' : ''}`}
+                    className={`text-xs ${window.innerWidth < 768 ? "px-1" : ""}`}
                 >
-                    {window.innerWidth < 768 
-                        ? status.split(' ')[0] // Show only first word on mobile
-                        : status
-                    }
+                    {window.innerWidth < 768
+                        ? status.split(" ")[0] // Show only first word on mobile
+                        : status}
                 </Tag>
             ),
         },
@@ -334,7 +333,9 @@ const StockReport = () => {
                             loading={loading}
                             className="w-full sm:w-auto"
                         >
-                            <span className="hidden sm:inline">Refresh Report</span>
+                            <span className="hidden sm:inline">
+                                Refresh Report
+                            </span>
                             <span className="sm:hidden">Refresh</span>
                         </Button>
                     </div>
@@ -357,13 +358,15 @@ const StockReport = () => {
                         <Statistic
                             title={
                                 <span className="text-xs sm:text-sm">
-                                    {window.innerWidth < 768 ? "Products" : "Total Products"}
+                                    {window.innerWidth < 768
+                                        ? "Products"
+                                        : "Total Products"}
                                 </span>
                             }
                             value={summary.totalProducts}
-                            valueStyle={{ 
+                            valueStyle={{
                                 color: "#1890ff",
-                                fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                fontSize: "clamp(1rem, 4vw, 1.5rem)",
                             }}
                         />
                     </Card>
@@ -372,12 +375,14 @@ const StockReport = () => {
                     <Card className="h-full">
                         <Statistic
                             title={
-                                <span className="text-xs sm:text-sm">In Stock</span>
+                                <span className="text-xs sm:text-sm">
+                                    In Stock
+                                </span>
                             }
                             value={summary.inStock}
-                            valueStyle={{ 
+                            valueStyle={{
                                 color: "#52c41a",
-                                fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                fontSize: "clamp(1rem, 4vw, 1.5rem)",
                             }}
                             prefix={<CheckCircleOutlined />}
                         />
@@ -387,12 +392,14 @@ const StockReport = () => {
                     <Card className="h-full">
                         <Statistic
                             title={
-                                <span className="text-xs sm:text-sm">Low Stock</span>
+                                <span className="text-xs sm:text-sm">
+                                    Low Stock
+                                </span>
                             }
                             value={summary.lowStock}
-                            valueStyle={{ 
+                            valueStyle={{
                                 color: "#fa8c16",
-                                fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                fontSize: "clamp(1rem, 4vw, 1.5rem)",
                             }}
                             prefix={<WarningOutlined />}
                         />
@@ -402,12 +409,14 @@ const StockReport = () => {
                     <Card className="h-full">
                         <Statistic
                             title={
-                                <span className="text-xs sm:text-sm">Out of Stock</span>
+                                <span className="text-xs sm:text-sm">
+                                    Out of Stock
+                                </span>
                             }
                             value={summary.outOfStock}
-                            valueStyle={{ 
+                            valueStyle={{
                                 color: "#ff4d4f",
-                                fontSize: "clamp(1rem, 4vw, 1.5rem)"
+                                fontSize: "clamp(1rem, 4vw, 1.5rem)",
                             }}
                             prefix={<StopOutlined />}
                         />
@@ -420,28 +429,31 @@ const StockReport = () => {
                 <Statistic
                     title={
                         <span className="text-sm sm:text-base">
-                            {window.innerWidth < 768 ? "Inventory Value" : "Total Inventory Value"}
+                            {window.innerWidth < 768
+                                ? "Inventory Value"
+                                : "Total Inventory Value"}
                         </span>
                     }
                     value={summary.totalInventoryValue}
                     precision={2}
                     prefix="₹"
-                    valueStyle={{ 
-                        color: "#722ed1", 
-                        fontSize: window.innerWidth < 768 ? "20px" : "28px"
+                    valueStyle={{
+                        color: "#722ed1",
+                        fontSize: window.innerWidth < 768 ? "20px" : "28px",
                     }}
                 />
             </Card>
 
             {/* Stock Report Table */}
-            <Card title={
-                <span className="text-sm sm:text-base">
-                    {window.innerWidth < 768 
-                        ? `Stock Report (${filteredData.length})` 
-                        : `Stock Report (${filteredData.length} products)`
-                    }
-                </span>
-            }>
+            <Card
+                title={
+                    <span className="text-sm sm:text-base">
+                        {window.innerWidth < 768
+                            ? `Stock Report (${filteredData.length})`
+                            : `Stock Report (${filteredData.length} products)`}
+                    </span>
+                }
+            >
                 <div className="overflow-x-auto">
                     <Table
                         columns={columns}
@@ -453,12 +465,13 @@ const StockReport = () => {
                             showSizeChanger: window.innerWidth >= 768,
                             showQuickJumper: window.innerWidth >= 1024,
                             showTotal: (total, range) =>
-                                window.innerWidth >= 768 
+                                window.innerWidth >= 768
                                     ? `${range[0]}-${range[1]} of ${total} items`
                                     : `${range[0]}-${range[1]}/${total}`,
-                            pageSizeOptions: window.innerWidth >= 768 
-                                ? ["10", "15", "25", "50", "100"]
-                                : ["5", "8", "15"],
+                            pageSizeOptions:
+                                window.innerWidth >= 768
+                                    ? ["10", "15", "25", "50", "100"]
+                                    : ["5", "8", "15"],
                             simple: window.innerWidth < 768,
                         }}
                         scroll={{ x: 700 }}
@@ -478,9 +491,10 @@ const StockReport = () => {
                 <Card>
                     <div className="text-center py-8">
                         <SearchOutlined
-                            style={{ 
-                                fontSize: window.innerWidth < 768 ? "36px" : "48px", 
-                                color: "#d9d9d9" 
+                            style={{
+                                fontSize:
+                                    window.innerWidth < 768 ? "36px" : "48px",
+                                color: "#d9d9d9",
                             }}
                         />
                         <p className="text-gray-500 mt-4 text-sm sm:text-base px-4">
@@ -498,9 +512,10 @@ const StockReport = () => {
                 <Card>
                     <div className="text-center py-8">
                         <StopOutlined
-                            style={{ 
-                                fontSize: window.innerWidth < 768 ? "36px" : "48px", 
-                                color: "#d9d9d9" 
+                            style={{
+                                fontSize:
+                                    window.innerWidth < 768 ? "36px" : "48px",
+                                color: "#d9d9d9",
                             }}
                         />
                         <p className="text-gray-500 mt-4 text-sm sm:text-base px-4">
