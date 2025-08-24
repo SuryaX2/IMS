@@ -2,6 +2,7 @@
 import React, { useContext } from "react";
 import { Layout, Menu, Avatar } from "antd";
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 import { menuItems } from "../../data";
 
@@ -9,6 +10,11 @@ const { Sider } = Layout;
 
 const DashboardSidebar = ({ collapsed, setCollapsed, currentPage }) => {
     const { user, logout } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    const handleLogoClick = () => {
+        navigate("/dashboard");
+    };
 
     return (
         <Sider
@@ -25,9 +31,10 @@ const DashboardSidebar = ({ collapsed, setCollapsed, currentPage }) => {
                 position: "sticky",
                 top: 0,
                 left: 0,
+                zIndex: 1000,
             }}
         >
-            <SidebarLogo collapsed={collapsed} />
+            <SidebarLogo collapsed={collapsed} onClick={handleLogoClick} />
             <div className="mt-4 mb-8 mx-4 h-px bg-indigo-700 opacity-50"></div>
 
             <Menu
@@ -48,19 +55,26 @@ const DashboardSidebar = ({ collapsed, setCollapsed, currentPage }) => {
     );
 };
 
-const SidebarLogo = ({ collapsed }) => (
-    <div className="flex items-center justify-center h-16 my-6">
+const SidebarLogo = ({ collapsed, onClick }) => (
+    <div
+        className="flex items-center justify-center h-16 my-6 cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={onClick}
+    >
         {collapsed ? (
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-800 bg-clip-text text-transparent">
-                    IPro
-                </span>
-            </div>
+            <img
+                src="/IconOnly_Transparent_NoBuffer.png"
+                alt="InventoryPro Logo"
+                className="h-12 w-auto p-1 "
+                style={{ maxHeight: "48px" }}
+            />
         ) : (
-            <div className="flex flex-col items-center">
-                <h1 className="text-3xl font-bold text-white m-0">
-                    InventoryPro
-                </h1>
+            <div className="flex items-center">
+                <img
+                    src="/FullLogo_Transparent_NoBuffer.png"
+                    alt="InventoryPro Logo"
+                    className="h-full w-auto p-1 "
+                    style={{ maxHeight: "100px" }}
+                />
             </div>
         )}
     </div>

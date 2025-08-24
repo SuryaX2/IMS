@@ -23,6 +23,11 @@ const DashboardHeader = ({ collapsed, setCollapsed }) => {
         navigate("/login");
     };
 
+    // Handle logo click
+    const handleLogoClick = () => {
+        navigate("/dashboard");
+    };
+
     // Avatar dropdown menu
     const avatarMenu = [
         {
@@ -51,6 +56,20 @@ const DashboardHeader = ({ collapsed, setCollapsed }) => {
             }}
         >
             <div className="flex items-center gap-4">
+                {/* Logo for mobile */}
+                <div
+                    className="cursor-pointer md:hidden"
+                    onClick={handleLogoClick}
+                >
+                    <div className="flex items-center">
+                        <img
+                            src="/IconOnly_Transparent_NoBuffer.png"
+                            alt="InventoryPro Logo"
+                            className="h-full w-auto p-2"
+                            style={{ maxHeight: "48px" }}
+                        />
+                    </div>
+                </div>
                 <div className="md:hidden">
                     <button
                         className="text-lg px-2 py-1 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors"
@@ -63,9 +82,7 @@ const DashboardHeader = ({ collapsed, setCollapsed }) => {
                         )}
                     </button>
                 </div>
-                <h1 className="text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-800 bg-clip-text text-transparent m-0 md:hidden">
-                    InventoryPro
-                </h1>
+
                 <div className="hidden md:block">
                     <button
                         className="text-lg px-2 py-1 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors"
