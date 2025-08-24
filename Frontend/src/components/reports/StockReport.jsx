@@ -17,11 +17,14 @@ import {
     StopOutlined,
     FileExcelOutlined,
     ReloadOutlined,
+    InboxOutlined,
+    DollarOutlined,
 } from "@ant-design/icons";
 import { api } from "../../api/api";
 import AuthContext from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
+import StatCard from "../dashboard/StatCard";
 
 const StockReport = () => {
     const [stockData, setStockData] = useState([]);
@@ -352,97 +355,77 @@ const StockReport = () => {
             </Card>
 
             {/* Summary Cards */}
-            <Row gutter={[8, 8]} className="mb-4 sm:mb-6">
+            <Row gutter={[16, 16]} className="mb-4 sm:mb-6">
                 <Col xs={12} sm={6} lg={6}>
-                    <Card className="h-full">
-                        <Statistic
-                            title={
-                                <span className="text-xs sm:text-sm">
-                                    {window.innerWidth < 768
-                                        ? "Products"
-                                        : "Total Products"}
-                                </span>
-                            }
-                            value={summary.totalProducts}
-                            valueStyle={{
-                                color: "#1890ff",
-                                fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                            }}
-                        />
-                    </Card>
+                    <StatCard
+                        title={
+                            window.innerWidth < 768
+                                ? "Products"
+                                : "Total Products"
+                        }
+                        value={summary.totalProducts}
+                        icon={
+                            <InboxOutlined className="text-xl sm:text-2xl text-blue" />
+                        }
+                        valueStyle={{ color: "#1890ff" }}
+                        className="dashboard-stat-card"
+                    />
                 </Col>
                 <Col xs={12} sm={6} lg={6}>
-                    <Card className="h-full">
-                        <Statistic
-                            title={
-                                <span className="text-xs sm:text-sm">
-                                    In Stock
-                                </span>
-                            }
-                            value={summary.inStock}
-                            valueStyle={{
-                                color: "#52c41a",
-                                fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                            }}
-                            prefix={<CheckCircleOutlined />}
-                        />
-                    </Card>
+                    <StatCard
+                        title="In Stock"
+                        value={summary.inStock}
+                        icon={
+                            <CheckCircleOutlined className="text-xl sm:text-2xl text-green" />
+                        }
+                        valueStyle={{ color: "#52c41a" }}
+                        className="dashboard-stat-card"
+                    />
                 </Col>
                 <Col xs={12} sm={6} lg={6}>
-                    <Card className="h-full">
-                        <Statistic
-                            title={
-                                <span className="text-xs sm:text-sm">
-                                    Low Stock
-                                </span>
-                            }
-                            value={summary.lowStock}
-                            valueStyle={{
-                                color: "#fa8c16",
-                                fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                            }}
-                            prefix={<WarningOutlined />}
-                        />
-                    </Card>
+                    <StatCard
+                        title="Low Stock"
+                        value={summary.lowStock}
+                        icon={
+                            <WarningOutlined className="text-xl sm:text-2xl text-orange" />
+                        }
+                        valueStyle={{ color: "#fa8c16" }}
+                        className="dashboard-stat-card"
+                    />
                 </Col>
                 <Col xs={12} sm={6} lg={6}>
-                    <Card className="h-full">
-                        <Statistic
-                            title={
-                                <span className="text-xs sm:text-sm">
-                                    Out of Stock
-                                </span>
-                            }
-                            value={summary.outOfStock}
-                            valueStyle={{
-                                color: "#ff4d4f",
-                                fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                            }}
-                            prefix={<StopOutlined />}
-                        />
-                    </Card>
+                    <StatCard
+                        title="Out of Stock"
+                        value={summary.outOfStock}
+                        icon={
+                            <StopOutlined className="text-xl sm:text-2xl text-red" />
+                        }
+                        valueStyle={{ color: "#ff4d4f" }}
+                        className="dashboard-stat-card"
+                    />
                 </Col>
             </Row>
 
             {/* Total Inventory Value */}
-            <Card>
-                <Statistic
-                    title={
-                        <span className="text-sm sm:text-base">
-                            {window.innerWidth < 768
+            <Row gutter={[16, 16]} className="mb-4 sm:mb-6">
+                <Col xs={24}>
+                    <StatCard
+                        title={
+                            window.innerWidth < 768
                                 ? "Inventory Value"
-                                : "Total Inventory Value"}
-                        </span>
-                    }
-                    value={summary.totalInventoryValue}
-                    precision={2}
-                    prefix="₹"
-                    valueStyle={{
-                        color: "#722ed1",
-                        fontSize: window.innerWidth < 768 ? "20px" : "28px",
-                    }}
-                />
-            </Card>
+                                : "Total Inventory Value"
+                        }
+                        value={summary.totalInventoryValue}
+                        icon={
+                            <DollarOutlined className="text-xl sm:text-2xl text-purple" />
+                        }
+                        valueStyle={{ color: "#722ed1" }}
+                        className="dashboard-stat-card"
+                        formatter={(value) => `₹${value.toLocaleString()}`}
+                        precision={2}
+                    />
+                </Col>
+            </Row>
 
             {/* Stock Report Table */}
             <Card

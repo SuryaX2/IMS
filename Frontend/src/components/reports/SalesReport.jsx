@@ -34,6 +34,7 @@ import { api } from "../../api/api";
 import AuthContext from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
+import StatCard from "../dashboard/StatCard";
 
 const { RangePicker } = DatePicker;
 
@@ -247,34 +248,32 @@ const SalesReport = () => {
             {salesData && (
                 <>
                     {/* Summary Cards */}
-                    <Row gutter={[12, 12]} className="mb-4 sm:mb-6">
+                    <Row gutter={[16, 16]} className="mb-4 sm:mb-6">
                         <Col xs={24} sm={12}>
-                            <Card className="h-full">
-                                <Statistic
-                                    title="Total Sales Revenue"
-                                    value={salesData.summary.totalSales}
-                                    precision={2}
-                                    prefix="₹"
-                                    valueStyle={{
-                                        color: "#52c41a",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                                    }}
-                                    suffix={<DollarOutlined />}
-                                />
-                            </Card>
+                            <StatCard
+                                title="Total Sales Revenue"
+                                value={salesData.summary.totalSales}
+                                icon={
+                                    <DollarOutlined className="text-xl sm:text-2xl text-green" />
+                                }
+                                valueStyle={{ color: "#52c41a" }}
+                                className="dashboard-stat-card"
+                                formatter={(value) =>
+                                    `₹${value.toLocaleString()}`
+                                }
+                                precision={2}
+                            />
                         </Col>
                         <Col xs={24} sm={12}>
-                            <Card className="h-full">
-                                <Statistic
-                                    title="Total Orders"
-                                    value={salesData.summary.totalOrders}
-                                    valueStyle={{
-                                        color: "#1890ff",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                                    }}
-                                    suffix={<ShoppingCartOutlined />}
-                                />
-                            </Card>
+                            <StatCard
+                                title="Total Orders"
+                                value={salesData.summary.totalOrders}
+                                icon={
+                                    <ShoppingCartOutlined className="text-xl sm:text-2xl text-blue" />
+                                }
+                                valueStyle={{ color: "#1890ff" }}
+                                className="dashboard-stat-card"
+                            />
                         </Col>
                     </Row>
 

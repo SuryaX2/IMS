@@ -27,11 +27,13 @@ import {
     ShoppingOutlined,
     UserOutlined,
     FileExcelOutlined,
+    FileTextOutlined,
 } from "@ant-design/icons";
 import { api } from "../../api/api";
 import AuthContext from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
+import StatCard from "../dashboard/StatCard";
 
 const { RangePicker } = DatePicker;
 
@@ -272,46 +274,43 @@ const PurchaseReport = () => {
             {purchaseData && (
                 <>
                     {/* Summary Cards */}
-                    <Row gutter={[12, 12]} className="mb-4 sm:mb-6">
+                    <Row gutter={[16, 16]} className="mb-4 sm:mb-6">
                         <Col xs={24} sm={12} lg={8}>
-                            <Card className="h-full">
-                                <Statistic
-                                    title="Total Purchases"
-                                    value={summary.totalPurchases}
-                                    precision={2}
-                                    prefix="₹"
-                                    valueStyle={{
-                                        color: "#52c41a",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                                    }}
-                                    suffix={<ShoppingOutlined />}
-                                />
-                            </Card>
+                            <StatCard
+                                title="Total Purchases"
+                                value={summary.totalPurchases}
+                                icon={
+                                    <ShoppingOutlined className="text-xl sm:text-2xl text-green" />
+                                }
+                                valueStyle={{ color: "#52c41a" }}
+                                className="dashboard-stat-card"
+                                formatter={(value) =>
+                                    `₹${value.toLocaleString()}`
+                                }
+                                precision={2}
+                            />
                         </Col>
                         <Col xs={24} sm={12} lg={8}>
-                            <Card className="h-full">
-                                <Statistic
-                                    title="Total Suppliers"
-                                    value={summary.totalSuppliers}
-                                    valueStyle={{
-                                        color: "#1890ff",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                                    }}
-                                    suffix={<UserOutlined />}
-                                />
-                            </Card>
+                            <StatCard
+                                title="Total Suppliers"
+                                value={summary.totalSuppliers}
+                                icon={
+                                    <UserOutlined className="text-xl sm:text-2xl text-blue" />
+                                }
+                                valueStyle={{ color: "#1890ff" }}
+                                className="dashboard-stat-card"
+                            />
                         </Col>
                         <Col xs={24} sm={24} lg={8}>
-                            <Card className="h-full">
-                                <Statistic
-                                    title="Total Transactions"
-                                    value={summary.totalTransactions}
-                                    valueStyle={{
-                                        color: "#722ed1",
-                                        fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                                    }}
-                                />
-                            </Card>
+                            <StatCard
+                                title="Total Transactions"
+                                value={summary.totalTransactions}
+                                icon={
+                                    <FileTextOutlined className="text-xl sm:text-2xl text-purple" />
+                                }
+                                valueStyle={{ color: "#722ed1" }}
+                                className="dashboard-stat-card"
+                            />
                         </Col>
                     </Row>
 

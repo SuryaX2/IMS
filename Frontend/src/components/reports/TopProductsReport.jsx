@@ -34,6 +34,7 @@ import { api } from "../../api/api";
 import AuthContext from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
+import StatCard from "../dashboard/StatCard";
 
 const { Option } = Select;
 
@@ -350,65 +351,53 @@ const TopProductsReport = () => {
 
             {/* Summary Cards */}
             {topProducts.length > 0 && (
-                <Row gutter={[12, 12]} className="mb-4 sm:mb-6">
+                <Row gutter={[16, 16]} className="mb-4 sm:mb-6">
                     <Col xs={24} sm={8} lg={8}>
-                        <Card className="h-full">
-                            <Statistic
-                                title={
-                                    <span className="text-xs sm:text-sm">
-                                        {window.innerWidth < 768
-                                            ? "Products"
-                                            : "Total Products"}
-                                    </span>
-                                }
-                                value={summary.totalProducts}
-                                valueStyle={{
-                                    color: "#1890ff",
-                                    fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                                }}
-                                prefix={<TrophyOutlined />}
-                            />
-                        </Card>
+                        <StatCard
+                            title={
+                                window.innerWidth < 768
+                                    ? "Products"
+                                    : "Total Products"
+                            }
+                            value={summary.totalProducts}
+                            icon={
+                                <TrophyOutlined className="text-xl sm:text-2xl text-blue" />
+                            }
+                            valueStyle={{ color: "#1890ff" }}
+                            className="dashboard-stat-card"
+                        />
                     </Col>
                     <Col xs={24} sm={8} lg={8}>
-                        <Card className="h-full">
-                            <Statistic
-                                title={
-                                    <span className="text-xs sm:text-sm">
-                                        {window.innerWidth < 768
-                                            ? "Qty Sold"
-                                            : "Total Quantity Sold"}
-                                    </span>
-                                }
-                                value={summary.totalQuantitySold}
-                                valueStyle={{
-                                    color: "#52c41a",
-                                    fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                                }}
-                                prefix={<ShoppingCartOutlined />}
-                            />
-                        </Card>
+                        <StatCard
+                            title={
+                                window.innerWidth < 768
+                                    ? "Qty Sold"
+                                    : "Total Quantity Sold"
+                            }
+                            value={summary.totalQuantitySold}
+                            icon={
+                                <ShoppingCartOutlined className="text-xl sm:text-2xl text-green" />
+                            }
+                            valueStyle={{ color: "#52c41a" }}
+                            className="dashboard-stat-card"
+                        />
                     </Col>
                     <Col xs={24} sm={8} lg={8}>
-                        <Card className="h-full">
-                            <Statistic
-                                title={
-                                    <span className="text-xs sm:text-sm">
-                                        {window.innerWidth < 768
-                                            ? "Revenue"
-                                            : "Total Revenue"}
-                                    </span>
-                                }
-                                value={summary.totalRevenue}
-                                precision={window.innerWidth < 768 ? 0 : 2}
-                                prefix="₹"
-                                valueStyle={{
-                                    color: "#722ed1",
-                                    fontSize: "clamp(1rem, 4vw, 1.5rem)",
-                                }}
-                                suffix={<DollarOutlined />}
-                            />
-                        </Card>
+                        <StatCard
+                            title={
+                                window.innerWidth < 768
+                                    ? "Revenue"
+                                    : "Total Revenue"
+                            }
+                            value={summary.totalRevenue}
+                            icon={
+                                <DollarOutlined className="text-xl sm:text-2xl text-purple" />
+                            }
+                            valueStyle={{ color: "#722ed1" }}
+                            className="dashboard-stat-card"
+                            formatter={(value) => `₹${value.toLocaleString()}`}
+                            precision={window.innerWidth < 768 ? 0 : 2}
+                        />
                     </Col>
                 </Row>
             )}
