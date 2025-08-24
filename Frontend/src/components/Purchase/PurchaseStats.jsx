@@ -6,6 +6,7 @@ import {
     UndoOutlined,
     ShoppingOutlined,
 } from "@ant-design/icons";
+import StatCard from "../dashboard/StatCard";
 
 const PurchaseStats = ({ stats }) => {
     const statsData = [
@@ -45,33 +46,50 @@ const PurchaseStats = ({ stats }) => {
 
     return (
         <Row gutter={[16, 16]} className="mb-6">
-            {statsData.map((stat, index) => (
-                <Col key={index} xs={12} sm={12} md={6} lg={6}>
-                    <Card
-                        className={`${stat.bgColor} border-0 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer`}
-                        bodyStyle={{ padding: "20px" }}
-                    >
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <div className="text-gray-600 text-sm mb-1">
-                                    {stat.title}
-                                </div>
-                                <div
-                                    className="text-2xl font-bold"
-                                    style={{ color: stat.color }}
-                                >
-                                    {stat.value}
-                                </div>
-                            </div>
-                            <div
-                                className={`text-3xl ${stat.iconColor} opacity-80`}
-                            >
-                                {stat.icon}
-                            </div>
-                        </div>
-                    </Card>
-                </Col>
-            ))}
+            <Col xs={24} sm={12} md={6}>
+                <StatCard
+                    title="Purchases"
+                    value={stats.total}
+                    icon={
+                        <ShoppingOutlined className="text-xl sm:text-2xl text-blue" />
+                    }
+                    valueStyle={{ color: "#1890ff" }}
+                    className="dashboard-stat-card"
+                />
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+                <StatCard
+                    title="Pending"
+                    value={stats.pending}
+                    icon={
+                        <ClockCircleOutlined className="text-xl sm:text-2xl text-yellow" />
+                    }
+                    valueStyle={{ color: "#faad14" }}
+                    className="dashboard-stat-card"
+                />
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+                <StatCard
+                    title="Completed"
+                    value={stats.completed}
+                    icon={
+                        <CheckCircleOutlined className="text-xl sm:text-2xl text-green" />
+                    }
+                    valueStyle={{ color: "#52c41a" }}
+                    className="dashboard-stat-card"
+                />
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+                <StatCard
+                    title="Returned"
+                    value={stats.returned}
+                    icon={
+                        <UndoOutlined className="text-xl sm:text-2xl text-red" />
+                    }
+                    valueStyle={{ color: "#ff4d4f" }}
+                    className="dashboard-stat-card"
+                />
+            </Col>
         </Row>
     );
 };

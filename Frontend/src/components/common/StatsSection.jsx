@@ -1,43 +1,55 @@
 import React from "react";
-import { Row } from "antd";
+import { Row, Col } from "antd";
 import { TagsOutlined, AppstoreOutlined } from "@ant-design/icons";
-import StatsCard from "./StatsCard";
+import StatCard from "../dashboard/StatCard";
 
 const StatsSection = ({ categoryStats, unitStats }) => {
     return (
         <Row gutter={[16, 16]} className="mb-0">
-            <StatsCard
-                title="Total Categories"
-                value={categoryStats.total}
-                prefix={<TagsOutlined className="text-blue-500" />}
-                valueStyle={{ color: "#1890ff" }}
-                gradient="from-blue-50 to-blue-100/50"
-                borderColor="border-blue-200"
-            />
-            <StatsCard
-                title="Your Categories"
-                value={categoryStats.mine}
-                prefix={<TagsOutlined className="text-green-500" />}
-                valueStyle={{ color: "#52c41a" }}
-                gradient="from-green-50 to-green-100/50"
-                borderColor="border-green-200"
-            />
-            <StatsCard
-                title="Total Units"
-                value={unitStats.total}
-                prefix={<AppstoreOutlined className="text-purple-500" />}
-                valueStyle={{ color: "#722ed1" }}
-                gradient="from-purple-50 to-purple-100/50"
-                borderColor="border-purple-200"
-            />
-            <StatsCard
-                title="Your Units"
-                value={unitStats.mine}
-                prefix={<AppstoreOutlined className="text-orange-500" />}
-                valueStyle={{ color: "#fa8c16" }}
-                gradient="from-orange-50 to-orange-100/50"
-                borderColor="border-orange-200"
-            />
+            <Col xs={24} sm={12} lg={6}>
+                <StatCard
+                    title="Total Categories"
+                    value={categoryStats.total}
+                    icon={
+                        <TagsOutlined className="text-xl sm:text-2xl text-blue" />
+                    }
+                    valueStyle={{ color: "#1890ff" }}
+                    className="dashboard-stat-card"
+                />
+            </Col>
+            <Col xs={24} sm={12} lg={6}>
+                <StatCard
+                    title="Your Categories"
+                    value={categoryStats.mine}
+                    icon={
+                        <TagsOutlined className="text-xl sm:text-2xl text-green" />
+                    }
+                    valueStyle={{ color: "#52c41a" }}
+                    className="dashboard-stat-card"
+                />
+            </Col>
+            <Col xs={24} sm={12} lg={6}>
+                <StatCard
+                    title="Total Units"
+                    value={unitStats.total}
+                    icon={
+                        <AppstoreOutlined className="text-xl sm:text-2xl text-purple" />
+                    }
+                    valueStyle={{ color: "#722ed1" }}
+                    className="dashboard-stat-card"
+                />
+            </Col>
+            <Col xs={24} sm={12} lg={6}>
+                <StatCard
+                    title="Your Units"
+                    value={unitStats.mine}
+                    icon={
+                        <AppstoreOutlined className="text-xl sm:text-2xl text-orange" />
+                    }
+                    valueStyle={{ color: "#fa8c16" }}
+                    className="dashboard-stat-card"
+                />
+            </Col>
         </Row>
     );
 };
