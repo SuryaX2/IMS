@@ -297,7 +297,7 @@ const Dashboard = () => {
                                 }
                                 className="dashboard-stat-card"
                                 formatter={(value) =>
-                                    `$${value.toLocaleString()}`
+                                    `₹${value.toLocaleString()}`
                                 }
                             />
                         </Col>
@@ -312,7 +312,7 @@ const Dashboard = () => {
                                 }
                                 className="dashboard-stat-card"
                                 formatter={(value) =>
-                                    `$${value.toLocaleString()}`
+                                    `₹${value.toLocaleString()}`
                                 }
                             />
                         </Col>
@@ -327,7 +327,7 @@ const Dashboard = () => {
                                 }
                                 className="dashboard-stat-card"
                                 formatter={(value) =>
-                                    `$${value.toLocaleString()}`
+                                    `₹${value.toLocaleString()}`
                                 }
                                 precision={2}
                             />
