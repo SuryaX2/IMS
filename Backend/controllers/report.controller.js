@@ -490,7 +490,6 @@ const getPurchaseReport = asyncHandler(async (req, res, next) => {
         return next(new ApiError(500, error.message));
     }
 });
-
 // Get low stock alerts and send email notifications
 const getLowStockAlerts = asyncHandler(async (req, res, next) => {
     const { threshold = 10, sendEmail = false } = req.query;
@@ -518,59 +517,96 @@ const getLowStockAlerts = asyncHandler(async (req, res, next) => {
             const user = await User.findById(userId).select("username email");
 
             if (user && user.email) {
-                // Create HTML table of low stock products
                 const productsTable = lowStockProducts
-                    .map(
-                        (product) => `
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${product.product_name}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${product.product_code}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${product.stock}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${product.category_id?.category_name || "N/A"}</td>
-                    </tr>
-                `
-                    )
+                    .map((product, index) => {
+                        // Determine row color based on even/odd index
+                        const backgroundColor =
+                            index % 2 === 0 ? "#ffffff" : "#f8fafc";
+                        return `
+                            <tr style="background-color: ${backgroundColor};">
+                                <td style="padding: 14px 16px; color: #1e293b; font-weight: 600; font-size: 15px;">${product.product_name}</td>
+                                <td style="padding: 14px 16px; color: #475569; font-family: monospace;">${product.product_code}</td>
+                                <td style="padding: 14px 16px;">
+                                    <span style="background-color: #fee2e2; color: #b91c1c; font-weight: 700; padding: 4px 10px; border-radius: 9999px; font-size: 14px;">
+                                        ${product.stock}
+                                    </span>
+                                </td>
+                                <td style="padding: 14px 16px; color: #475569;">${product.category_id?.category_name || "N/A"}</td>
+                            </tr>
+                        `;
+                    })
                     .join("");
 
                 const mailOptions = {
-                    from: process.env.SENDER_EMAIL,
+                    from: `Inventory System <${process.env.SENDER_EMAIL}>`,
                     to: user.email,
                     subject: "Low Stock Alert - Action Required",
                     html: `
-                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
-                            <h1 style="color: #d9534f; text-align: center;">⚠️ Low Stock Alert</h1>
-                            <p style="font-size: 16px; color: #555;">
-                                Hello ${user.username},
-                            </p>
-                            <p style="font-size: 16px; color: #555;">
-                                The following products are running low on stock and may require replenishment:
-                            </p>
-                            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px;">
-                                <thead>
-                                    <tr style="background-color: #f2f2f2;">
-                                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Product Name</th>
-                                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Product Code</th>
-                                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Current Stock</th>
-                                        <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Category</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${productsTable}
-                                </tbody>
-                            </table>
-                            <p style="font-size: 16px; color: #555;">
-                                Please consider restocking these items soon to avoid any disruption in your operations.
-                            </p>
-                            <p style="font-size: 16px; color: #555; margin-top: 20px;">
-                                Regards,<br>
-                                <strong>Inventory Management System</strong>
-                            </p>
-                            <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-                            <p style="text-align: center; font-size: 14px; color: #888;">
-                                &copy; ${new Date().getFullYear()} Inventory Management System. All rights reserved.
-                            </p>
+                    <!DOCTYPE html>
+                    <html lang="en">
+
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Low Stock Alert</title>
+                    </head>
+
+                    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f7f8fa;">
+
+                        <span style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+                            Heads up! Some of your products are running low on stock.
+                        </span>
+
+                        <div style="max-width: 640px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb;">
+                            <div style="padding: 32px;">
+                                <h1 style="font-size: 28px; font-weight: 800; color: #111827; margin: 0 0 4px 0;">
+                                    ⚠️ Low Stock Alert
+                                </h1>
+                                <p style="font-size: 16px; color: #4b5563; margin: 0 0 24px 0;">
+                                    Immediate attention required for the items below.
+                                </p>
+
+                                <p style="font-size: 16px; color: #374151; line-height: 1.6; margin-bottom: 24px;">
+                                    Hello <strong>${user.username}</strong>, the following products have fallen below the stock threshold:
+                                </p>
+
+                                <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                                        <thead>
+                                            <tr style="background-color: #f9fafb;">
+                                                <th style="padding: 12px 16px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Product</th>
+                                                <th style="padding: 12px 16px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Code</th>
+                                                <th style="padding: 12px 16px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Stock Left</th>
+                                                <th style="padding: 12px 16px; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Category</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${productsTable}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <p style="font-size: 16px; color: #374151; line-height: 1.6;">
+                                    Timely restocking will prevent any potential sales disruptions.
+                                </p>
+                                <p style="text-align: center; margin: 32px 0;">
+
+                                    <a href="${process.env.FRONTEND_URL}/products" target="_blank" style="display: inline-block; padding: 14px 32px; font-size: 16px; font-weight: 600; color: #ffffff; background-color: #3b82f6; border-radius: 8px; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        Restock Items Now
+                                    </a>
+                                </p>
+                            </div>
+
+                            <div style="padding: 24px; background-color: #f8fafc; border-top: 1px solid #e5e7eb; text-align: center;">
+                                <p style="font-size: 12px; color: #9ca3af; margin: 16px 0 0 0;">
+                                    &copy; ${new Date().getFullYear()} InventoryPro. All Rights Reserved.
+                                </p>
+                            </div>
                         </div>
-                    `,
+                    </body>
+
+                    </html>
+                `,
                 };
 
                 await transporter.sendMail(mailOptions);
@@ -593,7 +629,6 @@ const getLowStockAlerts = asyncHandler(async (req, res, next) => {
         return next(new ApiError(500, error.message));
     }
 });
-
 
 export {
     getDashboardMetrics,
