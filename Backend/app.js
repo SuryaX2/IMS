@@ -7,7 +7,8 @@ const app = express();
 
 app.use(
     cors({
-        origin: 'https://inventorypro-ims.vercel.app',
+        origin: "https://inventorypro-ims.vercel.app",
+        methods: ["GET", "POST", "PUT", "DELETE"],
         credentials: true,
     })
 );
