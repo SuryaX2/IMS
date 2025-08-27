@@ -1,5 +1,5 @@
-import React, { useState, useContext } from "react";
-import { Card, Tabs, Badge, Button, Space, Alert } from "antd";
+import React, { useState, useContext, useEffect } from "react";
+import { Card, Tabs, Badge, Button, Space, Alert, Tooltip } from "antd";
 import {
     FileTextOutlined,
     ShoppingCartOutlined,
@@ -8,6 +8,8 @@ import {
     AlertOutlined,
     BarChartOutlined,
     MailOutlined,
+    ClockCircleOutlined,
+    SettingOutlined,
 } from "@ant-design/icons";
 import PageHeader from "../components/common/PageHeader";
 import StockReport from "../components/reports/StockReport";
@@ -20,44 +22,51 @@ import toast from "react-hot-toast";
 
 const Reports = () => {
     const [activeTab, setActiveTab] = useState("stock");
-    const [sendingAlert, setSendingAlert] = useState(false);
+    const [triggeringAlert, setTriggeringAlert] = useState(false);
+    const [schedulerStatus, setSchedulerStatus] = useState(null);
     const { user } = useContext(AuthContext);
     const isMobile = window.innerWidth < 768;
 
-    const sendLowStockAlert = async () => {
+    // New function for admin to manually trigger alerts (for testing)
+    const triggerLowStockAlert = async () => {
         try {
-            setSendingAlert(true);
-            const response = await api.get(
-                "/reports/low-stock-alerts?sendEmail=true&threshold=10"
-            );
+            setTriggeringAlert(true);
+            const response = await api.post("/scheduler/trigger-alerts");
 
             if (response.data.success) {
-                const emailSent = response.data.data.emailSent;
-                const alertCount = response.data.data.lowStockProducts.length;
-
-                if (emailSent) {
-                    toast.success(
-                        `Low stock alert email sent! Found ${alertCount} products with low stock.`
-                    );
-                } else if (alertCount === 0) {
-                    toast.success(
-                        "Great! No products are currently low on stock."
-                    );
-                } else {
-                    toast.info(
-                        `Found ${alertCount} low stock products, but email could not be sent.`
-                    );
-                }
+                const { sent, failed, noLowStock, total } = response.data.data;
+                toast.success(
+                    `Alert process completed! 📧 Sent: ${sent}, ✅ No low stock: ${noLowStock}, ❌ Failed: ${failed} (Total users: ${total})`
+                );
             }
         } catch (error) {
             toast.error(
                 error.response?.data?.message ||
-                    "Failed to send low stock alert"
+                    "Failed to trigger low stock alerts"
             );
         } finally {
-            setSendingAlert(false);
+            setTriggeringAlert(false);
         }
     };
+
+    // Get scheduler status (for admin)
+    const getSchedulerStatus = async () => {
+        try {
+            const response = await api.get("/scheduler/status");
+            if (response.data.success) {
+                setSchedulerStatus(response.data.data);
+            }
+        } catch (error) {
+            console.error("Failed to get scheduler status:", error);
+        }
+    };
+
+    // Load scheduler status on component mount for admin
+    useEffect(() => {
+        if (user?.role === "admin") {
+            getSchedulerStatus();
+        }
+    }, [user]);
 
     const tabItems = [
         {
@@ -161,6 +170,66 @@ const Reports = () => {
                 />
             )}
 
+            {/* Automatic Low Stock Alert Info */}
+            <Alert
+                message="📧 Automatic Low Stock Alerts"
+                description={
+                    <div className="flex flex-col gap-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <span className={isMobile ? "text-xs" : "text-sm"}>
+                                Low stock email alerts are automatically sent
+                                every Monday at 9:00 AM.
+                                {user?.role === "admin"
+                                    ? " You can manually trigger alerts for testing."
+                                    : " Check your email regularly for important stock notifications."}
+                            </span>
+                            {user?.role === "admin" && (
+                                <div className="flex gap-2 items-center">
+                                    {schedulerStatus && (
+                                        <Badge
+                                            status={
+                                                schedulerStatus.isRunning
+                                                    ? "processing"
+                                                    : "error"
+                                            }
+                                            text={
+                                                schedulerStatus.isRunning
+                                                    ? "Running"
+                                                    : "Stopped"
+                                            }
+                                        />
+                                    )}
+                                    <Button
+                                        type="link"
+                                        icon={<SettingOutlined />}
+                                        size="small"
+                                        onClick={triggerLowStockAlert}
+                                        loading={triggeringAlert}
+                                    >
+                                        Test Alerts
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                        {schedulerStatus && user?.role === "admin" && (
+                            <div className="text-xs text-gray-500">
+                                Threshold: {schedulerStatus.threshold} units |
+                                Next run:{" "}
+                                {schedulerStatus.nextRun
+                                    ? new Date(
+                                          schedulerStatus.nextRun
+                                      ).toLocaleString()
+                                    : "Not scheduled"}
+                            </div>
+                        )}
+                    </div>
+                }
+                type="success"
+                showIcon
+                icon={<ClockCircleOutlined />}
+                className="mb-4 sm:mb-6"
+            />
+
             {/* Quick Actions */}
             <Card
                 className="mb-4 sm:mb-6"
@@ -186,15 +255,25 @@ const Reports = () => {
                         </p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
-                        <Button
-                            type="primary"
-                            icon={<MailOutlined />}
-                            onClick={sendLowStockAlert}
-                            loading={sendingAlert}
-                            size={isMobile ? "middle" : "default"}
-                        >
-                            {isMobile ? "Stock Alert" : "Send Low Stock Alert"}
-                        </Button>
+                        {user?.role === "admin" && (
+                            <Tooltip title="Manually trigger low stock alerts for all users (for testing purposes)">
+                                <Button
+                                    type="primary"
+                                    icon={<AlertOutlined />}
+                                    onClick={triggerLowStockAlert}
+                                    loading={triggeringAlert}
+                                    size={isMobile ? "middle" : "default"}
+                                    disabled={
+                                        schedulerStatus &&
+                                        !schedulerStatus.isRunning
+                                    }
+                                >
+                                    {isMobile
+                                        ? "Test Alerts"
+                                        : "Trigger Test Alerts"}
+                                </Button>
+                            </Tooltip>
+                        )}
                         <Button
                             icon={<BarChartOutlined />}
                             onClick={() => window.print()}
@@ -281,6 +360,10 @@ const Reports = () => {
                     {user?.role === "admin"
                         ? " Admin view shows system-wide data."
                         : " Data is filtered to your account."}
+                </p>
+                <p className="mt-1 px-2">
+                    📧 Low stock alerts automatically sent every Monday at 9:00
+                    AM
                 </p>
                 <p className="mt-1 px-2">
                     Last updated: {new Date().toLocaleString()}

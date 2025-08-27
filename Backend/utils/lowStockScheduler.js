@@ -97,14 +97,10 @@ class LowStockScheduler {
 
                             <div style="background-color: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin: 24px 0;">
                                 <p style="color: #92400e; font-size: 14px; margin: 0; font-weight: 500;">
-                                    💡 <strong>Tip:</strong> Consider setting up automatic reorder points for frequently sold items to prevent stockouts.
+                                    💡 <strong>Tip:</strong> Take action now to prevent potential sales disruptions and ensure customer satisfaction.
                                 </p>
                             </div>
 
-                            <p style="font-size: 16px; color: #374151; line-height: 1.6;">
-                                Take action now to prevent potential sales disruptions and ensure customer satisfaction.
-                            </p>
-                            
                             <p style="text-align: center; margin: 32px 0;">
                                 <a href="${process.env.FRONTEND_URL}/products" target="_blank" style="display: inline-block; padding: 14px 32px; font-size: 16px; font-weight: 600; color: #ffffff; background-color: #3b82f6; border-radius: 8px; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                     Restock Items Now
