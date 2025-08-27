@@ -27,6 +27,7 @@ import productRouter from "./routes/product.routes.js";
 import purchaseRouter from "./routes/purchase.routes.js";
 import orderRouter from "./routes/order.routes.js";
 import reportRouter from "./routes/report.routes.js";
+import schedulerRouter from "./routes/scheduler.routes.js";
 
 //routes declaration
 app.use("/api/v1/users", userRouter);
@@ -38,6 +39,7 @@ app.use("/api/v1/products", productRouter);
 app.use("/api/v1/purchases", purchaseRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/reports", reportRouter);
+app.use("/api/v1/scheduler", schedulerRouter);
 
 /**
    ___________________________ :: API Documentation :: ___________________________
