@@ -8,7 +8,20 @@ dotenv.config({
 });
 
 app.get("/", (req, res) => {
-    res.send("<h1>Hello World !!</h1>");
+    res.json({
+        message: "Hello World !!",
+        status: "Backend is running",
+        timestamp: new Date().toISOString(),
+        env: process.env.NODE_ENV || "development",
+    });
+});
+
+app.get("/api/v1/test", (req, res) => {
+    res.json({
+        message: "API routes are working!",
+        endpoint: "/api/v1/test",
+        timestamp: new Date().toISOString()
+    });
 });
 
 connectDB()
