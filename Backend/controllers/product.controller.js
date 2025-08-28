@@ -2,7 +2,7 @@ import { Product } from "../models/product.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 
 const createProduct = asyncHandler(async (req, res, next) => {
     const {
@@ -40,13 +40,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
 
         let productImageUrl = "default-product.png";
         if (req.file) {
-            const imageLocalPath = req.file.path;
-
-            if (!imageLocalPath) {
-                return next(new ApiError(400, "Photo is required"));
-            }
-
-            const image = await uploadOnCloudinary(imageLocalPath);
+            const image = await uploadToCloudinary(req.file);
 
             if (image) {
                 productImageUrl = image.url;
@@ -163,8 +157,7 @@ const updateProduct = asyncHandler(async (req, res, next) => {
 
         // If product image is being updated
         if (req.file) {
-            const imageLocalPath = req.file.path;
-            const image = await uploadOnCloudinary(imageLocalPath);
+            const image = await uploadToCloudinary(req.file);
 
             if (image) {
                 updateData.product_image = image.url;

@@ -3,7 +3,7 @@ import { Customer } from "../models/customer.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 
 const createCustomer = asyncHandler(async (req, res, next) => {
     const {
@@ -38,13 +38,7 @@ const createCustomer = asyncHandler(async (req, res, next) => {
 
         let photoUrl = "default-customer.png";
         if (req.file) {
-            const photoLocalPath = req.file.path;
-
-            if (!photoLocalPath) {
-                return next(new ApiError(400, "Photo is required"));
-            }
-
-            const photo = await uploadOnCloudinary(photoLocalPath);
+            const photo = await uploadToCloudinary(req.file);
 
             if (photo) {
                 photoUrl = photo.url;
@@ -145,8 +139,7 @@ const updateCustomer = asyncHandler(async (req, res, next) => {
 
         // If photo is being updated
         if (req.file) {
-            const photoLocalPath = req.file.path;
-            const photo = await uploadOnCloudinary(photoLocalPath);
+            const photo = await uploadToCloudinary(req.file);
 
             if (photo) {
                 updateData.photo = photo.url;

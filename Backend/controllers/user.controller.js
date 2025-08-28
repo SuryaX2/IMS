@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import transporter from "../utils/nodemailer.js";
@@ -17,26 +17,14 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
         return { accessToken, refreshToken };
     } catch (error) {
-        return next(
-            new ApiError(
-                500,
-                "Something went wrong while generating referesh and access token"
-            )
+        throw new ApiError(
+            500,
+            "Something went wrong while generating referesh and access token"
         );
     }
 };
 
 const registerUser = asyncHandler(async (req, res, next) => {
-    // get user details from frontend
-    // validation - not empty
-    // check if user already exists: username, email
-    // check for images, check for avatar
-    // upload them to cloudinary, avatar
-    // create user object - create entry in db
-    // remove password and refresh token field from response
-    // check for user creation
-    // return res
-
     const { email, username, password } = req.body;
 
     if ([email, username, password].some((field) => field?.trim() === "")) {
@@ -53,20 +41,22 @@ const registerUser = asyncHandler(async (req, res, next) => {
         );
     }
 
-    // console.log(req.files);
-    const avatarLocalPath = req.files?.avatar[0]?.path;
+    // Handle avatar upload - check both req.files and req.file
+    let avatarFile = null;
+    if (req.files?.avatar?.[0]) {
+        avatarFile = req.files.avatar[0];
+    } else if (req.file) {
+        avatarFile = req.file;
+    }
 
-    if (!avatarLocalPath) {
+    if (!avatarFile) {
         return next(new ApiError(400, "Avatar file is required"));
     }
-    // console.log(avatarLocalPath);
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    const avatar = await uploadToCloudinary(avatarFile);
 
-    // console.log(avatar);
-    // console.log(avatar.url);
     if (!avatar) {
-        return next(new ApiError(400, "Avatar file is required"));
+        return next(new ApiError(400, "Avatar file upload failed"));
     }
 
     const user = await User.create({
@@ -126,15 +116,7 @@ const registerUser = asyncHandler(async (req, res, next) => {
 });
 
 const loginUser = asyncHandler(async (req, res, next) => {
-    // req body -> data
-    // username or email
-    // find the user
-    // password check
-    // access and referesh token
-    // send cookie
-
     const { email, username, password } = req.body;
-    console.log(email);
 
     if (!username && !email) {
         return next(new ApiError(400, "username or email is required"));
@@ -312,16 +294,14 @@ const updateAccountDetails = asyncHandler(async (req, res, next) => {
 });
 
 const updateUserAvatar = asyncHandler(async (req, res, next) => {
-    const avatarLocalPath = req.file?.path;
-
-    if (!avatarLocalPath) {
+    if (!req.file) {
         return next(new ApiError(400, "Avatar file is missing"));
     }
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    const avatar = await uploadToCloudinary(req.file);
 
-    if (!avatar.url) {
-        return next(new ApiError(400, "Error while uploading on avatar"));
+    if (!avatar?.url) {
+        return next(new ApiError(400, "Error while uploading avatar"));
     }
 
     const user = await User.findByIdAndUpdate(
