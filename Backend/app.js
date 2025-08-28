@@ -7,16 +7,36 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN || "https://inventorypro-ims.vercel.app",
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+
+        const allowedOrigins = [
+            process.env.CORS_ORIGIN || "https://inventorypro-ims.vercel.app",
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "https://inventorypro-ims.vercel.app",
+        ];
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.log("Blocked origin:", origin);
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
         "Content-Type",
         "Authorization",
         "x-requested-with",
         "Access-Control-Allow-Origin",
+        "Origin",
+        "Accept",
     ],
     credentials: true,
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200,
+    preflightContinue: false,
 };
 
 app.use(cors(corsOptions));
@@ -24,26 +44,35 @@ app.use(cors(corsOptions));
 // Handle preflight requests explicitly
 app.options("*", cors(corsOptions));
 
-// Additional CORS headers middleware (as backup)
+// Enhanced CORS headers middleware
 app.use((req, res, next) => {
-    const origin =
-        process.env.CORS_ORIGIN || "https://inventorypro-ims.vercel.app";
-    res.header("Access-Control-Allow-Origin", origin);
+    const origin = req.headers.origin;
+    const allowedOrigins = [
+        process.env.CORS_ORIGIN || "https://inventorypro-ims.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://inventorypro-ims.vercel.app",
+    ];
+
+    if (allowedOrigins.includes(origin)) {
+        res.header("Access-Control-Allow-Origin", origin);
+    }
+
+    res.header("Access-Control-Allow-Credentials", "true");
     res.header(
         "Access-Control-Allow-Methods",
         "GET,PUT,POST,DELETE,PATCH,OPTIONS"
     );
     res.header(
         "Access-Control-Allow-Headers",
-        "Content-Type, Authorization, Content-Length, X-Requested-With"
+        "Content-Type, Authorization, Content-Length, X-Requested-With, Origin, Accept"
     );
-    res.header("Access-Control-Allow-Credentials", "true");
 
     if (req.method === "OPTIONS") {
         return res.sendStatus(200);
     }
     next();
-}); 
+});
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));

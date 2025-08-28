@@ -144,10 +144,13 @@ const loginUser = asyncHandler(async (req, res, next) => {
         "-password -refreshToken"
     );
 
+    // Updated cookie options for deployment
     const options = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Changed for cross-origin
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        path: "/",
     };
 
     return res
@@ -195,10 +198,20 @@ const logoutUser = asyncHandler(async (req, res, next) => {
 
 const refreshAccessToken = asyncHandler(async (req, res, next) => {
     const incomingRefreshToken =
-        req.cookies.refreshToken || req.body.refreshToken;
+        req.cookies.refreshToken ||
+        req.body.refreshToken ||
+        req.header("Authorization")?.replace("Bearer ", "");
+
+    console.log("Refresh token sources:", {
+        cookies: !!req.cookies?.refreshToken,
+        body: !!req.body?.refreshToken,
+        header: !!req.header("Authorization"),
+    });
 
     if (!incomingRefreshToken) {
-        return next(new ApiError(401, "unauthorized request"));
+        return next(
+            new ApiError(401, "Unauthorized request - No refresh token")
+        );
     }
 
     try {
@@ -210,7 +223,9 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
         const user = await User.findById(decodedToken?._id);
 
         if (!user) {
-            return next(new ApiError(401, "Invalid refresh token"));
+            return next(
+                new ApiError(401, "Invalid refresh token - User not found")
+            );
         }
 
         if (incomingRefreshToken !== user?.refreshToken) {
@@ -220,15 +235,20 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
         const options = {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days for refresh token
+            path: "/",
         };
 
-        const { accessToken, newRefreshToken } =
+        const { accessToken, refreshToken: newRefreshToken } =
             await generateAccessAndRefreshTokens(user._id);
 
         return res
             .status(200)
-            .cookie("accessToken", accessToken, options)
+            .cookie("accessToken", accessToken, {
+                ...options,
+                maxAge: 24 * 60 * 60 * 1000, // 24 hours for access token
+            })
             .cookie("refreshToken", newRefreshToken, options)
             .json(
                 new ApiResponse(
@@ -238,6 +258,7 @@ const refreshAccessToken = asyncHandler(async (req, res, next) => {
                 )
             );
     } catch (error) {
+        console.error("Refresh token error:", error);
         return next(
             new ApiError(401, error?.message || "Invalid refresh token")
         );
