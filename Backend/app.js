@@ -5,13 +5,45 @@ import errorHandler from "./middleware/error.middleware.js";
 
 const app = express();
 
-app.use(
-    cors({
-        origin: "https://inventorypro-ims.vercel.app",
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        credentials: true,
-    })
-);
+// CORS configuration
+const corsOptions = {
+    origin: process.env.CORS_ORIGIN || "https://inventorypro-ims.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "x-requested-with",
+        "Access-Control-Allow-Origin",
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly
+app.options("*", cors(corsOptions));
+
+// Additional CORS headers middleware (as backup)
+app.use((req, res, next) => {
+    const origin =
+        process.env.CORS_ORIGIN || "https://inventorypro-ims.vercel.app";
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header(
+        "Access-Control-Allow-Methods",
+        "GET,PUT,POST,DELETE,PATCH,OPTIONS"
+    );
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization, Content-Length, X-Requested-With"
+    );
+    res.header("Access-Control-Allow-Credentials", "true");
+
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+    }
+    next();
+});
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
