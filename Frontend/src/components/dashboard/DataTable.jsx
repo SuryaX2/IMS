@@ -1,8 +1,7 @@
 import React from "react";
 import { Card, Table, Typography, Tooltip, Badge } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
-
-const { Link } = Typography;
+import { Link as RouterLink } from "react-router-dom";
 
 const DataTable = ({
     title,
@@ -39,14 +38,14 @@ const DataTable = ({
             extra={
                 viewAllLink && (
                     <Tooltip title={`View all ${title.toLowerCase()}`}>
-                        <Link
-                            href={viewAllLink}
+                        <RouterLink
+                            to={viewAllLink}
                             className="flex items-center text-primary hover:text-primary-dark transition-colors text-xs sm:text-sm"
                         >
                             <span className="hidden sm:inline">View All</span>
                             <span className="sm:hidden">All</span>
                             <ArrowRightOutlined className="ml-1" />
-                        </Link>
+                        </RouterLink>
                     </Tooltip>
                 )
             }
