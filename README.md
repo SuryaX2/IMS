@@ -19,6 +19,7 @@ An overview of the UI screens from the InventoryPro system.
   - [Purchase Report](#purchase-report)
   - [Top-Products Report](#top-products-report)
 
+
 ---
 
 ## 📊 Dashboard
