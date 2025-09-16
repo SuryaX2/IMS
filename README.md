@@ -6,23 +6,24 @@ An overview of the UI screens from the InventoryPro system.
 
 ## 🧭 Table of Contents
 
-- [📊 Dashboard](#📊-dashboard)
-- [📦 Products](#📦-products)
-- [🧾 Orders](#🧾-orders)
-- [🛒 Purchases](#🛒-purchases)
-- [👥 Customers](#👥-customers)
-- [🚚 Suppliers](#🚚-suppliers)
-- [🗂️ Categories & Units](#🗂️-categories--units)
-- [📑 Reports](#📑-reports)
-  - [📦 Stock Reports](#📦-stock-reports)
-  - [💰 Sales Report](#💰-sales-report)
-  - [📥 Purchase Report](#📥-purchase-report)
-  - [🔝 Top-Products Report](#🔝-top-products-report)
+- [Dashboard](#dashboard)
+- [Products](#products)
+- [Orders](#orders)
+- [Purchases](#purchases)
+- [Customers](#customers)
+- [Suppliers](#suppliers)
+- [Categories & Units](#categories--units)
+- [Reports](#reports)
+  - [Stock Reports](#stock-reports)
+  - [Sales Report](#sales-report)
+  - [Purchase Report](#purchase-report)
+  - [Top-Products Report](#top-products-report)
+
 
 
 ---
 
-## 📊 Dashboard
+## Dashboard
 
 ![Dashboard 1](https://github.com/user-attachments/assets/2ee761c2-ccab-4cd5-99da-633125a2e731)
 ![Dashboard 2](https://github.com/user-attachments/assets/4b8cdc36-f441-4648-a9ae-b9dd3758619e)
@@ -30,7 +31,7 @@ An overview of the UI screens from the InventoryPro system.
 
 ---
 
-## 📦 Products
+## Products
 
 ![Products 1](https://github.com/user-attachments/assets/9212fc3c-6c78-472d-b120-debc862319e9)
 ![Products 2](https://github.com/user-attachments/assets/743e3ef7-f6ed-4ba8-8463-fdd0fc2aa10f)
@@ -39,7 +40,7 @@ An overview of the UI screens from the InventoryPro system.
 
 ---
 
-## 🧾 Orders
+## Orders
 
 ![Orders 1](https://github.com/user-attachments/assets/1bdf1644-9d91-48d6-a27e-778c39d4cd64)
 ![Orders 2](https://github.com/user-attachments/assets/47668cb7-1156-455e-8176-85b02ea3de84)
@@ -48,7 +49,7 @@ An overview of the UI screens from the InventoryPro system.
 
 ---
 
-## 🛒 Purchases
+## Purchases
 
 ![Purchases 1](https://github.com/user-attachments/assets/98901d79-1b41-4616-a34c-e970a4f2e056)
 ![Purchases 2](https://github.com/user-attachments/assets/65213785-ea7b-4309-b71a-6c3bd8fcad65)
@@ -57,7 +58,7 @@ An overview of the UI screens from the InventoryPro system.
 
 ---
 
-## 👥 Customers
+## Customers
 
 ![Customers 1](https://github.com/user-attachments/assets/ace0d0f9-a820-418b-86c7-55930c7a868b)
 ![Customers 2](https://github.com/user-attachments/assets/40e8aabd-d40b-4995-bed9-1016d5b59f37)
@@ -66,7 +67,7 @@ An overview of the UI screens from the InventoryPro system.
 
 ---
 
-## 🚚 Suppliers
+## Suppliers
 
 ![Suppliers 1](https://github.com/user-attachments/assets/c4c1af03-cad4-46a8-bc24-cb1c13e725d4)
 ![Suppliers 2](https://github.com/user-attachments/assets/53699cc4-3d9d-4a3e-a637-382fbbb5b8cb)
@@ -74,7 +75,7 @@ An overview of the UI screens from the InventoryPro system.
 
 ---
 
-## 🗂️ Categories & Units
+## Categories & Units
 
 ![Categories 1](https://github.com/user-attachments/assets/64f6f039-9f04-49ba-a83f-7847830a0c37)
 ![Categories 2](https://github.com/user-attachments/assets/bc90e9c6-d752-48a0-9cdb-e3b1906e9c39)
@@ -83,16 +84,16 @@ An overview of the UI screens from the InventoryPro system.
 
 ---
 
-## 📑 Reports
+## Reports
 
-### 📦 Stock Reports
+### Stock Reports
 
 ![Stock Report 1](https://github.com/user-attachments/assets/59e92398-3aeb-438a-9428-c7684bbb16f3)
 ![Stock Report 2](https://github.com/user-attachments/assets/8e394e4e-0203-465c-b96d-8e25df0eef2a)
 
 ---
 
-### 💰 Sales Report
+### Sales Report
 
 ![Sales Report 1](https://github.com/user-attachments/assets/49adc685-0b8e-44a2-badb-d113f24f3cd0)
 ![Sales Report 2](https://github.com/user-attachments/assets/fdea57fd-9f37-4a56-9fb3-fae6aa54f2ed)
@@ -100,7 +101,7 @@ An overview of the UI screens from the InventoryPro system.
 
 ---
 
-### 📥 Purchase Report
+### Purchase Report
 
 ![Purchase Report 1](https://github.com/user-attachments/assets/098563ea-fb5c-4771-8136-224886002742)
 ![Purchase Report 2](https://github.com/user-attachments/assets/f6d6b2f1-4a46-41eb-90da-2745802d8228)
@@ -108,7 +109,7 @@ An overview of the UI screens from the InventoryPro system.
 
 ---
 
-### 🔝 Top-Products Report
+### Top-Products Report
 
 ![Top Products 1](https://github.com/user-attachments/assets/1dd995ca-3163-4819-8b94-fe9ecd4c0348)
 ![Top Products 2](https://github.com/user-attachments/assets/5cfb485d-83df-4996-9f14-0084a76c7e3a)
