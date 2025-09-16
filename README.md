@@ -6,18 +6,18 @@ An overview of the UI screens from the InventoryPro system.
 
 ## 🧭 Table of Contents
 
-- [Dashboard](#dashboard)
-- [Products](#products)
-- [Orders](#orders)
-- [Purchases](#purchases)
-- [Customers](#customers)
-- [Suppliers](#suppliers)
-- [Categories & Units](#categories--units)
-- [Reports](#reports)
-  - [Stock Reports](#stock-reports)
-  - [Sales Report](#sales-report)
-  - [Purchase Report](#purchase-report)
-  - [Top-Products Report](#top-products-report)
+- [📊 Dashboard](#📊-dashboard)
+- [📦 Products](#📦-products)
+- [🧾 Orders](#🧾-orders)
+- [🛒 Purchases](#🛒-purchases)
+- [👥 Customers](#👥-customers)
+- [🚚 Suppliers](#🚚-suppliers)
+- [🗂️ Categories & Units](#🗂️-categories--units)
+- [📑 Reports](#📑-reports)
+  - [📦 Stock Reports](#📦-stock-reports)
+  - [💰 Sales Report](#💰-sales-report)
+  - [📥 Purchase Report](#📥-purchase-report)
+  - [🔝 Top-Products Report](#🔝-top-products-report)
 
 
 ---
