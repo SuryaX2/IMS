@@ -199,10 +199,10 @@ Authorization: Bearer <your_access_token>
 
 ### Token Lifecycle
 
-| Token Type        | Expiry     | Storage          | Purpose            |
-| ----------------- | ---------- | ---------------- | ------------------ |
-| **Access Token**  | 15 minutes | Client (memory)  | API authentication |
-| **Refresh Token** | 7 days     | HTTP-only cookie | Token renewal      |
+| Token Type        | Expiry  | Storage          | Purpose            |
+| ----------------- | ------- | ---------------- | ------------------ |
+| **Access Token**  | 1 day   | Client (memory)  | API authentication |
+| **Refresh Token** | 10 days | HTTP-only cookie | Token renewal      |
 
 ### Role-Based Access Control
 
