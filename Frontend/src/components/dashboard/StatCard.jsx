@@ -10,21 +10,19 @@ const StatCard = ({
     suffix,
     precision = 0,
     formatter,
-    trend = null, // positive, negative, neutral
+    trend = null,
     trendValue = null,
     trendIcon = null,
     description = null,
     valueStyle = {},
     className = "",
 }) => {
-    // Function to determine trend color
     const getTrendColor = () => {
-        if (trend === "positive") return "#52c41a";
-        if (trend === "negative") return "#f5222d";
-        return "#8c8c8c";
+        if (trend === "positive") return "#10b981";
+        if (trend === "negative") return "#ef4444";
+        return "#6b7280";
     };
 
-    // Get trend indicator text
     const getTrendText = () => {
         if (trendValue === null) return null;
         return `${trendValue > 0 ? "+" : ""}${trendValue}%`;
@@ -32,53 +30,60 @@ const StatCard = ({
 
     return (
         <Card
-            className={`rounded-lg border-0 overflow-hidden shadow hover:shadow-md transition-all duration-300 ${className}`}
-            bodyStyle={{ padding: "20px 24px" }}
+            className={`border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-200 ${className}`}
+            bodyStyle={{ padding: 0 }}
+            styles={{ body: { padding: 0 } }}
         >
-            <div className="flex flex-col h-full">
-                <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center text-gray-500">
-                        <span className="font-medium">{title}</span>
+            <div className="p-5">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                        <span className="text-sm font-medium text-gray-600 truncate">
+                            {title}
+                        </span>
                         {description && (
                             <Tooltip title={description}>
-                                <InfoCircleOutlined className="ml-1 text-xs text-gray-400" />
+                                <InfoCircleOutlined className="text-xs text-gray-400 flex-shrink-0" />
                             </Tooltip>
                         )}
                     </div>
                     {icon && (
-                        <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary-light bg-opacity-20">
-                            {icon}
+                        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 flex-shrink-0">
+                            <span className="text-blue-600 text-lg">
+                                {icon}
+                            </span>
                         </div>
                     )}
                 </div>
 
-                <Statistic
-                    value={value}
-                    precision={precision}
-                    formatter={formatter}
-                    prefix={prefix}
-                    suffix={suffix}
-                    valueStyle={{
-                        fontSize: "28px",
-                        fontWeight: "bold",
-                        ...valueStyle,
-                    }}
-                />
+                <div className="mb-3">
+                    <Statistic
+                        value={value}
+                        precision={precision}
+                        formatter={formatter}
+                        prefix={prefix}
+                        suffix={suffix}
+                        valueStyle={{
+                            fontSize: "32px",
+                            fontWeight: "700",
+                            color: "#111827",
+                            lineHeight: "1.2",
+                            ...valueStyle,
+                        }}
+                    />
+                </div>
 
                 {trend && trendValue !== null && (
-                    <div className="flex items-center mt-2">
-                        {trendIcon}
+                    <div className="flex items-center gap-1">
+                        {trendIcon && (
+                            <span className="flex-shrink-0">{trendIcon}</span>
+                        )}
                         <span
-                            style={{
-                                color: getTrendColor(),
-                                fontWeight: "medium",
-                                fontSize: "14px",
-                                marginLeft: trendIcon ? "4px" : 0,
-                            }}
+                            className="text-sm font-semibold"
+                            style={{ color: getTrendColor() }}
                         >
                             {getTrendText()}
                         </span>
-                        <span className="text-gray-500 text-xs ml-1">
+                        <span className="text-xs text-gray-500 ml-0.5">
                             vs last period
                         </span>
                     </div>

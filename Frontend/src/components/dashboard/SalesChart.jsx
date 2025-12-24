@@ -18,34 +18,30 @@ import {
 const { Text, Title } = Typography;
 
 const SalesChart = ({ salesData = {}, loading = false }) => {
-    // Extract the salesByDate array from the backend data structure
     const salesByDate = useMemo(() => {
-        // Handle different data formats that might be passed from Dashboard
         if (Array.isArray(salesData)) {
-            return salesData; // If salesData is already an array
+            return salesData;
         } else if (
             salesData?.salesByDate &&
             Array.isArray(salesData.salesByDate)
         ) {
-            return salesData.salesByDate; // If salesData contains salesByDate array
+            return salesData.salesByDate;
         }
-        return []; // Default empty array if no valid data
+        return [];
     }, [salesData]);
 
-    // Transform data for the chart (backend sends _id as date and total as sales value)
     const chartData = useMemo(
         () =>
             salesByDate.map((item) => ({
-                date: item._id, // Use the date string directly
+                date: item._id,
                 sales: item.total,
-                orders: item.orders || 0, // Ensure orders has a default value
+                orders: item.orders || 0,
             })),
         [salesByDate]
     );
 
     const hasSalesData = chartData && chartData.length > 0;
 
-    // Calculate metrics for the summary cards
     const totalSales = useMemo(
         () =>
             hasSalesData
@@ -70,7 +66,6 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
         [totalSales, chartData, hasSalesData]
     );
 
-    // Calculate trend by comparing first and last parts of the data
     const trend = useMemo(() => {
         if (!hasSalesData || chartData.length < 2) return 0;
 
@@ -91,15 +86,14 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
         return ((secondHalfTotal - firstHalfTotal) / firstHalfTotal) * 100;
     }, [chartData, hasSalesData]);
 
-    // Custom tooltip for the Recharts component
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white p-3 border border-gray-200 shadow-lg rounded-lg">
-                    <p className="text-gray-600 font-medium text-xs sm:text-sm">
+                <div className="bg-white px-3 py-2 border border-gray-200 shadow-md rounded-lg">
+                    <p className="text-gray-500 text-xs font-medium mb-0.5">
                         {label}
                     </p>
-                    <p className="text-blue-600 font-bold text-sm sm:text-base">
+                    <p className="text-blue-600 font-semibold text-sm mb-0">
                         ${Number(payload[0].value).toLocaleString()}
                     </p>
                 </div>
@@ -108,10 +102,8 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
         return null;
     };
 
-    // Format dollar values
-    const formatDollar = (value) => `${Number(value).toLocaleString()}`;
+    const formatDollar = (value) => `$${Number(value).toLocaleString()}`;
 
-    // Get summary data directly from the API response if available
     const summaryData = useMemo(() => {
         if (salesData && salesData.summary) {
             return salesData.summary;
@@ -123,100 +115,95 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
     }, [salesData, totalSales, totalOrders]);
 
     return (
-        <div className="h-full p-3 sm:p-6 bg-white rounded-xl border border-gray-100">
-            <div className="flex items-center mb-4 sm:mb-6">
-                <LineChartOutlined className="text-blue-600 mr-2 sm:mr-3 text-lg sm:text-xl" />
-                <h1 className="m-0 text-gray-800 font-bold text-lg sm:text-xl">
-                    Sales Performance
-                </h1>
-            </div>
+        <section className="h-full bg-white rounded-lg border border-gray-200 shadow-sm">
+            <header className="px-5 py-4 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                    <LineChartOutlined className="text-blue-600 text-lg" />
+                    <h2 className="m-0 text-gray-900 font-semibold text-base">
+                        Sales Performance
+                    </h2>
+                </div>
+            </header>
 
             {loading ? (
-                <div className="flex justify-center items-center h-60 sm:h-80">
+                <div className="flex justify-center items-center h-96">
                     <Spin size="large" />
                 </div>
             ) : hasSalesData ? (
-                <>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 sm:p-4 rounded-xl shadow-sm border border-blue-100">
-                            <Text className="text-blue-700 text-xs sm:text-sm font-medium">
+                <div className="p-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                        <div className="bg-blue-50 px-4 py-3 rounded-lg border border-blue-100">
+                            <Text className="text-blue-700 text-xs font-medium uppercase tracking-wide">
                                 Total Sales
                             </Text>
-                            <Title
-                                level={4}
-                                className="m-0 text-blue-800 mt-1 text-lg sm:text-xl"
-                            >
+                            <div className="text-blue-900 text-2xl font-bold mt-1">
                                 ${summaryData.totalSales.toLocaleString()}
-                            </Title>
+                            </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 sm:p-4 rounded-xl shadow-sm border border-indigo-100">
-                            <Text className="text-indigo-700 text-xs sm:text-sm font-medium">
+                        <div className="bg-indigo-50 px-4 py-3 rounded-lg border border-indigo-100">
+                            <Text className="text-indigo-700 text-xs font-medium uppercase tracking-wide">
                                 Total Orders
                             </Text>
-                            <Title
-                                level={4}
-                                className="m-0 text-indigo-800 mt-1 text-lg sm:text-xl"
-                            >
+                            <div className="text-indigo-900 text-2xl font-bold mt-1">
                                 {summaryData.totalOrders}
-                            </Title>
+                            </div>
                         </div>
 
                         <div
-                            className={`bg-gradient-to-br ${
+                            className={`px-4 py-3 rounded-lg border ${
                                 trend > 0
-                                    ? "from-green-50 to-green-100 border-green-100"
+                                    ? "bg-emerald-50 border-emerald-100"
                                     : trend < 0
-                                      ? "from-red-50 to-red-100 border-red-100"
-                                      : "from-gray-50 to-gray-100 border-gray-100"
-                            } p-3 sm:p-4 rounded-xl shadow-sm border`}
+                                      ? "bg-rose-50 border-rose-100"
+                                      : "bg-gray-50 border-gray-100"
+                            }`}
                         >
                             <Text
-                                className={`${
+                                className={`text-xs font-medium uppercase tracking-wide ${
                                     trend > 0
-                                        ? "text-green-700"
+                                        ? "text-emerald-700"
                                         : trend < 0
-                                          ? "text-red-700"
+                                          ? "text-rose-700"
                                           : "text-gray-700"
-                                } text-xs sm:text-sm font-medium`}
+                                }`}
                             >
                                 Growth Trend
                             </Text>
-                            <Title
-                                level={4}
-                                className={`m-0 flex items-center mt-1 text-lg sm:text-xl ${
+                            <div
+                                className={`flex items-center text-2xl font-bold mt-1 ${
                                     trend > 0
-                                        ? "text-green-800"
+                                        ? "text-emerald-900"
                                         : trend < 0
-                                          ? "text-red-800"
-                                          : "text-gray-800"
+                                          ? "text-rose-900"
+                                          : "text-gray-900"
                                 }`}
                             >
                                 {trend > 0 ? (
-                                    <ArrowUpOutlined className="mr-1 sm:mr-2 text-green-600 text-sm" />
+                                    <ArrowUpOutlined className="mr-1.5 text-emerald-600 text-base" />
                                 ) : trend < 0 ? (
-                                    <ArrowDownOutlined className="mr-1 sm:mr-2 text-red-600 text-sm" />
+                                    <ArrowDownOutlined className="mr-1.5 text-rose-600 text-base" />
                                 ) : null}
                                 {trend > 0 ? "+" : ""}
                                 {trend.toFixed(1)}%
-                            </Title>
+                            </div>
                         </div>
                     </div>
 
                     <div
-                        className="bg-white rounded-xl border border-gray-100 p-2 sm:p-4"
+                        className="bg-gray-50 rounded-lg border border-gray-200 p-4"
                         style={{
-                            height: window.innerWidth < 768 ? "300px" : "400px",
+                            height: window.innerWidth < 768 ? "320px" : "510px",
                         }}
                     >
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart
                                 data={chartData}
                                 margin={{
-                                    top: 10,
-                                    right: window.innerWidth < 768 ? 10 : 30,
-                                    left: 0,
-                                    bottom: 0,
+                                    top: 5,
+                                    right: window.innerWidth < 768 ? 5 : 20,
+                                    left: window.innerWidth < 768 ? -20 : -10,
+                                    bottom: 5,
                                 }}
                             >
                                 <defs>
@@ -229,25 +216,30 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                     >
                                         <stop
                                             offset="5%"
-                                            stopColor="#1890ff"
-                                            stopOpacity={0.15}
+                                            stopColor="#2563eb"
+                                            stopOpacity={0.2}
                                         />
                                         <stop
                                             offset="95%"
-                                            stopColor="#1890ff"
-                                            stopOpacity={0.01}
+                                            stopColor="#2563eb"
+                                            stopOpacity={0}
                                         />
                                     </linearGradient>
                                 </defs>
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                    stroke="#e5e7eb"
+                                />
                                 <XAxis
                                     dataKey="date"
                                     axisLine={false}
                                     tickLine={false}
-                                    tickMargin={10}
+                                    tickMargin={12}
                                     tick={{
                                         fill: "#6b7280",
                                         fontSize:
-                                            window.innerWidth < 768 ? 9 : 11,
+                                            window.innerWidth < 768 ? 10 : 12,
                                     }}
                                     interval={window.innerWidth < 768 ? 1 : 0}
                                 />
@@ -255,63 +247,53 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                                     tickFormatter={formatDollar}
                                     axisLine={false}
                                     tickLine={false}
-                                    tickMargin={10}
+                                    tickMargin={8}
                                     tick={{
                                         fill: "#6b7280",
                                         fontSize:
-                                            window.innerWidth < 768 ? 9 : 11,
+                                            window.innerWidth < 768 ? 10 : 12,
                                     }}
-                                    width={window.innerWidth < 768 ? 50 : 60}
-                                />
-                                <CartesianGrid
-                                    strokeDasharray="3 3"
-                                    vertical={false}
-                                    stroke="#e5e7eb"
+                                    width={window.innerWidth < 768 ? 55 : 65}
                                 />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Area
                                     type="monotone"
                                     dataKey="sales"
-                                    stroke="#1890ff"
-                                    strokeWidth={
-                                        window.innerWidth < 768 ? 2 : 2.5
-                                    }
+                                    stroke="#2563eb"
+                                    strokeWidth={2.5}
                                     fillOpacity={1}
                                     fill="url(#colorSales)"
                                     activeDot={{
-                                        r: window.innerWidth < 768 ? 4 : 6,
+                                        r: window.innerWidth < 768 ? 5 : 6,
                                         strokeWidth: 2,
                                         stroke: "#fff",
-                                        fill: "#1890ff",
+                                        fill: "#2563eb",
                                     }}
-                                    dot={{
-                                        r: window.innerWidth < 768 ? 2 : 3,
-                                        strokeWidth: 2,
-                                        stroke: "#1890ff",
-                                        fill: "#fff",
-                                    }}
+                                    dot={false}
                                 />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="text-xs text-gray-500 mt-2 sm:mt-3 text-right">
-                        Average daily sales: ${averageSales.toLocaleString()}
+                    <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+                        <span className="text-xs text-gray-500">
+                            Average daily sales
+                        </span>
+                        <span className="text-sm font-semibold text-gray-700">
+                            ${averageSales.toLocaleString()}
+                        </span>
                     </div>
-                </>
+                </div>
             ) : (
-                <div className="h-full flex items-center justify-center">
+                <div className="h-96 flex items-center justify-center">
                     <Empty
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
                         description={
                             <div className="text-center">
-                                <Title
-                                    level={5}
-                                    className="text-gray-500 mt-0 mb-2 text-sm sm:text-base"
-                                >
+                                <div className="text-gray-600 font-medium text-sm mb-1">
                                     No Sales Data Available
-                                </Title>
-                                <p className="text-xs sm:text-sm text-gray-400 mb-0">
+                                </div>
+                                <p className="text-xs text-gray-400 mb-0">
                                     Sales data will appear here once you have
                                     recorded orders.
                                 </p>
@@ -320,7 +302,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                     />
                 </div>
             )}
-        </div>
+        </section>
     );
 };
 

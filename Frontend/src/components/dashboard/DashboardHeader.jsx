@@ -1,37 +1,45 @@
 import React from "react";
-import { Typography, Space, Button } from "antd";
+import { Typography, Button } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const DashboardHeader = ({ onRefresh }) => {
-    const today = new Date().toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+    const today = new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
     });
 
     return (
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-                <h1 className="mb-1 text-4xl font-bold">Dashboard</h1>
-                <p className="text-gray-500 text-base md:text-sm">
-                    Welcome back! Here's what's happening with your inventory today.
-                </p>
-                <Text className="block text-sm text-gray-400 mt-1">{today}</Text>
+        <header className="bg-white border-b border-gray-200 px-6 py-5">
+            <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-1">
+                    <h1 className="mb-1 text-4xl font-bold">Dashboard</h1>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
+                        <Text className="text-sm text-gray-600">
+                            Welcome back! Here's what's happening with your
+                            inventory today.
+                        </Text>
+                        <Text className="text-xs text-gray-400 sm:border-l sm:border-gray-300 sm:pl-3">
+                            {today}
+                        </Text>
+                    </div>
+                </div>
+                {onRefresh && (
+                    <Button
+                        onClick={onRefresh}
+                        icon={<ReloadOutlined />}
+                        type="primary"
+                        size="middle"
+                        className="shrink-0"
+                    >
+                        <span className="hidden sm:inline">Refresh</span>
+                    </Button>
+                )}
             </div>
-            {onRefresh && (
-                <Button 
-                    onClick={onRefresh}
-                    icon={<ReloadOutlined />}
-                    type="primary"
-                    className="mt-4 md:mt-0"
-                >
-                    Refresh Data
-                </Button>
-            )}
-        </div>
+        </header>
     );
 };
 
