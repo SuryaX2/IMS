@@ -193,7 +193,7 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                     <div
                         className="bg-gray-50 rounded-lg border border-gray-200 p-4"
                         style={{
-                            height: window.innerWidth < 768 ? "320px" : "510px",
+                            height: window.innerWidth < 768 ? "320px" : "535px",
                         }}
                     >
                         <ResponsiveContainer width="100%" height="100%">

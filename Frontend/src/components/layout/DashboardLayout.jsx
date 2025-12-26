@@ -53,7 +53,7 @@ const DashboardLayout = () => {
                 <MobileMenu collapsed={collapsed} currentPage={currentPage} />
 
                 <Content className="m-0 p-4 sm:p-6">
-                    <div className="bg-white p-4 rounded-lg min-h-screen border border-gray-100 shadow-sm">
+                    <div className="bg-white rounded-lg min-h-screen border border-gray-100 shadow-sm">
                         <Outlet />
                     </div>
                 </Content>

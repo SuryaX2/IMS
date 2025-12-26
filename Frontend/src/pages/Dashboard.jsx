@@ -57,12 +57,10 @@ const Dashboard = () => {
         fetchDashboardData();
     }, [timeframe]);
 
-    // Fetch dashboard data from API endpoints
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
 
-            // Using the API endpoints you provided
             const [
                 dashboardResponse,
                 topProductsResponse,
@@ -101,7 +99,6 @@ const Dashboard = () => {
         }
     };
 
-    // Top products table columns
     const topProductsColumns = [
         {
             title: "Product",
@@ -151,7 +148,6 @@ const Dashboard = () => {
         },
     ];
 
-    // Low stock alerts table columns
     const lowStockColumns = [
         {
             title: "Product",
@@ -198,7 +194,6 @@ const Dashboard = () => {
         },
     ];
 
-    // Recent orders columns
     const recentOrdersColumns = [
         {
             title: "Order ID",
@@ -279,212 +274,191 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white">
-            <div className="px-3 sm:px-6 py-4 sm:py-8">
+        <main className="min-h-screen ">
+            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <DashboardHeader onRefresh={fetchDashboardData} />
 
-                {/* Key metrics cards */}
-                <div className="mt-6 sm:mt-8">
-                    <Row gutter={[16, 16]} className="sm:gutter-24">
-                        <Col xs={24} sm={12} lg={8}>
-                            <StatCard
-                                title="Total Sales"
-                                value={dashboardData.totalSales}
-                                prefix={<ShoppingCartOutlined />}
-                                valueStyle={{ color: token.colorSuccess }}
-                                icon={
-                                    <ShoppingCartOutlined className="text-xl sm:text-2xl text-success" />
-                                }
-                                className="dashboard-stat-card"
-                                formatter={(value) =>
-                                    `₹${value.toLocaleString()}`
-                                }
-                            />
-                        </Col>
-                        <Col xs={24} sm={12} lg={8}>
-                            <StatCard
-                                title="Total Purchases"
-                                value={dashboardData.totalPurchase}
-                                prefix={<ShoppingOutlined />}
-                                valueStyle={{ color: token.colorPrimary }}
-                                icon={
-                                    <ShoppingOutlined className="text-xl sm:text-2xl text-primary" />
-                                }
-                                className="dashboard-stat-card"
-                                formatter={(value) =>
-                                    `₹${value.toLocaleString()}`
-                                }
-                            />
-                        </Col>
-                        <Col xs={24} sm={24} lg={8}>
-                            <StatCard
-                                title="Inventory Value"
-                                value={dashboardData.inventoryValue}
-                                prefix={<DollarOutlined />}
-                                valueStyle={{ color: token.colorPurple }}
-                                icon={
-                                    <DollarOutlined className="text-xl sm:text-2xl text-purple" />
-                                }
-                                className="dashboard-stat-card"
-                                formatter={(value) =>
-                                    `₹${value.toLocaleString()}`
-                                }
-                                precision={2}
-                            />
-                        </Col>
-                    </Row>
-
-                    <Row
-                        gutter={[16, 16]}
-                        className="mt-4 sm:mt-6 sm:gutter-24"
-                    >
-                        <Col xs={24} sm={8}>
-                            <StatCard
-                                title="Total Products"
-                                value={dashboardData.totalProducts}
-                                icon={
-                                    <InboxOutlined className="text-xl sm:text-2xl text-blue" />
-                                }
-                                className="dashboard-stat-card"
-                            />
-                        </Col>
-                        <Col xs={24} sm={8}>
-                            <StatCard
-                                title="Total Stock"
-                                value={dashboardData.totalStock}
-                                icon={
-                                    <ShoppingOutlined className="text-xl sm:text-2xl text-cyan" />
-                                }
-                                className="dashboard-stat-card"
-                            />
-                        </Col>
-                        <Col xs={24} sm={8}>
-                            <StatCard
-                                title="Out of Stock"
-                                value={dashboardData.outOfStockCount}
-                                icon={
-                                    <WarningOutlined className="text-xl sm:text-2xl" />
-                                }
-                                valueStyle={{
-                                    color:
-                                        dashboardData.outOfStockCount > 0
-                                            ? token.colorError
-                                            : token.colorSuccess,
-                                }}
-                                className="dashboard-stat-card"
-                            />
-                        </Col>
-                    </Row>
-                </div>
-
-                {/* Analytics Section */}
-                <div className="mt-8 sm:mt-10">
-                    <div className="mb-4 sm:mb-6">
-                        <Divider orientation="center">
-                            <Text className="text-lg sm:text-2xl font-bold text-gray-800">
-                                <AreaChartOutlined className="mr-2" />
-                                Analytics & Insights
-                            </Text>
-                        </Divider>
+                <section className="mt-6">
+                    <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6">
+                        <Row gutter={[20, 20]}>
+                            <Col xs={24} sm={12} lg={8}>
+                                <StatCard
+                                    title="Total Sales"
+                                    value={dashboardData.totalSales}
+                                    prefix={<ShoppingCartOutlined />}
+                                    valueStyle={{ color: token.colorSuccess }}
+                                    icon={
+                                        <ShoppingCartOutlined className="text-2xl text-success" />
+                                    }
+                                    formatter={(value) =>
+                                        `₹${value.toLocaleString()}`
+                                    }
+                                />
+                            </Col>
+                            <Col xs={24} sm={12} lg={8}>
+                                <StatCard
+                                    title="Total Purchases"
+                                    value={dashboardData.totalPurchase}
+                                    prefix={<ShoppingOutlined />}
+                                    valueStyle={{ color: token.colorPrimary }}
+                                    icon={
+                                        <ShoppingOutlined className="text-2xl text-primary" />
+                                    }
+                                    formatter={(value) =>
+                                        `₹${value.toLocaleString()}`
+                                    }
+                                />
+                            </Col>
+                            <Col xs={24} sm={24} lg={8}>
+                                <StatCard
+                                    title="Inventory Value"
+                                    value={dashboardData.inventoryValue}
+                                    prefix={<DollarOutlined />}
+                                    valueStyle={{ color: token.colorPurple }}
+                                    icon={
+                                        <DollarOutlined className="text-2xl text-purple" />
+                                    }
+                                    formatter={(value) =>
+                                        `₹${value.toLocaleString()}`
+                                    }
+                                    precision={2}
+                                />
+                            </Col>
+                            <Col xs={24} sm={8}>
+                                <StatCard
+                                    title="Total Products"
+                                    value={dashboardData.totalProducts}
+                                    icon={
+                                        <InboxOutlined className="text-2xl text-blue" />
+                                    }
+                                />
+                            </Col>
+                            <Col xs={24} sm={8}>
+                                <StatCard
+                                    title="Total Stock"
+                                    value={dashboardData.totalStock}
+                                    icon={
+                                        <ShoppingOutlined className="text-2xl text-cyan" />
+                                    }
+                                />
+                            </Col>
+                            <Col xs={24} sm={8}>
+                                <StatCard
+                                    title="Out of Stock"
+                                    value={dashboardData.outOfStockCount}
+                                    icon={
+                                        <WarningOutlined className="text-2xl" />
+                                    }
+                                    valueStyle={{
+                                        color:
+                                            dashboardData.outOfStockCount > 0
+                                                ? token.colorError
+                                                : token.colorSuccess,
+                                    }}
+                                />
+                            </Col>
+                        </Row>
                     </div>
+                </section>
 
-                    <Row
-                        gutter={[16, 16]}
-                        className="mb-8 sm:mb-10 sm:gutter-24"
-                    >
+                <section className="mt-6">
+                    <Divider className="flex items-center gap-2 mb-4">
+                        <span className="flex items-center gap-2">
+                            <AreaChartOutlined className="text-xl text-gray-700" />
+                            <h2 className="text-xl font-semibold text-gray-900 m-0">
+                                Analytics & Insights
+                            </h2>
+                        </span>
+                    </Divider>
+                    <Row gutter={[20, 20]}>
                         <Col xs={24} xl={16}>
-                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 h-full">
+                            <Card
+                                className="border border-gray-200 rounded-xl h-full"
+                                bodyStyle={{ padding: 0 }}
+                            >
                                 <SalesChart
                                     salesData={dashboardData.salesData}
                                 />
-                            </div>
+                            </Card>
                         </Col>
                         <Col xs={24} xl={8}>
-                            <div className="h-full flex flex-col space-y-4 sm:space-y-6">
-                                <div className="flex-1 shadow-lg">
+                            <div className="flex flex-col gap-5 h-full">
+                                <Card
+                                    className="border border-gray-200 rounded-xl flex-1"
+                                    bodyStyle={{ padding: 0 }}
+                                >
                                     <ProductDistribution
                                         topProducts={dashboardData.topProducts}
                                     />
-                                </div>
-
-                                {/* Quick Insights */}
+                                </Card>
                                 {dashboardData.topProducts &&
                                     dashboardData.topProducts.length > 0 && (
                                         <Card
                                             title={
-                                                <div className="flex items-center">
-                                                    <InfoCircleOutlined className="text-blue-500 mr-2" />
-                                                    <span className="text-sm sm:text-base font-semibold">
+                                                <div className="flex items-center gap-2">
+                                                    <InfoCircleOutlined className="text-blue-500" />
+                                                    <span className="text-sm font-semibold">
                                                         Quick Insights
                                                     </span>
                                                 </div>
                                             }
-                                            className="shadow-lg border border-gray-100 rounded-xl"
-                                            bodyStyle={{ padding: "12px 16px" }}
+                                            className="border border-gray-200 rounded-xl"
+                                            bodyStyle={{ padding: "16px" }}
                                             headStyle={{
                                                 borderBottom:
                                                     "1px solid #f0f0f0",
-                                                padding: "10px 16px",
-                                                backgroundColor: "#fafafa",
+                                                padding: "12px 16px",
+                                                minHeight: "auto",
                                             }}
                                         >
                                             <div className="space-y-3">
-                                                <div className="p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
+                                                <div className="p-3 bg-green-50 rounded-lg border border-green-100">
                                                     <Text
                                                         strong
-                                                        className="text-green-700 text-xs sm:text-sm"
+                                                        className="text-green-700 text-xs block mb-1"
                                                     >
                                                         Top Performer
                                                     </Text>
-                                                    <div className="mt-1">
-                                                        <Text className="text-xs sm:text-sm font-medium text-gray-800 block">
-                                                            {
-                                                                dashboardData
-                                                                    .topProducts[0]
-                                                                    ?.product_name
-                                                            }
-                                                        </Text>
-                                                        <Badge
-                                                            count={`${dashboardData.topProducts[0]?.quantity_sold} units`}
-                                                            className="mt-1"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    "#52c41a",
-                                                                fontSize:
-                                                                    "10px",
-                                                            }}
-                                                        />
-                                                    </div>
+                                                    <Text className="text-sm font-medium text-gray-900 block mb-1">
+                                                        {
+                                                            dashboardData
+                                                                .topProducts[0]
+                                                                ?.product_name
+                                                        }
+                                                    </Text>
+                                                    <Badge
+                                                        count={`${dashboardData.topProducts[0]?.quantity_sold} units`}
+                                                        style={{
+                                                            backgroundColor:
+                                                                "#52c41a",
+                                                            fontSize: "10px",
+                                                        }}
+                                                    />
                                                 </div>
-                                                <div className="p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
+                                                <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
                                                     <Text
                                                         strong
-                                                        className="text-blue-700 text-xs sm:text-sm"
+                                                        className="text-blue-700 text-xs block mb-1"
                                                     >
                                                         Most Profitable
                                                     </Text>
-                                                    <div className="mt-1">
-                                                        <Text className="text-xs sm:text-sm font-medium text-gray-800 block">
-                                                            {
-                                                                dashboardData.topProducts.sort(
-                                                                    (a, b) =>
-                                                                        b.total_sales -
-                                                                        a.total_sales
-                                                                )[0]
-                                                                    ?.product_name
-                                                            }
-                                                        </Text>
-                                                        <Badge
-                                                            count={`$${dashboardData.topProducts.sort((a, b) => b.total_sales - a.total_sales)[0]?.total_sales.toLocaleString()}`}
-                                                            className="mt-1"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    "#1890ff",
-                                                                fontSize:
-                                                                    "10px",
-                                                            }}
-                                                        />
-                                                    </div>
+                                                    <Text className="text-sm font-medium text-gray-900 block mb-1">
+                                                        {
+                                                            dashboardData.topProducts.sort(
+                                                                (a, b) =>
+                                                                    b.total_sales -
+                                                                    a.total_sales
+                                                            )[0]?.product_name
+                                                        }
+                                                    </Text>
+                                                    <Badge
+                                                        count={`$${dashboardData.topProducts.sort((a, b) => b.total_sales - a.total_sales)[0]?.total_sales.toLocaleString()}`}
+                                                        style={{
+                                                            backgroundColor:
+                                                                "#1890ff",
+                                                            fontSize: "10px",
+                                                        }}
+                                                    />
                                                 </div>
                                             </div>
                                         </Card>
@@ -492,24 +466,23 @@ const Dashboard = () => {
                             </div>
                         </Col>
                     </Row>
-                </div>
+                </section>
 
-                {/* Reports Section */}
-                <div className="mt-10 sm:mt-12">
-                    <Divider orientation="center" className="mb-6 sm:mb-8">
-                        <Text className="text-lg sm:text-2xl font-bold text-gray-800">
-                            <PieChartOutlined className="mr-2" />
-                            Reports & Alerts
-                        </Text>
+                <section className="mt-6 pb-6">
+                    <Divider className="flex items-center gap-2 mb-4">
+                        <span className="flex items-center gap-2">
+                            <PieChartOutlined className="text-xl text-gray-700" />
+                            <h2 className="text-xl font-semibold text-gray-900 m-0">
+                                Reports & Activity
+                            </h2>
+                        </span>
                     </Divider>
-
-                    {/* First row: Top Products and Low Stock - Equal height */}
-                    <Row
-                        gutter={[16, 16]}
-                        className="mb-4 sm:mb-6 sm:gutter-24"
-                    >
+                    <Row gutter={[20, 20]}>
                         <Col xs={24} lg={12}>
-                            <div className="h-full shadow-lg">
+                            <Card
+                                className="border border-gray-200 rounded-xl h-full"
+                                bodyStyle={{ padding: 0 }}
+                            >
                                 <DataTable
                                     title="Top Selling Products"
                                     columns={topProductsColumns}
@@ -520,10 +493,13 @@ const Dashboard = () => {
                                     viewAllLink="/reports/top-products"
                                     pagination={{ pageSize: 5, size: "small" }}
                                 />
-                            </div>
+                            </Card>
                         </Col>
                         <Col xs={24} lg={12}>
-                            <div className="h-full shadow-lg">
+                            <Card
+                                className="border border-gray-200 rounded-xl h-full"
+                                bodyStyle={{ padding: 0 }}
+                            >
                                 <DataTable
                                     title="Low Stock Alerts"
                                     columns={lowStockColumns}
@@ -534,14 +510,13 @@ const Dashboard = () => {
                                     viewAllLink="/reports/low-stock-alerts"
                                     pagination={{ pageSize: 5, size: "small" }}
                                 />
-                            </div>
+                            </Card>
                         </Col>
-                    </Row>
-
-                    {/* Second row: Recent Orders (full width) */}
-                    <Row gutter={[16, 16]} className="sm:gutter-24">
                         <Col xs={24}>
-                            <div className="min-h-0 h-full shadow-lg">
+                            <Card
+                                className="border border-gray-200 rounded-xl"
+                                bodyStyle={{ padding: 0 }}
+                            >
                                 <DataTable
                                     title="Recent Orders"
                                     columns={recentOrdersColumns}
@@ -552,12 +527,12 @@ const Dashboard = () => {
                                     viewAllLink="/orders"
                                     pagination={{ pageSize: 8, size: "small" }}
                                 />
-                            </div>
+                            </Card>
                         </Col>
                     </Row>
-                </div>
+                </section>
             </div>
-        </div>
+        </main>
     );
 };
 
