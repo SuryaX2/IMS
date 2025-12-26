@@ -13,7 +13,6 @@ const DashboardLayout = () => {
     const [isMobile, setIsMobile] = useState(false);
     const location = useLocation();
 
-    // Handle screen resize
     useEffect(() => {
         const checkScreenSize = () => {
             setIsMobile(window.innerWidth < 768);
@@ -30,30 +29,28 @@ const DashboardLayout = () => {
         };
     }, []);
 
-    // Extract current path information
     const currentPath = location.pathname;
     const pathSegments = currentPath.split("/").filter(Boolean);
     const currentPage = pathSegments.length > 0 ? pathSegments[0] : "dashboard";
 
     return (
-        <Layout className="min-h-screen">
+        <Layout className="min-h-screen bg-slate-50">
             <DashboardSidebar
                 collapsed={collapsed}
                 setCollapsed={setCollapsed}
                 currentPage={currentPage}
             />
 
-            <Layout>
+            <Layout className="bg-slate-50">
                 <DashboardHeader
                     collapsed={collapsed}
                     setCollapsed={setCollapsed}
                 />
 
-                {/* Mobile menu (shows when screen is small) */}
                 <MobileMenu collapsed={collapsed} currentPage={currentPage} />
 
-                <Content className="m-0 p-4 sm:p-6">
-                    <div className="bg-white rounded-lg min-h-screen border border-gray-100 shadow-sm">
+                <Content className="mx-4 my-4 sm:mx-6 sm:my-6 lg:mx-8 lg:my-8">
+                    <div className="bg-white rounded-xl border border-slate-200/60 shadow-sm overflow-hidden min-h-[calc(100vh-8rem)] transition-shadow duration-200 hover:shadow-md">
                         <Outlet />
                     </div>
                 </Content>
