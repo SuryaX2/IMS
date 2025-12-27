@@ -4,7 +4,6 @@ import { toast } from "react-hot-toast";
 import AuthContext from "../context/AuthContext";
 import { userService } from "../services/userService";
 
-// Components
 import ProfileHeader from "../components/profile/ProfileHeader";
 import EditProfileForm from "../components/profile/EditProfileForm";
 import AccountInfoTab from "../components/profile/AccountInfoTab";
@@ -16,23 +15,19 @@ const { Content } = Layout;
 const ProfilePage = () => {
     const { user, refreshUser } = useContext(AuthContext);
 
-    // Form instances
     const [profileForm] = Form.useForm();
     const [passwordForm] = Form.useForm();
     const [otpForm] = Form.useForm();
 
-    // UI state
     const [loading, setLoading] = useState(false);
     const [avatarLoading, setAvatarLoading] = useState(false);
     const [showOtpModal, setShowOtpModal] = useState(false);
     const [activeTab, setActiveTab] = useState("1");
     const [editMode, setEditMode] = useState(false);
 
-    // Data state
     const [isVerified, setIsVerified] = useState(user?.isVerified || false);
     const [newPasswordData, setNewPasswordData] = useState(null);
 
-    // Initialize form data from user
     useEffect(() => {
         if (user) {
             profileForm.setFieldsValue({
@@ -42,7 +37,6 @@ const ProfilePage = () => {
         }
     }, [user, profileForm]);
 
-    // Profile management
     const handleProfileUpdate = async (values) => {
         try {
             setLoading(true);
@@ -56,7 +50,6 @@ const ProfilePage = () => {
         }
     };
 
-    // Avatar management
     const handleAvatarUpload = async (info) => {
         if (info.file.status === "uploading") {
             setAvatarLoading(true);
@@ -81,7 +74,6 @@ const ProfilePage = () => {
         }, 0);
     };
 
-    // Password management
     const handlePasswordRequest = (values) => {
         setNewPasswordData({
             oldPassword: values.oldPassword,
@@ -134,88 +126,82 @@ const ProfilePage = () => {
         }
     };
 
-    // UI handlers
     const handleTabChange = (key) => {
         setActiveTab(key);
     };
 
     return (
-        <Content
-            className="p-4 md:p-8 min-h-screen"
-            style={{
-                background:
-                    "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 50%, #DBEAFE 100%)",
-            }}
-        >
-            <div className="max-w-5xl mx-auto">
-                {/* Profile Header Component */}
-                <ProfileHeader
-                    user={user}
-                    isVerified={isVerified}
-                    avatarLoading={avatarLoading}
-                    handleAvatarUpload={handleAvatarUpload}
-                    customUploadRequest={customUploadRequest}
-                    setEditMode={setEditMode}
-                />
+        <Content className="min-h-screen bg-white">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+                <Card className="border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <ProfileHeader
+                        user={user}
+                        isVerified={isVerified}
+                        avatarLoading={avatarLoading}
+                        handleAvatarUpload={handleAvatarUpload}
+                        customUploadRequest={customUploadRequest}
+                        setEditMode={setEditMode}
+                    />
 
-                {/* Profile Content */}
-                <Card className="shadow-xl rounded-3xl border-0 overflow-hidden hover:shadow-2xl transition-shadow duration-300 mb-8">
-                    {editMode ? (
-                        <EditProfileForm
-                            profileForm={profileForm}
-                            handleProfileUpdate={handleProfileUpdate}
-                            loading={loading}
-                            setEditMode={setEditMode}
-                            user={user}
-                        />
-                    ) : (
-                        <Tabs
-                            activeKey={activeTab}
-                            onChange={handleTabChange}
-                            className="profile-tabs"
-                            type="card"
-                            size="large"
-                            items={[
-                                {
-                                    key: "1",
-                                    label: "Account Information",
-                                    children: (
-                                        <AccountInfoTab
-                                            user={user}
-                                            isVerified={isVerified}
-                                            handleTabChange={handleTabChange}
-                                        />
-                                    ),
-                                },
-                                {
-                                    key: "2",
-                                    label: "Change Password",
-                                    children: (
-                                        <PasswordChangeTab
-                                            passwordForm={passwordForm}
-                                            handlePasswordRequest={
-                                                handlePasswordRequest
-                                            }
-                                            loading={loading}
-                                        />
-                                    ),
-                                },
-                            ]}
-                        />
-                    )}
+                    <div className="border-t border-gray-100">
+                        {editMode ? (
+                            <div className="p-6 sm:p-8">
+                                <EditProfileForm
+                                    profileForm={profileForm}
+                                    handleProfileUpdate={handleProfileUpdate}
+                                    loading={loading}
+                                    setEditMode={setEditMode}
+                                    user={user}
+                                />
+                            </div>
+                        ) : (
+                            <Tabs
+                                activeKey={activeTab}
+                                onChange={handleTabChange}
+                                size="large"
+                                items={[
+                                    {
+                                        key: "1",
+                                        label: "Account Information",
+                                        children: (
+                                            <AccountInfoTab
+                                                user={user}
+                                                isVerified={isVerified}
+                                                handleTabChange={
+                                                    handleTabChange
+                                                }
+                                            />
+                                        ),
+                                    },
+                                    {
+                                        key: "2",
+                                        label: "Change Password",
+                                        children: (
+                                            <PasswordChangeTab
+                                                passwordForm={passwordForm}
+                                                handlePasswordRequest={
+                                                    handlePasswordRequest
+                                                }
+                                                loading={loading}
+                                            />
+                                        ),
+                                    },
+                                ]}
+                            />
+                        )}
+                    </div>
                 </Card>
-
-                {/* OTP Verification Modal Component */}
-                <OtpVerificationModal
-                    showOtpModal={showOtpModal}
-                    setShowOtpModal={setShowOtpModal}
-                    otpForm={otpForm}
-                    handleVerifyOtp={handleVerifyOtp}
-                    handleSendOtp={handleSendOtp}
-                    loading={loading}
-                    newPasswordData={newPasswordData}
-                />
             </div>
+
+            <OtpVerificationModal
+                showOtpModal={showOtpModal}
+                setShowOtpModal={setShowOtpModal}
+                otpForm={otpForm}
+                handleVerifyOtp={handleVerifyOtp}
+                handleSendOtp={handleSendOtp}
+                loading={loading}
+                newPasswordData={newPasswordData}
+            />
         </Content>
     );
 };

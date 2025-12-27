@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Form, Input, Button, Typography } from "antd";
-import { ClockCircleOutlined, SafetyOutlined } from "@ant-design/icons";
+import { MailOutlined, SafetyOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -15,46 +15,33 @@ const OtpVerificationModal = ({
 }) => {
     return (
         <Modal
-            title={
-                <div className="flex items-center gap-2 p-2">
-                    <SafetyOutlined className="text-indigo-500 text-2xl" />
-                    <span className="text-indigo-800 font-bold text-xl">
-                        Security Verification
-                    </span>
-                </div>
-            }
+            title={null}
             open={showOtpModal}
             onCancel={() => setShowOtpModal(false)}
             footer={null}
             centered
-            className="rounded-2xl overflow-hidden"
-            width={420}
+            width={440}
             styles={{
-                padding: "24px",
+                body: { padding: "32px" },
             }}
         >
-            <Form form={otpForm} layout="vertical" onFinish={handleVerifyOtp}>
-                <div className="bg-white p-4 rounded-xl mb-6 border-l-4 border-indigo-500 shadow-md">
-                    <div className="flex items-start gap-3">
-                        <ClockCircleOutlined className="text-indigo-500 text-xl mt-1" />
-                        <div>
-                            <Text
-                                strong
-                                className="text-indigo-700 block mb-1 text-lg"
-                            >
-                                {newPasswordData
-                                    ? "Verify Password Change"
-                                    : "Email Verification"}
-                            </Text>
-                            <Text className="text-gray-600">
-                                {newPasswordData
-                                    ? "To complete your password change, please enter the OTP sent to your email."
-                                    : "Please enter the verification code sent to your email."}
-                            </Text>
-                        </div>
-                    </div>
+            <div className="flex flex-col items-center text-center mb-6">
+                <div className="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
+                    <SafetyOutlined className="text-indigo-600 text-2xl" />
                 </div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    {newPasswordData
+                        ? "Verify Password Change"
+                        : "Verify Your Email"}
+                </h2>
+                <Text className="text-gray-500 text-sm">
+                    {newPasswordData
+                        ? "Enter the verification code sent to your email to confirm your password change."
+                        : "We've sent a 6-digit verification code to your email address."}
+                </Text>
+            </div>
 
+            <Form form={otpForm} layout="vertical" onFinish={handleVerifyOtp}>
                 <Form.Item
                     name="otp"
                     rules={[
@@ -63,30 +50,39 @@ const OtpVerificationModal = ({
                             message: "Please input the OTP!",
                         },
                     ]}
+                    className="mb-6"
                 >
                     <Input
-                        placeholder="Enter 6-digit OTP"
-                        className="text-center text-xl rounded-lg h-14 font-mono"
+                        placeholder="000000"
+                        className="text-center text-2xl tracking-widest font-mono rounded-lg h-14 border-gray-300 focus:border-indigo-500"
                         maxLength={6}
                         size="large"
                     />
                 </Form.Item>
 
-                <div className="flex justify-between mt-6">
-                    <Button
-                        onClick={() => handleSendOtp()}
-                        className="text-indigo-600 hover:text-indigo-700 hover:border-indigo-500 rounded-lg"
-                    >
-                        Resend OTP
-                    </Button>
+                <div className="space-y-3">
                     <Button
                         type="primary"
                         htmlType="submit"
                         loading={loading}
-                        className="bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg shadow-md h-10 px-6"
+                        block
+                        className="bg-indigo-600 hover:bg-indigo-700 border-0 rounded-lg h-11 font-medium shadow-sm"
                     >
-                        Verify
+                        Verify Code
                     </Button>
+
+                    <div className="flex items-center justify-center gap-2 text-sm">
+                        <Text className="text-gray-500">
+                            Didn't receive the code?
+                        </Text>
+                        <Button
+                            type="link"
+                            onClick={() => handleSendOtp()}
+                            className="text-indigo-600 hover:text-indigo-700 p-0 h-auto font-medium"
+                        >
+                            Resend
+                        </Button>
+                    </div>
                 </div>
             </Form>
         </Modal>

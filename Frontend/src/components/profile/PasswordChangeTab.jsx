@@ -3,7 +3,8 @@ import { Form, Typography } from "antd";
 import {
     LockOutlined,
     KeyOutlined,
-    SafetyCertificateTwoTone,
+    SafetyCertificateOutlined,
+    CheckCircleOutlined,
 } from "@ant-design/icons";
 import { FormDivider, PrimaryButton, GradientCard } from "../common/UI";
 import { ConfirmPasswordFormItem, PasswordFormItem } from "../common/FormItems";
@@ -16,140 +17,180 @@ const PasswordChangeTab = ({
     loading,
 }) => {
     return (
-        <div className="animate-fadeIn">
-            {/* Background Header with Gradient */}
-            <div
-                className="h-36 lg:h-56 w-full relative overflow-hidden rounded-t-2xl"
-                style={{
-                    background:
-                        "linear-gradient(135deg, #2563eb 0%, #4f46e5 35%, #7c3aed 70%, #6366f1 100%)",
-                }}
-            >
-                <div className="absolute inset-0 flex items-center px-8">
-                    <div className="bg-white/20 p-3 rounded-full backdrop-blur-sm flex items-center justify-center shadow-lg">
-                        <KeyOutlined className="text-white text-xl" />
-                    </div>
-                    <div className="ml-4">
-                        <h1 className="text-2xl md:text-3xl font-bold text-white m-0">
-                            Password Security
-                        </h1>
-                        <Text className="text-white/80">
-                            Secure your account with a strong password
-                        </Text>
-                    </div>
-                </div>
-                <svg
-                    className="absolute bottom-0 left-0 w-full"
-                    viewBox="0 0 1440 100"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M0 50L60 45.7C120 41.3 240 32.7 360 30.8C480 29 600 34 720 38.3C840 42.7 960 46.3 1080 43.3C1200 40.3 1320 30.7 1380 25.8L1440 21V101H1380C1320 101 1200 101 1080 101C960 101 840 101 720 101C600 101 480 101 360 101C240 101 120 101 60 101H0V50Z"
-                        fill="white"
-                    />
-                </svg>
-            </div>
-
-            <div className="px-4 md:px-8 pb-8 pt-6">
-                <div className="max-w-3xl mx-auto">
-                    <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-full shadow-md">
-                                    <SafetyCertificateTwoTone
-                                        className="text-white text-xl"
-                                        twoToneColor="#ffffff"
-                                    />
+        <div className="animate-fadeIn w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
+            <div className="max-w-6xl mx-auto w-full">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
+                    <div className="lg:col-span-2 w-full">
+                        <div className="lg:sticky lg:top-8 w-full">
+                            <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 flex-shrink-0">
+                                    <KeyOutlined className="text-white text-lg sm:text-xl" />
                                 </div>
-                                <div>
-                                    <Text className="text-lg font-medium text-gray-800">
-                                        Update Password
-                                    </Text>
-                                    <Text className="text-gray-500 block">
-                                        Change your current password
-                                    </Text>
+                                <div className="min-w-0 flex-1">
+                                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 m-0 truncate">
+                                        Password Security
+                                    </h1>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="bg-blue-50 p-4 rounded-xl mb-6 border-l-4 border-blue-500 flex items-start gap-3">
-                            <SafetyCertificateTwoTone
-                                twoToneColor="#3B82F6"
-                                className="text-xl mt-1"
-                            />
-                            <Text className="text-blue-700">
-                                For security reasons, you'll need to enter your
-                                current password and verify with a one-time code
-                                sent to your email.
+                            <Text className="text-sm sm:text-base text-gray-600 block mb-6 sm:mb-8">
+                                Strengthen your account security by updating
+                                your password regularly
                             </Text>
-                        </div>
 
-                        <Form
-                            form={passwordForm}
-                            layout="vertical"
-                            onFinish={handlePasswordRequest}
-                        >
-                            <div className="space-y-4">
-                                <div className="bg-gray-50 p-5 rounded-lg border border-gray-100">
-                                    <PasswordFormItem
-                                        name="oldPassword"
-                                        label={
-                                            <div className="flex items-center gap-2">
-                                                <div className="bg-blue-100 p-2 rounded-full flex items-center justify-center">
-                                                    <LockOutlined className="text-blue-500 text-lg" />
-                                                </div>
-                                                <span>Current Password</span>
-                                            </div>
-                                        }
-                                        placeholder="Enter your current password"
-                                    />
+                            <div className="space-y-3 sm:space-y-4">
+                                <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <CheckCircleOutlined className="text-green-600 text-sm" />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <Text className="text-sm font-medium text-gray-900 block mb-1">
+                                            Strong Password
+                                        </Text>
+                                        <Text className="text-xs sm:text-sm text-gray-600">
+                                            Use at least 8 characters with a mix
+                                            of letters, numbers, and symbols
+                                        </Text>
+                                    </div>
                                 </div>
 
-                                <div className="bg-gray-50 p-5 rounded-lg border border-gray-100">
-                                    <PasswordFormItem
-                                        name="password"
-                                        label={
-                                            <div className="flex items-center gap-2">
-                                                <div className="bg-green-100 p-2 rounded-full flex items-center justify-center">
-                                                    <LockOutlined className="text-green-500 text-lg" />
-                                                </div>
-                                                <span>New Password</span>
-                                            </div>
-                                        }
-                                        placeholder="Enter your new password"
-                                    />
+                                <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <SafetyCertificateOutlined className="text-blue-600 text-sm" />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <Text className="text-sm font-medium text-gray-900 block mb-1">
+                                            Email Verification
+                                        </Text>
+                                        <Text className="text-xs sm:text-sm text-gray-600">
+                                            We'll send a one-time code to your
+                                            email for additional security
+                                        </Text>
+                                    </div>
                                 </div>
 
-                                <div className="bg-gray-50 p-5 rounded-lg border border-gray-100">
-                                    <ConfirmPasswordFormItem
-                                        label={
-                                            <div className="flex items-center gap-2">
-                                                <div className="bg-green-100 p-2 rounded-full flex items-center justify-center">
-                                                    <LockOutlined className="text-green-500 text-lg" />
-                                                </div>
-                                                <span>
-                                                    Confirm New Password
-                                                </span>
-                                            </div>
-                                        }
-                                    />
+                                <div className="flex items-start gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <LockOutlined className="text-purple-600 text-sm" />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <Text className="text-sm font-medium text-gray-900 block mb-1">
+                                            Secure Process
+                                        </Text>
+                                        <Text className="text-xs sm:text-sm text-gray-600">
+                                            Your current password is required to
+                                            authorize this change
+                                        </Text>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <FormDivider />
+                    <div className="lg:col-span-3 w-full">
+                        <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden w-full">
+                            <div className="bg-gradient-to-r from-slate-50 to-blue-50/50 px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100">
+                                <Text className="text-base sm:text-lg font-semibold text-gray-900 block">
+                                    Update Your Password
+                                </Text>
+                                <Text className="text-xs sm:text-sm text-gray-600 block mt-1">
+                                    Enter your current and new password below
+                                </Text>
+                            </div>
 
-                            <Form.Item>
-                                <PrimaryButton
-                                    htmlType="submit"
-                                    loading={loading}
-                                    icon={<LockOutlined />}
-                                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 border-0 rounded-full shadow-lg transition-all duration-300 hover:scale-105"
+                            <div className="p-4 sm:p-6 md:p-8 w-full">
+                                <Form
+                                    form={passwordForm}
+                                    layout="vertical"
+                                    onFinish={handlePasswordRequest}
                                 >
-                                    Update Password
-                                </PrimaryButton>
-                            </Form.Item>
-                        </Form>
+                                    <div className="space-y-5 sm:space-y-6">
+                                        <div className="bg-slate-50 rounded-lg sm:rounded-xl p-4 sm:p-5 border border-slate-200 w-full">
+                                            <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                                                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-200 flex items-center justify-center flex-shrink-0">
+                                                    <LockOutlined className="text-slate-600 text-xs" />
+                                                </div>
+                                                <Text className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                                    Current Authentication
+                                                </Text>
+                                            </div>
+                                            <PasswordFormItem
+                                                name="oldPassword"
+                                                label={
+                                                    <span className="text-sm font-medium text-gray-700">
+                                                        Current Password
+                                                    </span>
+                                                }
+                                                placeholder="Enter your current password"
+                                            />
+                                        </div>
+
+                                        <div className="relative">
+                                            <div className="absolute left-1/2 -translate-x-1/2 -top-3 bg-white px-3 py-1 rounded-full border border-gray-200 shadow-sm z-10">
+                                                <Text className="text-xs font-medium text-gray-500 whitespace-nowrap">
+                                                    New Credentials
+                                                </Text>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-4 sm:p-5 border border-blue-200 w-full">
+                                            <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                                                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-blue-200 flex items-center justify-center flex-shrink-0">
+                                                    <KeyOutlined className="text-blue-700 text-xs" />
+                                                </div>
+                                                <Text className="text-xs font-semibold text-blue-700 uppercase tracking-wider">
+                                                    New Password Setup
+                                                </Text>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <PasswordFormItem
+                                                    name="password"
+                                                    label={
+                                                        <span className="text-sm font-medium text-gray-700">
+                                                            New Password
+                                                        </span>
+                                                    }
+                                                    placeholder="Create a strong password"
+                                                />
+
+                                                <ConfirmPasswordFormItem
+                                                    label={
+                                                        <span className="text-sm font-medium text-gray-700">
+                                                            Confirm New Password
+                                                        </span>
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-amber-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-amber-200 flex items-start gap-2 sm:gap-3">
+                                            <SafetyCertificateOutlined className="text-amber-600 text-sm sm:text-base mt-0.5 flex-shrink-0" />
+                                            <Text className="text-xs sm:text-sm text-amber-900 leading-relaxed">
+                                                After submitting, you'll receive
+                                                a verification code via email.
+                                                Keep this tab open to complete
+                                                the process.
+                                            </Text>
+                                        </div>
+                                    </div>
+
+                                    <FormDivider />
+
+                                    <Form.Item className="mb-0">
+                                        <PrimaryButton
+                                            htmlType="submit"
+                                            loading={loading}
+                                            icon={<LockOutlined />}
+                                            block
+                                            size="large"
+                                            className="h-11 sm:h-12 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl transition-shadow w-full"
+                                        >
+                                            Update Password Securely
+                                        </PrimaryButton>
+                                    </Form.Item>
+                                </Form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
