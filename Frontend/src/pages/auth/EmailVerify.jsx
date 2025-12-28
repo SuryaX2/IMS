@@ -1,6 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import { Form, Spin, Typography } from "antd";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import {
+    CheckCircleOutlined,
+    MailOutlined,
+    ArrowLeftOutlined,
+} from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
@@ -10,7 +14,7 @@ import { OtpInput } from "../../components/auth/FormItems";
 import AuthButton from "../../components/auth/AuthButton";
 import { api } from "../../api/api";
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 const EmailVerify = () => {
     const [loading, setLoading] = useState(false);
@@ -21,7 +25,6 @@ const EmailVerify = () => {
     const { user, setUser } = useContext(AuthContext);
 
     useEffect(() => {
-        // Redirect if user is already verified, but don't show toast if we just verified
         if (user?.isVerified && !justVerified) {
             toast.success("Your email is already verified!");
             navigate("/dashboard");
@@ -30,7 +33,6 @@ const EmailVerify = () => {
         }
     }, [user, navigate, justVerified]);
 
-    // Function to send verification OTP
     const sendVerificationOtp = async () => {
         setLoading(true);
         try {
@@ -64,7 +66,6 @@ const EmailVerify = () => {
         }
     };
 
-    // Function to verify OTP
     const onFinish = async (values) => {
         setVerifying(true);
         try {
@@ -87,12 +88,10 @@ const EmailVerify = () => {
                 setJustVerified(true);
                 toast.success("Email verified successfully!");
 
-                // Update user context
                 if (setUser) {
                     setUser((prev) => ({ ...prev, isVerified: true }));
                 }
 
-                // Redirect to home page after short delay
                 setTimeout(() => {
                     navigate("/dashboard");
                 }, 1500);
@@ -110,7 +109,6 @@ const EmailVerify = () => {
         }
     };
 
-    // Trigger OTP send on component mount if not already sent
     useEffect(() => {
         if (!otpSent && !user?.isVerified) {
             sendVerificationOtp();
@@ -120,13 +118,13 @@ const EmailVerify = () => {
     return (
         <AuthLayout>
             <AuthCard
-                title="Email Verification"
-                subtitle="We've sent a 6-digit code to your email address."
+                title={"Verify Your Email"}
+                subtitle={"Enter the 6-digit code sent to your email"}
             >
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-8">
+                    <div className="flex flex-col items-center justify-center py-12">
                         <Spin size="large" />
-                        <Text className="mt-4">
+                        <Text className="mt-4 text-gray-600">
                             Sending verification code...
                         </Text>
                     </div>
@@ -138,59 +136,63 @@ const EmailVerify = () => {
                                 onFinish={onFinish}
                                 layout="vertical"
                             >
-                                <OtpInput />
+                                <div className="mb-8">
+                                    <OtpInput />
+                                </div>
 
-                                <Form.Item>
+                                <Form.Item className="mb-6">
                                     <AuthButton
                                         loading={verifying}
                                         icon={<CheckCircleOutlined />}
+                                        className="w-full h-11"
                                     >
                                         Verify Email
                                     </AuthButton>
                                 </Form.Item>
 
-                                <div className="flex justify-between mt-4">
-                                    <AuthButton
-                                        type="link"
+                                <div className="flex items-center justify-center gap-6 text-sm">
+                                    <button
+                                        type="button"
                                         onClick={sendVerificationOtp}
                                         disabled={loading}
-                                        className="text-blue-500 hover:text-blue-700 font-medium p-0"
+                                        className="text-blue-600 hover:text-blue-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Resend OTP
-                                    </AuthButton>
-
-                                    <AuthButton
-                                        type="link"
+                                        Resend Code
+                                    </button>
+                                    <span className="text-gray-300">|</span>
+                                    <button
+                                        type="button"
                                         onClick={() => navigate("/login")}
-                                        className="text-blue-500 hover:text-blue-700 font-medium p-0"
+                                        className="text-gray-600 hover:text-gray-800 font-medium transition-colors inline-flex items-center gap-1"
                                     >
+                                        <ArrowLeftOutlined className="text-xs" />
                                         Back to Login
-                                    </AuthButton>
+                                    </button>
                                 </div>
                             </Form>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-8">
                                 <AuthButton
                                     onClick={() => navigate("/login")}
-                                    className="w-1/2"
+                                    className="w-full max-w-xs h-11"
                                 >
-                                    Login to continue
+                                    Login to Continue
                                 </AuthButton>
                             </div>
                         )}
                     </>
                 )}
 
-                <div className="mt-6 text-center">
-                    <span className="text-sm">
-                        Having trouble?{" "}
+                <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                    <Text className="text-sm text-gray-500">
+                        Need help?{" "}
                         <a
                             href="mailto:sekharsurya111@gmail.com"
-                            className="text-blue-500 hover:text-blue-700 font-medium"
+                            className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
                         >
                             Contact Support
                         </a>
-                    </span>
+                    </Text>
                 </div>
             </AuthCard>
         </AuthLayout>

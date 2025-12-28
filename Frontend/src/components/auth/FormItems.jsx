@@ -24,10 +24,10 @@ export const EmailInput = ({ name = "email", required = true, ...props }) => (
         {...props}
     >
         <Input
-            prefix={<MailOutlined className="text-gray-400" />}
+            prefix={<MailOutlined className="text-slate-400" />}
             placeholder="Email"
             size="large"
-            className="rounded-md py-2 bg-gray-100"
+            className="rounded-xl border-slate-200 hover:border-indigo-400 focus:border-indigo-500 bg-white transition-colors"
         />
     </Form.Item>
 );
@@ -55,10 +55,10 @@ export const PasswordInput = ({
         {...props}
     >
         <Input.Password
-            prefix={<LockOutlined className="text-gray-400" />}
+            prefix={<LockOutlined className="text-slate-400" />}
             placeholder={placeholder}
             size="large"
-            className="rounded-md py-2 bg-gray-100"
+            className="rounded-xl border-slate-200 hover:border-indigo-400 focus:border-indigo-500 bg-white transition-colors"
         />
     </Form.Item>
 );
@@ -83,10 +83,10 @@ export const UsernameInput = ({
         {...props}
     >
         <Input
-            prefix={<UserOutlined className="text-gray-400" />}
+            prefix={<UserOutlined className="text-slate-400" />}
             placeholder="Username"
             size="large"
-            className="rounded-md py-2 bg-gray-100"
+            className="rounded-xl border-slate-200 hover:border-indigo-400 focus:border-indigo-500 bg-white transition-colors"
         />
     </Form.Item>
 );
@@ -111,16 +111,15 @@ export const OtpInput = ({ name = "otp", required = true, ...props }) => (
         {...props}
     >
         <Input
-            prefix={<KeyOutlined className="text-gray-400" />}
+            prefix={<KeyOutlined className="text-slate-400" />}
             placeholder="Enter 6-digit OTP"
             size="large"
-            className="rounded-md py-2 bg-gray-100"
+            className="rounded-xl border-slate-200 hover:border-indigo-400 focus:border-indigo-500 bg-white transition-colors"
             maxLength={6}
         />
     </Form.Item>
 );
 
-// Prop types
 const inputPropTypes = {
     name: PropTypes.string,
     required: PropTypes.bool,

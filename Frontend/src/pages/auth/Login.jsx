@@ -22,7 +22,7 @@ const Login = () => {
     };
 
     return (
-        <AuthLayout imageSrc="/Inventory-management-system.webp">
+        <AuthLayout imageSrc="/imsTopImage.png">
             <AuthCard
                 title="Login"
                 subtitle="Sign in to continue to your account"
@@ -33,33 +33,35 @@ const Login = () => {
                     onFinish={onFinish}
                     layout="vertical"
                 >
-                    <EmailInput />
-                    <PasswordInput />
+                    <div className="space-y-4 mb-6">
+                        <EmailInput />
+                        <PasswordInput />
+                    </div>
 
-                    <Form.Item className="mb-2">
-                        <div className="flex justify-end">
-                            <Link
-                                to="/reset-password"
-                                className="text-blue-500 hover:text-blue-700 font-medium"
-                            >
-                                Forgot password?
-                            </Link>
-                        </div>
-                    </Form.Item>
+                    <div className="flex justify-end mb-5">
+                        <Link
+                            to="/reset-password"
+                            className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                        >
+                            Forgot password?
+                        </Link>
+                    </div>
 
-                    <Form.Item>
+                    <Form.Item className="mb-0">
                         <AuthButton loading={loading}>Sign In</AuthButton>
                     </Form.Item>
 
-                    <Divider plain>Or</Divider>
+                    <Divider plain className="my-6 text-gray-400 text-sm">
+                        Or
+                    </Divider>
 
-                    <div className="text-center mt-4">
+                    <div className="text-center text-sm">
                         <span className="text-gray-600">
                             Don't have an account?
                         </span>{" "}
                         <Link
                             to="/signup"
-                            className="text-blue-500 hover:text-blue-700 font-medium"
+                            className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
                         >
                             Sign up
                         </Link>

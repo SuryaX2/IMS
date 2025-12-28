@@ -19,7 +19,7 @@ const AuthButton = ({
             loading={loading}
             onClick={onClick}
             icon={icon}
-            className="bg-blue-500 hover:bg-blue-900 h-10 rounded-md"
+            className="h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 border-0 shadow-sm hover:shadow-md transition-all duration-200 font-medium"
             {...props}
         >
             {children}

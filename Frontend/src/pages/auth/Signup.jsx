@@ -34,14 +34,12 @@ const Signup = () => {
         try {
             setLoading(true);
 
-            // Create FormData for file upload
             const formData = new FormData();
             formData.append("username", values.username);
             formData.append("email", values.email);
             formData.append("password", values.password);
             formData.append("avatar", avatarFile);
 
-            // Send the form data to the backend
             const response = await api.post(`/users/register`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -63,7 +61,7 @@ const Signup = () => {
     };
 
     return (
-        <AuthLayout>
+        <AuthLayout imageSrc="/imsTopImage.png">
             <AuthCard
                 title="Create an Account"
                 subtitle="Join our platform and get started"
@@ -76,28 +74,34 @@ const Signup = () => {
                     requiredMark={false}
                     className="w-full"
                 >
-                    <div className="w-32 mx-auto mb-7">
-                        <AvatarUpload onChange={handleAvatarChange} />
+                    <div className="flex flex-col items-center mb-8">
+                        <div className="w-28 h-28">
+                            <AvatarUpload onChange={handleAvatarChange} />
+                        </div>
                     </div>
 
-                    <UsernameInput />
-                    <EmailInput />
-                    <PasswordInput hasFeedback={true} />
+                    <div className="space-y-4">
+                        <UsernameInput />
+                        <EmailInput />
+                        <PasswordInput hasFeedback={true} />
+                    </div>
 
-                    <Form.Item className="mt-6">
+                    <Form.Item className="mb-0 mt-6">
                         <AuthButton loading={loading}>Sign Up</AuthButton>
                     </Form.Item>
                 </Form>
 
-                <Divider plain>Or</Divider>
+                <Divider className="my-6" plain>
+                    Or
+                </Divider>
 
-                <div className="text-center mt-4">
+                <div className="text-center text-sm">
                     <span className="text-gray-600">
                         Already have an account?
                     </span>{" "}
                     <button
                         onClick={() => navigate("/login")}
-                        className="text-blue-600 font-medium px-2 hover:text-blue-800"
+                        className="text-blue-600 font-medium hover:text-blue-700 transition-colors"
                     >
                         Log in
                     </button>

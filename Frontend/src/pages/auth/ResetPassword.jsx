@@ -94,7 +94,7 @@ const ResetPassword = () => {
         {
             title: "Email",
             content: (
-                <Form layout="vertical">
+                <Form layout="vertical" className="space-y-5">
                     <EmailInput
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -108,23 +108,25 @@ const ResetPassword = () => {
         {
             title: "Verify",
             content: (
-                <Form layout="vertical">
+                <Form layout="vertical" className="space-y-4">
                     <OtpInput
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
                     />
-                    <PasswordInput
-                        name="newPassword"
-                        placeholder="Enter new password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                    <PasswordInput
-                        name="confirmPassword"
-                        placeholder="Confirm new password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
+                    <div className="space-y-3">
+                        <PasswordInput
+                            name="newPassword"
+                            placeholder="Enter new password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        <PasswordInput
+                            name="confirmPassword"
+                            placeholder="Confirm new password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                    </div>
                     <AuthButton onClick={handleResetPassword} loading={loading}>
                         Reset Password
                     </AuthButton>
@@ -143,34 +145,40 @@ const ResetPassword = () => {
                         : "Enter your email to reset password"
                 }
             >
-                <Steps current={currentStep} className="mb-8">
-                    {steps.map((item) => (
-                        <Step key={item.title} title={item.title} />
-                    ))}
-                </Steps>
+                <div className="mb-6">
+                    <Steps
+                        current={currentStep}
+                        size="small"
+                        className="max-w-xs mx-auto"
+                    >
+                        {steps.map((item) => (
+                            <Step key={item.title} title={item.title} />
+                        ))}
+                    </Steps>
+                </div>
 
-                <div>{steps[currentStep].content}</div>
+                <div className="mt-6">{steps[currentStep].content}</div>
 
                 {currentStep === 1 && (
-                    <div className="mt-4 text-center">
+                    <div className="mt-5 text-center">
                         <AuthButton
                             type="link"
                             onClick={handleSendOTP}
                             disabled={loading}
-                            className="p-0"
+                            className="p-0 h-auto text-sm text-gray-600 hover:text-blue-600"
                         >
                             Resend OTP
                         </AuthButton>
                     </div>
                 )}
 
-                <div className="text-center mt-4">
-                    <span className="text-gray-600">
+                <div className="text-center mt-6 pt-4 border-t border-gray-100">
+                    <span className="text-sm text-gray-500">
                         Remember your password?{" "}
-                    </span>{" "}
+                    </span>
                     <Link
                         to="/login"
-                        className="text-blue-500 hover:text-blue-700 font-medium"
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                     >
                         Log in
                     </Link>
