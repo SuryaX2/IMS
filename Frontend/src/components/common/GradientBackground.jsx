@@ -5,6 +5,7 @@ const GradientBackground = ({
     className = "",
     type = "blue", // blue, white-to-blue, blue-to-white
     decorations = true,
+    id,
 }) => {
     let bgClass = "";
 
@@ -23,7 +24,7 @@ const GradientBackground = ({
     }
 
     return (
-        <div className={`${bgClass} ${className} relative overflow-hidden`}>
+        <div id={id} className={`${bgClass} ${className} relative overflow-hidden`}>
             {decorations && type === "blue" && (
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white"></div>
@@ -46,7 +47,7 @@ const GradientBackground = ({
                 </>
             )}
 
-            <div className="container mx-auto px-4 relative z-10">
+            <div className="container mx-auto px-4 relative z-10" id={id}>
                 {children}
             </div>
         </div>

@@ -39,17 +39,17 @@ const Navbar = () => {
 
     return (
         <Header
-            className={`px-4 flex items-center justify-between h-16 fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+            className={`px-0 flex items-center justify-between h-16 fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
                 scrolled
-                    ? "bg-white shadow-md"
+                    ? "bg-white/95 backdrop-blur-md shadow-md border-b border-gray-100"
                     : "bg-transparent"
-                }`}
-            style={{borderBottom: "none"}}
+            }`}
+            style={{ borderBottom: "none" }}
         >
-            <div className="container mx-auto px-4 flex items-center justify-between">
+            <div className="container mx-auto px-6 flex items-center justify-between">
                 <div className="flex items-center">
                     <div
-                        className={`text-2xl font-bold cursor-pointer transition-colors ${
+                        className={`text-2xl font-semibold cursor-pointer transition-colors duration-200 tracking-tight ${
                             scrolled ? "text-blue-600" : "text-white"
                         }`}
                         onClick={() => handleNavigation("/")}
@@ -58,9 +58,9 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                <div className="hidden md:flex items-center">
-                    <nav className="mr-8">
-                        <ul className="flex space-x-8">
+                <div className="hidden md:flex items-center gap-8">
+                    <nav>
+                        <ul className="flex items-center gap-8">
                             {navLinks.map((link) => (
                                 <li key={link.name}>
                                     <a
@@ -76,34 +76,43 @@ const Navbar = () => {
                                                 block: "center",
                                             });
                                         }}
-                                        className={`font-medium hover:text-blue-300 transition-colors ${
+                                        className={`text-sm font-medium transition-all duration-200 relative group ${
                                             scrolled
-                                                ? "text-gray-700"
-                                                : "text-white"
+                                                ? "text-gray-600 hover:text-gray-900"
+                                                : "text-white/90 hover:text-white"
                                         }`}
                                     >
                                         {link.name}
+                                        <span
+                                            className={`absolute left-0 -bottom-1 w-0 h-0.5 transition-all duration-200 group-hover:w-full ${
+                                                scrolled
+                                                    ? "bg-gray-900"
+                                                    : "bg-white"
+                                            }`}
+                                        ></span>
                                     </a>
                                 </li>
                             ))}
                         </ul>
                     </nav>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center gap-3">
                         <Button
                             onClick={() => handleNavigation("/login")}
-                            className={
+                            className={`h-9 px-5 text-sm font-medium border rounded-xl transition-all duration-200 ${
                                 scrolled
-                                    ? ""
-                                    : "text-white border-white hover:text-white hover:border-blue-300"
-                            }
-                            ghost={!scrolled}
+                                    ? "border-gray-200 text-gray-700 hover:border-gray-300 hover:text-gray-900 bg-transparent"
+                                    : "border-white/30 text-white hover:border-white hover:bg-white/10 bg-transparent"
+                            }`}
                         >
                             Login
                         </Button>
                         <Button
-                            type="primary"
                             onClick={() => handleNavigation("/signup")}
-                            className={`${scrolled ? "bg-blue-600 hover:bg-blue-700" : "bg-white text-blue-600 hover:bg-gray-100"} border-none`}
+                            className={`h-9 px-5 text-sm font-medium rounded-xl border-0 transition-all duration-200 shadow-sm hover:shadow ${
+                                scrolled
+                                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                                    : "bg-white text-blue-600 hover:bg-gray-50"
+                            }`}
                         >
                             Sign Up
                         </Button>
@@ -115,20 +124,20 @@ const Navbar = () => {
                         type="text"
                         icon={
                             <MenuOutlined
-                                className={
-                                    scrolled ? "text-blue-600" : "text-white"
-                                }
+                                className={`text-xl ${
+                                    scrolled ? "text-gray-900" : "text-white"
+                                }`}
                             />
                         }
                         onClick={showDrawer}
-                        className="border-none shadow-none"
+                        className="border-0 shadow-none hover:bg-transparent"
                     />
                 </div>
             </div>
 
             <Drawer
                 title={
-                    <span className="text-xl font-bold text-blue-600">
+                    <span className="text-lg font-semibold text-gray-900 tracking-tight">
                         InventoryPro
                     </span>
                 }
@@ -136,49 +145,61 @@ const Navbar = () => {
                 onClose={closeDrawer}
                 open={visible}
                 width={280}
+                styles={{
+                    header: {
+                        borderBottom: "1px solid #f0f0f0",
+                        padding: "20px 24px",
+                    },
+                    body: {
+                        padding: "24px",
+                    },
+                }}
             >
-                <div className="mt-4 space-y-4">
-                    {navLinks.map((link) => (
-                        <div
-                            key={link.name}
-                            className="py-2 border-b border-gray-100"
+                <div className="flex flex-col h-full">
+                    <nav className="flex-1">
+                        {navLinks.map((link) => (
+                            <div key={link.name} className="mb-1">
+                                <a
+                                    href="#"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        const anchor = document.getElementById(
+                                            link.path
+                                        );
+                                        if (anchor) {
+                                            anchor.scrollIntoView({
+                                                behavior: "smooth",
+                                                block: "start",
+                                            });
+                                            setTimeout(
+                                                () => closeDrawer(),
+                                                100
+                                            );
+                                        }
+                                    }}
+                                    className="block py-3 px-4 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-200 text-sm font-medium"
+                                >
+                                    {link.name}
+                                </a>
+                            </div>
+                        ))}
+                    </nav>
+                    <div className="flex flex-col gap-3 pt-6 border-t border-gray-100">
+                        <Button
+                            block
+                            onClick={() => handleNavigation("/login")}
+                            className="h-10 text-sm font-medium border-gray-200 text-gray-700 hover:border-gray-300 hover:text-gray-900 rounded-xl"
                         >
-                            <a
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    const anchor = document.getElementById(
-                                        link.path
-                                    );
-                                    if (anchor) {
-                                        anchor.scrollIntoView({
-                                            behavior: "smooth",
-                                            block: "start",
-                                        });
-                                        setTimeout(() => closeDrawer(), 100);
-                                    }
-                                }}
-                                className="text-gray-800 hover:text-blue-600 transition-colors text-lg"
-                            >
-                                {link.name}
-                            </a>
-                        </div>
-                    ))}
-                    <Button
-                        block
-                        onClick={() => handleNavigation("/login")}
-                        className="mt-6"
-                    >
-                        Login
-                    </Button>
-                    <Button
-                        block
-                        type="primary"
-                        onClick={() => handleNavigation("/signup")}
-                        className="bg-blue-600 hover:bg-blue-700"
-                    >
-                        Sign Up
-                    </Button>
+                            Login
+                        </Button>
+                        <Button
+                            block
+                            onClick={() => handleNavigation("/signup")}
+                            className="h-10 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white border-0 rounded-xl shadow-sm"
+                        >
+                            Sign Up
+                        </Button>
+                    </div>
                 </div>
             </Drawer>
         </Header>

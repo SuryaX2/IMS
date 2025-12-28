@@ -6,19 +6,19 @@ import GradientBackground from "../common/GradientBackground";
 
 const Hero = ({ onGetStarted }) => {
     return (
-        <GradientBackground className="pt-16 md:py-24" type="blue">
-            <Row gutter={[32, 40]} align="middle">
+        <GradientBackground className="py-20 md:py-32" type="blue">
+            <Row gutter={[48, 48]} align="middle">
                 <Col xs={24} md={12}>
-                    <div className="text-white">
-                        <h1 className="text-4xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight mt-10 md:mt-0">
+                    <div className="text-white space-y-8">
+                        <h1 className="text-5xl md:text-6xl font-bold leading-tight tracking-tight max-w-xl">
                             Smart Inventory Management for Modern Businesses
                         </h1>
-                        <p className="text-lg md:text-xl opacity-90 mb-6 md:mb-10 max-w-lg">
+                        <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-xl">
                             Streamline your inventory, reduce costs, and boost
                             efficiency with our powerful yet intuitive inventory
                             solution.
                         </p>
-                        <div className="flex flex-wrap gap-4">
+                        <div className="flex flex-wrap gap-4 pt-2">
                             <Button
                                 type="secondary"
                                 size="large"
@@ -40,17 +40,17 @@ const Hero = ({ onGetStarted }) => {
                     </div>
                 </Col>
                 <Col xs={24} md={12}>
-                    <div className="relative mt-6 md:mt-0 mb-6">
-                        {/* Image frame with shadow and border */}
-                        <div className="absolute inset-0 bg-white/10 rounded-xl transform rotate-3"></div>
-                        <img
-                            src="/Inventory-management-system.webp"
-                            alt="Inventory Dashboard"
-                            className="w-full object-contain rounded-lg shadow-2xl relative z-10 transform hover:scale-105 transition-transform duration-500"
-                        />
-                        {/* Decorative elements */}
-                        <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-blue-400 rounded-full opacity-60 hidden md:block"></div>
-                        <div className="absolute -top-4 -right-4 w-10 h-10 bg-indigo-500 rounded-full opacity-60 hidden md:block"></div>
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-white/5 rounded-2xl transform rotate-2 blur-sm"></div>
+                        <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-3 shadow-2xl">
+                            <img
+                                src="/Inventory-management-system.webp"
+                                alt="Inventory Dashboard"
+                                className="w-full rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl"
+                            />
+                        </div>
+                        <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-white/10 rounded-full blur-xl hidden md:block"></div>
+                        <div className="absolute -top-6 -right-6 w-16 h-16 bg-white/10 rounded-full blur-lg hidden md:block"></div>
                     </div>
                 </Col>
             </Row>
