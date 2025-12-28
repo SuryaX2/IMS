@@ -49,7 +49,7 @@ const Navbar = () => {
             <div className="container mx-auto px-6 flex items-center justify-between">
                 <div className="flex items-center">
                     <div
-                        className={`text-2xl font-semibold cursor-pointer transition-colors duration-200 tracking-tight ${
+                        className={`text-2xl font-bold cursor-pointer transition-colors duration-200 tracking-tight ${
                             scrolled ? "text-blue-600" : "text-white"
                         }`}
                         onClick={() => handleNavigation("/")}

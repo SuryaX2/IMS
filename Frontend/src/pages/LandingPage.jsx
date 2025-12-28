@@ -20,7 +20,7 @@ const LandingPage = () => {
     };
 
     return (
-        <Layout className="overflow-hidden bg-white">
+        <Layout className="min-h-screen bg-white">
             <Navbar />
             <Content>
                 <Hero onGetStarted={handleGetStarted} />
@@ -29,7 +29,6 @@ const LandingPage = () => {
                 <Testimonials testimonials={testimonials} />
                 <CTASection />
             </Content>
-
             <Footer />
         </Layout>
     );
