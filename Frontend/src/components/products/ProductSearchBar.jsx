@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Input, Button, Space } from "antd";
+import { Input, Button, Space } from "antd";
 import {
     SearchOutlined,
     FilterOutlined,
@@ -14,50 +14,50 @@ const ProductSearchBar = ({
     onReset,
 }) => {
     return (
-        <Card className="mb-4 sm:mb-6">
-            <div className="flex flex-col gap-3 sm:gap-4">
-                {/* Search Input */}
-                <Input
-                    placeholder="Search products by name or code"
-                    prefix={<SearchOutlined />}
-                    value={searchText}
-                    onChange={(e) => onSearchChange(e.target.value)}
-                    onPressEnter={onSearch}
-                    size="large"
-                    className="w-full"
-                />
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm px-4 py-3 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                <div className="flex-1">
+                    <Input
+                        placeholder="Search products by name or code..."
+                        prefix={<SearchOutlined className="text-gray-400" />}
+                        value={searchText}
+                        onChange={(e) => onSearchChange(e.target.value)}
+                        onPressEnter={onSearch}
+                        size="large"
+                        className="w-full"
+                    />
+                </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                <Space size="small" className="w-full sm:w-auto">
                     <Button
                         icon={<FilterOutlined />}
                         onClick={onShowFilters}
-                        className="flex-1 min-w-0 sm:flex-none"
                         size="large"
+                        className="flex-1 sm:flex-none"
                     >
-                        <span className="hidden sm:inline">Filters</span>
+                        Filters
                     </Button>
 
                     <Button
                         icon={<ReloadOutlined />}
                         onClick={onReset}
-                        className="flex-1 min-w-0 sm:flex-none"
                         size="large"
+                        className="flex-1 sm:flex-none"
                     >
-                        <span className="hidden sm:inline">Reset</span>
+                        Reset
                     </Button>
 
                     <Button
                         type="primary"
                         onClick={onSearch}
-                        className="flex-1 min-w-0 sm:flex-none"
                         size="large"
+                        className="flex-1 sm:flex-none"
                     >
                         Search
                     </Button>
-                </div>
+                </Space>
             </div>
-        </Card>
+        </div>
     );
 };
 
