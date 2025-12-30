@@ -113,7 +113,7 @@ const ProductsTable = ({
                             <Text type="secondary">Selling Price:</Text>
                             <br />
                             <Text strong>
-                                ${product.selling_price.toFixed(2)}
+                                ₹{product.selling_price.toFixed(2)}
                             </Text>
                         </div>
                         <div>
@@ -210,10 +210,10 @@ const ProductsTable = ({
             render: (_, record) => (
                 <div className="flex flex-col">
                     <Text strong className="text-sm">
-                        ${record.selling_price.toFixed(2)}
+                        ₹ {record.selling_price.toFixed(2)}
                     </Text>
                     <Text type="secondary" className="text-xs">
-                        Buy: ${record.buying_price.toFixed(2)}
+                        Buy: ₹{record.buying_price.toFixed(2)}
                     </Text>
                 </div>
             ),
