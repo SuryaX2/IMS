@@ -89,11 +89,11 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white px-3 py-2 border border-gray-200 shadow-md rounded-lg">
-                    <p className="text-gray-500 text-xs font-medium mb-0.5">
+                <div className="bg-white px-4 py-3 border border-slate-200 shadow-lg rounded-lg">
+                    <p className="text-slate-500 text-xs font-medium mb-1">
                         {label}
                     </p>
-                    <p className="text-blue-600 font-semibold text-sm mb-0">
+                    <p className="text-blue-600 font-bold text-base mb-0">
                         ${Number(payload[0].value).toLocaleString()}
                     </p>
                 </div>
@@ -115,74 +115,81 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
     }, [salesData, totalSales, totalOrders]);
 
     return (
-        <section className="h-full bg-white rounded-lg border border-gray-200 shadow-sm">
-            <header className="px-5 py-4 border-b border-gray-100">
-                <div className="flex items-center gap-2">
-                    <LineChartOutlined className="text-blue-600 text-lg" />
-                    <h2 className="m-0 text-gray-900 font-semibold text-base">
-                        Sales Performance
-                    </h2>
+        <section className="w-full bg-white rounded-xl shadow-sm border border-slate-200">
+            <header className="px-6 py-5 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                        <LineChartOutlined className="text-blue-600 text-lg" />
+                    </div>
+                    <div>
+                        <h2 className="m-0 text-slate-900 font-bold text-lg leading-tight">
+                            Sales Performance
+                        </h2>
+                        <p className="m-0 text-slate-500 text-xs mt-0.5">
+                            Track your revenue and order trends
+                        </p>
+                    </div>
                 </div>
             </header>
 
             {loading ? (
-                <div className="flex justify-center items-center h-96">
+                <div className="flex justify-center items-center py-32">
                     <Spin size="large" />
                 </div>
             ) : hasSalesData ? (
-                <div className="p-5">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-                        <div className="bg-blue-50 px-4 py-3 rounded-lg border border-blue-100">
-                            <Text className="text-blue-700 text-xs font-medium uppercase tracking-wide">
+                <div className="p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 px-5 py-4 rounded-xl border-2 border-blue-400">
+                            <Text className="text-blue-700 text-xs font-semibold uppercase tracking-wider block mb-2">
                                 Total Sales
                             </Text>
-                            <div className="text-blue-900 text-2xl font-bold mt-1">
-                                ${summaryData.totalSales.toLocaleString()}
+                            <div className="text-blue-900 text-3xl font-bold">
+                                ₹ {summaryData.totalSales.toLocaleString()}
                             </div>
                         </div>
 
-                        <div className="bg-indigo-50 px-4 py-3 rounded-lg border border-indigo-100">
-                            <Text className="text-indigo-700 text-xs font-medium uppercase tracking-wide">
+                        <div className="bg-gradient-to-br from-indigo-50 to-indigo-100/50 px-5 py-4 rounded-xl border-2 border-indigo-400">
+                            <Text className="text-indigo-700 text-xs font-semibold uppercase tracking-wider block mb-2">
                                 Total Orders
                             </Text>
-                            <div className="text-indigo-900 text-2xl font-bold mt-1">
+                            <div className="text-indigo-900 text-3xl font-bold">
                                 {summaryData.totalOrders}
                             </div>
                         </div>
 
                         <div
-                            className={`px-4 py-3 rounded-lg border ${
+                            className={`px-5 py-4 rounded-xl border-2 sm:col-span-2 lg:col-span-1 ${
                                 trend > 0
-                                    ? "bg-emerald-50 border-emerald-100"
+                                    ? "bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-400"
                                     : trend < 0
-                                      ? "bg-rose-50 border-rose-100"
-                                      : "bg-gray-50 border-gray-100"
+                                      ? "bg-gradient-to-br from-rose-50 to-rose-100/50 border-rose-400"
+                                      : "bg-gradient-to-br from-slate-50 to-slate-100/50 border-slate-400"
                             }`}
                         >
                             <Text
-                                className={`text-xs font-medium uppercase tracking-wide ${
+                                className={`text-xs font-semibold uppercase tracking-wider block mb-2 ${
                                     trend > 0
                                         ? "text-emerald-700"
                                         : trend < 0
                                           ? "text-rose-700"
-                                          : "text-gray-700"
+                                          : "text-slate-700"
                                 }`}
                             >
                                 Growth Trend
                             </Text>
                             <div
-                                className={`flex items-center text-2xl font-bold mt-1 ${
+                                className={`flex items-center text-3xl font-bold ${
                                     trend > 0
                                         ? "text-emerald-900"
                                         : trend < 0
                                           ? "text-rose-900"
-                                          : "text-gray-900"
+                                          : "text-slate-900"
                                 }`}
                             >
                                 {trend > 0 ? (
-                                    <ArrowUpOutlined className="mr-1.5 text-emerald-600 text-base" />
+                                    <ArrowUpOutlined className="mr-2 text-emerald-600 text-xl" />
                                 ) : trend < 0 ? (
-                                    <ArrowDownOutlined className="mr-1.5 text-rose-600 text-base" />
+                                    <ArrowDownOutlined className="mr-2 text-rose-600 text-xl" />
                                 ) : null}
                                 {trend > 0 ? "+" : ""}
                                 {trend.toFixed(1)}%
@@ -190,110 +197,106 @@ const SalesChart = ({ salesData = {}, loading = false }) => {
                         </div>
                     </div>
 
-                    <div
-                        className="bg-gray-50 rounded-lg border border-gray-200 p-4"
-                        style={{
-                            height: window.innerWidth < 768 ? "320px" : "535px",
-                        }}
-                    >
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart
-                                data={chartData}
-                                margin={{
-                                    top: 5,
-                                    right: window.innerWidth < 768 ? 5 : 20,
-                                    left: window.innerWidth < 768 ? -20 : -10,
-                                    bottom: 5,
-                                }}
-                            >
-                                <defs>
-                                    <linearGradient
-                                        id="colorSales"
-                                        x1="0"
-                                        y1="0"
-                                        x2="0"
-                                        y2="1"
-                                    >
-                                        <stop
-                                            offset="5%"
-                                            stopColor="#2563eb"
-                                            stopOpacity={0.2}
-                                        />
-                                        <stop
-                                            offset="95%"
-                                            stopColor="#2563eb"
-                                            stopOpacity={0}
-                                        />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid
-                                    strokeDasharray="3 3"
-                                    vertical={false}
-                                    stroke="#e5e7eb"
-                                />
-                                <XAxis
-                                    dataKey="date"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tickMargin={12}
-                                    tick={{
-                                        fill: "#6b7280",
-                                        fontSize:
-                                            window.innerWidth < 768 ? 10 : 12,
+                    <div className="bg-slate-50/50 rounded-xl border border-slate-200 p-5">
+                        <div className="w-full h-80 sm:h-96 lg:h-[420px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart
+                                    data={chartData}
+                                    margin={{
+                                        top: 10,
+                                        right: 10,
+                                        left: 0,
+                                        bottom: 10,
                                     }}
-                                    interval={window.innerWidth < 768 ? 1 : 0}
-                                />
-                                <YAxis
-                                    tickFormatter={formatDollar}
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tickMargin={8}
-                                    tick={{
-                                        fill: "#6b7280",
-                                        fontSize:
-                                            window.innerWidth < 768 ? 10 : 12,
-                                    }}
-                                    width={window.innerWidth < 768 ? 55 : 65}
-                                />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Area
-                                    type="monotone"
-                                    dataKey="sales"
-                                    stroke="#2563eb"
-                                    strokeWidth={2.5}
-                                    fillOpacity={1}
-                                    fill="url(#colorSales)"
-                                    activeDot={{
-                                        r: window.innerWidth < 768 ? 5 : 6,
-                                        strokeWidth: 2,
-                                        stroke: "#fff",
-                                        fill: "#2563eb",
-                                    }}
-                                    dot={false}
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                                >
+                                    <defs>
+                                        <linearGradient
+                                            id="colorSales"
+                                            x1="0"
+                                            y1="0"
+                                            x2="0"
+                                            y2="1"
+                                        >
+                                            <stop
+                                                offset="5%"
+                                                stopColor="#3b82f6"
+                                                stopOpacity={0.3}
+                                            />
+                                            <stop
+                                                offset="95%"
+                                                stopColor="#3b82f6"
+                                                stopOpacity={0.05}
+                                            />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid
+                                        strokeDasharray="3 3"
+                                        vertical={false}
+                                        stroke="#e2e8f0"
+                                    />
+                                    <XAxis
+                                        dataKey="date"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tickMargin={12}
+                                        tick={{
+                                            fill: "#64748b",
+                                            fontSize: 11,
+                                            fontWeight: 500,
+                                        }}
+                                    />
+                                    <YAxis
+                                        tickFormatter={formatDollar}
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tickMargin={12}
+                                        tick={{
+                                            fill: "#64748b",
+                                            fontSize: 11,
+                                            fontWeight: 500,
+                                        }}
+                                        width={70}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="sales"
+                                        stroke="#3b82f6"
+                                        strokeWidth={3}
+                                        fillOpacity={1}
+                                        fill="url(#colorSales)"
+                                        activeDot={{
+                                            r: 6,
+                                            strokeWidth: 3,
+                                            stroke: "#fff",
+                                            fill: "#3b82f6",
+                                        }}
+                                        dot={false}
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
 
-                    <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
-                        <span className="text-xs text-gray-500">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mt-5 pt-5 border-t border-slate-200">
+                        <span className="text-sm text-slate-600 font-medium">
                             Average daily sales
                         </span>
-                        <span className="text-sm font-semibold text-gray-700">
+                        <span className="text-lg font-bold text-slate-900">
                             ${averageSales.toLocaleString()}
                         </span>
                     </div>
                 </div>
             ) : (
-                <div className="h-96 flex items-center justify-center">
+                <div className="py-32 flex items-center justify-center">
                     <Empty
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
                         description={
                             <div className="text-center">
-                                <div className="text-gray-600 font-medium text-sm mb-1">
+                                <div className="text-slate-700 font-semibold text-base mb-2">
                                     No Sales Data Available
                                 </div>
-                                <p className="text-xs text-gray-400 mb-0">
+                                <p className="text-sm text-slate-500 mb-0 max-w-xs mx-auto">
                                     Sales data will appear here once you have
                                     recorded orders.
                                 </p>

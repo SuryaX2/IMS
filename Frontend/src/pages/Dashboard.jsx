@@ -274,13 +274,13 @@ const Dashboard = () => {
     }
 
     return (
-        <main className="min-h-screen ">
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <main className="min-h-screen">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <DashboardHeader onRefresh={fetchDashboardData} />
 
                 <section className="mt-6">
-                    <div className="bg-white rounded-xl border border-gray-200 p-5 sm:p-6">
-                        <Row gutter={[20, 20]}>
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                        <Row gutter={[16, 16]}>
                             <Col xs={24} sm={12} lg={8}>
                                 <StatCard
                                     title="Total Sales"
@@ -361,128 +361,116 @@ const Dashboard = () => {
                     </div>
                 </section>
 
-                <section className="mt-6">
-                    <Divider className="flex items-center gap-2 mb-4">
-                        <span className="flex items-center gap-2">
-                            <AreaChartOutlined className="text-xl text-gray-700" />
-                            <h2 className="text-xl font-semibold text-gray-900 m-0">
+                <section className="mt-8">
+                    <Divider className="flex items-center gap-3 mb-6">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 m-0 leading-tight">
                                 Analytics & Insights
                             </h2>
-                        </span>
+                            <p className="text-sm text-slate-500 m-0">
+                                Performance metrics and trends
+                            </p>
+                        </div>
                     </Divider>
-                    <Row gutter={[20, 20]}>
-                        <Col xs={24} xl={16}>
-                            <Card
-                                className="border border-gray-200 rounded-xl h-full"
-                                bodyStyle={{ padding: 0 }}
-                            >
-                                <SalesChart
-                                    salesData={dashboardData.salesData}
-                                />
-                            </Card>
-                        </Col>
-                        <Col xs={24} xl={8}>
-                            <div className="flex flex-col gap-5 h-full">
-                                <Card
-                                    className="border border-gray-200 rounded-xl flex-1"
-                                    bodyStyle={{ padding: 0 }}
-                                >
-                                    <ProductDistribution
-                                        topProducts={dashboardData.topProducts}
-                                    />
-                                </Card>
-                                {dashboardData.topProducts &&
-                                    dashboardData.topProducts.length > 0 && (
-                                        <Card
-                                            title={
-                                                <div className="flex items-center gap-2">
-                                                    <InfoCircleOutlined className="text-blue-500" />
-                                                    <span className="text-sm font-semibold">
-                                                        Quick Insights
-                                                    </span>
-                                                </div>
-                                            }
-                                            className="border border-gray-200 rounded-xl"
-                                            bodyStyle={{ padding: "16px" }}
-                                            headStyle={{
-                                                borderBottom:
-                                                    "1px solid #f0f0f0",
-                                                padding: "12px 16px",
-                                                minHeight: "auto",
-                                            }}
-                                        >
-                                            <div className="space-y-3">
-                                                <div className="p-3 bg-green-50 rounded-lg border border-green-100">
-                                                    <Text
-                                                        strong
-                                                        className="text-green-700 text-xs block mb-1"
-                                                    >
-                                                        Top Performer
-                                                    </Text>
-                                                    <Text className="text-sm font-medium text-gray-900 block mb-1">
-                                                        {
-                                                            dashboardData
-                                                                .topProducts[0]
-                                                                ?.product_name
-                                                        }
-                                                    </Text>
-                                                    <Badge
-                                                        count={`${dashboardData.topProducts[0]?.quantity_sold} units`}
-                                                        style={{
-                                                            backgroundColor:
-                                                                "#52c41a",
-                                                            fontSize: "10px",
-                                                        }}
-                                                    />
-                                                </div>
-                                                <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                                    <Text
-                                                        strong
-                                                        className="text-blue-700 text-xs block mb-1"
-                                                    >
-                                                        Most Profitable
-                                                    </Text>
-                                                    <Text className="text-sm font-medium text-gray-900 block mb-1">
-                                                        {
-                                                            dashboardData.topProducts.sort(
-                                                                (a, b) =>
-                                                                    b.total_sales -
-                                                                    a.total_sales
-                                                            )[0]?.product_name
-                                                        }
-                                                    </Text>
-                                                    <Badge
-                                                        count={`$${dashboardData.topProducts.sort((a, b) => b.total_sales - a.total_sales)[0]?.total_sales.toLocaleString()}`}
-                                                        style={{
-                                                            backgroundColor:
-                                                                "#1890ff",
-                                                            fontSize: "10px",
-                                                        }}
-                                                    />
+
+                    <div className="space-y-6">
+                        <SalesChart salesData={dashboardData.salesData} />
+
+                        <ProductDistribution
+                            topProducts={dashboardData.topProducts}
+                        />
+
+                        {dashboardData.topProducts &&
+                            dashboardData.topProducts.length > 0 && (
+                                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                                    <div className="flex items-center gap-3 mb-5">
+                                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                            <InfoCircleOutlined className="text-lg text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-lg font-bold text-slate-900 m-0 leading-tight">
+                                                Quick Insights
+                                            </h3>
+                                            <p className="text-sm text-slate-500 m-0">
+                                                Key product highlights
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="p-5 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border-2 border-emerald-200">
+                                            <div className="flex items-start justify-between mb-3">
+                                                <Text className="text-emerald-700 text-xs font-bold uppercase tracking-wider block">
+                                                    Top Performer
+                                                </Text>
+                                                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                                                    🏆
                                                 </div>
                                             </div>
-                                        </Card>
-                                    )}
-                            </div>
-                        </Col>
-                    </Row>
+                                            <Text className="text-base font-bold text-slate-900 block mb-2">
+                                                {
+                                                    dashboardData.topProducts[0]
+                                                        ?.product_name
+                                                }
+                                            </Text>
+                                            <Badge
+                                                count={`${dashboardData.topProducts[0]?.quantity_sold} units sold`}
+                                                style={{
+                                                    backgroundColor: "#10b981",
+                                                    fontSize: "11px",
+                                                    fontWeight: 600,
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
+                                            <div className="flex items-start justify-between mb-3">
+                                                <Text className="text-blue-700 text-xs font-bold uppercase tracking-wider block">
+                                                    Most Profitable
+                                                </Text>
+                                                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                                                    💰
+                                                </div>
+                                            </div>
+                                            <Text className="text-base font-bold text-slate-900 block mb-2">
+                                                {
+                                                    dashboardData.topProducts.sort(
+                                                        (a, b) =>
+                                                            b.total_sales -
+                                                            a.total_sales
+                                                    )[0]?.product_name
+                                                }
+                                            </Text>
+                                            <Badge
+                                                count={`$${dashboardData.topProducts.sort((a, b) => b.total_sales - a.total_sales)[0]?.total_sales.toLocaleString()} revenue`}
+                                                style={{
+                                                    backgroundColor: "#3b82f6",
+                                                    fontSize: "11px",
+                                                    fontWeight: 600,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                    </div>
                 </section>
 
-                <section className="mt-6 pb-6">
-                    <Divider className="flex items-center gap-2 mb-4">
-                        <span className="flex items-center gap-2">
-                            <PieChartOutlined className="text-xl text-gray-700" />
-                            <h2 className="text-xl font-semibold text-gray-900 m-0">
+                <section className="mt-8 pb-8">
+                    <Divider className="flex items-center gap-3 mb-6">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900 m-0 leading-tight">
                                 Reports & Activity
                             </h2>
-                        </span>
+                            <p className="text-sm text-slate-500 m-0">
+                                Recent transactions and alerts
+                            </p>
+                        </div>
                     </Divider>
-                    <Row gutter={[20, 20]}>
-                        <Col xs={24} lg={12}>
-                            <Card
-                                className="border border-gray-200 rounded-xl h-full"
-                                bodyStyle={{ padding: 0 }}
-                            >
+
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
                                 <DataTable
                                     title="Top Selling Products"
                                     columns={topProductsColumns}
@@ -493,13 +481,9 @@ const Dashboard = () => {
                                     viewAllLink="/reports/top-products"
                                     pagination={{ pageSize: 5, size: "small" }}
                                 />
-                            </Card>
-                        </Col>
-                        <Col xs={24} lg={12}>
-                            <Card
-                                className="border border-gray-200 rounded-xl h-full"
-                                bodyStyle={{ padding: 0 }}
-                            >
+                            </div>
+
+                            <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
                                 <DataTable
                                     title="Low Stock Alerts"
                                     columns={lowStockColumns}
@@ -510,26 +494,22 @@ const Dashboard = () => {
                                     viewAllLink="/reports/low-stock-alerts"
                                     pagination={{ pageSize: 5, size: "small" }}
                                 />
-                            </Card>
-                        </Col>
-                        <Col xs={24}>
-                            <Card
-                                className="border border-gray-200 rounded-xl"
-                                bodyStyle={{ padding: 0 }}
-                            >
-                                <DataTable
-                                    title="Recent Orders"
-                                    columns={recentOrdersColumns}
-                                    dataSource={dashboardData.recentOrders.slice(
-                                        0,
-                                        8
-                                    )}
-                                    viewAllLink="/orders"
-                                    pagination={{ pageSize: 8, size: "small" }}
-                                />
-                            </Card>
-                        </Col>
-                    </Row>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                            <DataTable
+                                title="Recent Orders"
+                                columns={recentOrdersColumns}
+                                dataSource={dashboardData.recentOrders.slice(
+                                    0,
+                                    8
+                                )}
+                                viewAllLink="/orders"
+                                pagination={{ pageSize: 8, size: "small" }}
+                            />
+                        </div>
+                    </div>
                 </section>
             </div>
         </main>
