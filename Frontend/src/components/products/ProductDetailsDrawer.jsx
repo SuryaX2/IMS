@@ -204,7 +204,7 @@ const ProductDetailsDrawer = ({
                                     Buying Price
                                 </Text>
                                 <Text className="text-base font-semibold text-gray-900">
-                                    $
+                                    ₹
                                     {product.buying_price?.toFixed(2) || "0.00"}
                                 </Text>
                             </div>
@@ -214,7 +214,7 @@ const ProductDetailsDrawer = ({
                                     Selling Price
                                 </Text>
                                 <Text className="text-base font-semibold text-blue-600">
-                                    $
+                                    ₹
                                     {product.selling_price?.toFixed(2) ||
                                         "0.00"}
                                 </Text>

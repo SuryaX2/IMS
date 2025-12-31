@@ -230,7 +230,7 @@ const ProductModal = ({
                                         >
                                             <InputNumber
                                                 placeholder="0.00"
-                                                prefix="$"
+                                                prefix="₹"
                                                 style={{ width: "100%" }}
                                                 precision={2}
                                                 size="large"
@@ -264,7 +264,7 @@ const ProductModal = ({
                                         >
                                             <InputNumber
                                                 placeholder="0.00"
-                                                prefix="$"
+                                                prefix="₹"
                                                 style={{ width: "100%" }}
                                                 precision={2}
                                                 size="large"
