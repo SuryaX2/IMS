@@ -1,9 +1,7 @@
-import React from "react";
 import {
     Drawer,
     Descriptions,
     Tag,
-    Card,
     Empty,
     Spin,
     Button,
