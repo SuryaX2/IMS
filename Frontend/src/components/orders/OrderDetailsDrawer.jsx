@@ -1,13 +1,4 @@
-import {
-    Drawer,
-    Descriptions,
-    Tag,
-    Empty,
-    Spin,
-    Button,
-    Table,
-    Divider,
-} from "antd";
+import { Drawer, Tag, Empty, Spin, Button, Table, Divider } from "antd";
 import {
     FilePdfOutlined,
     CloseOutlined,
@@ -84,175 +75,150 @@ const OrderDetailsDrawer = ({
     return (
         <Drawer
             title={
-                <div className="flex items-center space-x-2">
-                    <ShoppingCartOutlined className="text-blue-500" />
-                    <span className="text-xl font-bold text-gray-800">
-                        Order #{selectedOrder.invoice_no}
+                <div className="text-center w-full">
+                    <span className="text-xl font-bold tracking-wide uppercase text-gray-900">
+                        Order Details - #{selectedOrder.invoice_no}
                     </span>
                 </div>
             }
             placement="right"
             onClose={onClose}
             open={visible}
-            width={700}
-            className="order-details-drawer"
-            extra={
-                <Button
-                    type="text"
-                    icon={<CloseOutlined />}
-                    onClick={onClose}
-                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full"
-                />
-            }
+            width={520}
+            closeIcon={<CloseOutlined className="text-gray-500" />}
             styles={{
-                body: { padding: 0, backgroundColor: "#f8fafc" },
+                body: { padding: 24, backgroundColor: "#ffffff" },
                 header: {
-                    borderBottom: "1px solid #e2e8f0",
-                    paddingBottom: 16,
-                    backgroundColor: "#ffffff",
-                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+                    borderBottom: "1px solid #f0f0f0",
+                    padding: "20px 24px",
                 },
             }}
         >
-            <div className="p-6 space-y-6">
-                {/* Order Status Header */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-800 flex items-center space-x-2">
-                            <span>Order Overview</span>
-                        </h3>
-                        <Tag
-                            icon={getStatusIcon(selectedOrder.order_status)}
-                            color={getStatusColor(selectedOrder.order_status)}
-                            className="text-sm font-medium px-3 py-1 rounded-full"
-                        >
-                            {selectedOrder.order_status.toUpperCase()}
-                        </Tag>
+            <div className="space-y-6">
+                <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+                    <span className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                        Order Status
+                    </span>
+                    <Tag
+                        icon={getStatusIcon(selectedOrder.order_status)}
+                        color={getStatusColor(selectedOrder.order_status)}
+                        className="text-sm font-medium px-3 py-1"
+                    >
+                        {selectedOrder.order_status.toUpperCase()}
+                    </Tag>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                    <div>
+                        <div className="flex items-center space-x-2 mb-2">
+                            <UserOutlined className="text-gray-400" />
+                            <span className="text-xs font-medium text-gray-500 uppercase">
+                                Customer
+                            </span>
+                        </div>
+                        <p className="text-base font-semibold text-gray-900">
+                            {selectedOrder.customer_id?.name || "N/A"}
+                        </p>
                     </div>
 
-                    <Divider className="my-4" />
-
-                    {/* Customer & Order Info Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                            <div className="flex items-center space-x-2 mb-2">
-                                <UserOutlined className="text-blue-600" />
-                                <span className="text-sm font-medium text-blue-800">
-                                    Customer
-                                </span>
-                            </div>
-                            <p className="text-base font-semibold text-blue-900">
-                                {selectedOrder.customer_id?.name || "N/A"}
-                            </p>
+                    <div>
+                        <div className="flex items-center space-x-2 mb-2">
+                            <CalendarOutlined className="text-gray-400" />
+                            <span className="text-xs font-medium text-gray-500 uppercase">
+                                Order Date
+                            </span>
                         </div>
-
-                        <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                            <div className="flex items-center space-x-2 mb-2">
-                                <CalendarOutlined className="text-green-600" />
-                                <span className="text-sm font-medium text-green-800">
-                                    Order Date
-                                </span>
-                            </div>
-                            <p className="text-base font-semibold text-green-900">
-                                {dayjs(selectedOrder.order_date).format(
-                                    "MMMM DD, YYYY"
-                                )}
-                            </p>
-                        </div>
+                        <p className="text-base font-semibold text-gray-900">
+                            {dayjs(selectedOrder.order_date).format(
+                                "MMMM DD, YYYY"
+                            )}
+                        </p>
                     </div>
                 </div>
 
-                {/* Order Summary */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                <Divider style={{ margin: "24px 0" }} />
+
+                <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-4 uppercase tracking-wide">
                         Order Summary
-                    </h4>
-                    <Descriptions
-                        column={{ xs: 1, sm: 2, md: 2 }}
-                        size="middle"
-                        labelStyle={{
-                            fontWeight: 600,
-                            color: "#374151",
-                            fontSize: "14px",
-                        }}
-                        contentStyle={{
-                            color: "#1f2937",
-                            fontSize: "14px",
-                        }}
-                        className="custom-descriptions"
-                    >
-                        <Descriptions.Item label="Total Products">
-                            <div className="flex items-center">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 whitespace-nowrap">
-                                    {selectedOrder.total_products} items
-                                </span>
-                            </div>
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Subtotal">
-                            <span className="text-gray-700 font-medium">
+                    </h3>
+                    <div className="bg-gray-50 rounded-2xl p-4 border-2 space-y-3 shadow-[0px_0px_20px_rgba(0,0,0,0.09)]">
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-600">
+                                Total Products
+                            </span>
+                            <span className="text-sm font-medium text-gray-900">
+                                {selectedOrder.total_products} items
+                            </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-600">
+                                Subtotal
+                            </span>
+                            <span className="text-sm font-medium text-gray-900">
                                 ₹{selectedOrder.sub_total?.toFixed(2)}
                             </span>
-                        </Descriptions.Item>
-                        <Descriptions.Item label="GST (18%)">
-                            <span className="text-gray-700 font-medium">
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-600">
+                                GST (18%)
+                            </span>
+                            <span className="text-sm font-medium text-gray-900">
                                 ₹
                                 {(
                                     selectedOrder.total -
                                     selectedOrder.sub_total
                                 )?.toFixed(2)}
                             </span>
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Total Amount">
-                            <span className="text-xs font-bold text-green-600 bg-green-100 px-2.5 py-0.5 rounded-lg">
+                        </div>
+                        <Divider style={{ margin: "12px 0" }} />
+                        <div className="flex items-center justify-between">
+                            <span className="text-base font-semibold text-gray-900">
+                                Total Amount
+                            </span>
+                            <span className="text-xl font-bold text-green-600">
                                 ₹{selectedOrder.total?.toFixed(2)}
                             </span>
-                        </Descriptions.Item>
-                    </Descriptions>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Order Items Table */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-                        <h4 className="text-lg font-semibold text-gray-800 flex items-center space-x-2">
-                            <ShoppingCartOutlined className="text-blue-500" />
-                            <span>Order Items</span>
-                        </h4>
-                    </div>
+                <Divider style={{ margin: "24px 0" }} />
 
-                    <div className="p-6">
-                        {detailsLoading ? (
-                            <div className="text-center py-12">
-                                <Spin size="large" />
-                                <p className="mt-4 text-gray-500 text-base">
-                                    Loading items...
-                                </p>
-                            </div>
-                        ) : orderDetails.length > 0 ? (
-                            <Table
-                                dataSource={orderDetails}
-                                columns={columns}
-                                pagination={false}
-                                rowKey={(record, index) => index}
-                                className="custom-table"
-                                size="middle"
-                                rowClassName="hover:bg-gray-50 transition-colors duration-200"
+                <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-4 uppercase tracking-wide">
+                        Order Items
+                    </h3>
+                    {detailsLoading ? (
+                        <div className="text-center py-12">
+                            <Spin size="large" />
+                            <p className="mt-4 text-gray-500 text-sm">
+                                Loading items...
+                            </p>
+                        </div>
+                    ) : orderDetails.length > 0 ? (
+                        <Table
+                            dataSource={orderDetails}
+                            columns={columns}
+                            pagination={false}
+                            rowKey={(record, index) => index}
+                            size="middle"
+                            bordered
+                        />
+                    ) : (
+                        <div className="py-12">
+                            <Empty
+                                description={
+                                    <span className="text-gray-500">
+                                        No items found for this order
+                                    </span>
+                                }
                             />
-                        ) : (
-                            <div className="py-12">
-                                <Empty
-                                    description={
-                                        <span className="text-gray-500 text-lg">
-                                            No items found for this order
-                                        </span>
-                                    }
-                                />
-                            </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
-                {/* Action Button */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="pt-4">
                     <Button
                         type="primary"
                         icon={<FilePdfOutlined />}
@@ -262,7 +228,7 @@ const OrderDetailsDrawer = ({
                                 selectedOrder.invoice_no
                             )
                         }
-                        className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-0 rounded-lg text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="w-full"
                         size="large"
                     >
                         Download Invoice PDF

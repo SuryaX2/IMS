@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Form } from "antd";
 import { PlusOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 
-// Components
 import PageHeader from "../components/common/PageHeader";
 import OrderStats from "../components/orders/OrderStats";
 import OrderFilters from "../components/orders/OrderFilters";
@@ -10,7 +9,6 @@ import OrdersTable from "../components/orders/OrdersTable";
 import CreateOrderModal from "../components/orders/CreateOrderModal";
 import OrderDetailsDrawer from "../components/orders/OrderDetailsDrawer";
 
-// Hooks
 import { useOrders } from "../hooks/orders/useOrders";
 import { useOrderOperations } from "../hooks/orders/useOrderOperations";
 
@@ -20,7 +18,6 @@ const Orders = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [createForm] = Form.useForm();
 
-    // Main orders hook
     const {
         orders,
         customers,
@@ -33,7 +30,6 @@ const Orders = () => {
         fetchOrders,
     } = useOrders();
 
-    // Order operations hook
     const {
         orderDetails,
         detailsLoading,
@@ -45,7 +41,6 @@ const Orders = () => {
         fetchOrders(pagination.current, pagination.pageSize)
     );
 
-    // Event handlers
     const handleTableChange = (paginationInfo) => {
         fetchOrders(paginationInfo.current, paginationInfo.pageSize);
     };
@@ -92,10 +87,8 @@ const Orders = () => {
 
     return (
         <div className="min-h-screen bg-white">
-            {/* Main Container */}
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                {/* Page Header */}
-                <div className="mb-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                <div className="space-y-6">
                     <PageHeader
                         title="Orders"
                         subtitle="Manage and track your orders"
@@ -106,15 +99,9 @@ const Orders = () => {
                         actionIcon={<PlusOutlined />}
                         onActionClick={() => setCreateModalVisible(true)}
                     />
-                </div>
 
-                {/* Stats Section */}
-                <div className="mb-8">
                     <OrderStats stats={stats} />
-                </div>
 
-                {/* Filters Section */}
-                <div className="mb-6">
                     <OrderFilters
                         filters={filters}
                         customers={customers}
@@ -122,41 +109,38 @@ const Orders = () => {
                         onApplyFilters={handleApplyFilters}
                         onResetFilters={handleResetFilters}
                     />
+
+                    <div className="bg-white rounded-lg border-2 border-gray-200">
+                        <OrdersTable
+                            orders={orders}
+                            loading={loading}
+                            pagination={pagination}
+                            onTableChange={handleTableChange}
+                            onViewDetails={handleViewDetails}
+                            onUpdateStatus={updateOrderStatus}
+                            onGenerateInvoice={generateInvoice}
+                        />
+                    </div>
                 </div>
-
-                {/* Orders Table */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <OrdersTable
-                        orders={orders}
-                        loading={loading}
-                        pagination={pagination}
-                        onTableChange={handleTableChange}
-                        onViewDetails={handleViewDetails}
-                        onUpdateStatus={updateOrderStatus}
-                        onGenerateInvoice={generateInvoice}
-                    />
-                </div>
-
-                {/* Create Order Modal */}
-                <CreateOrderModal
-                    visible={createModalVisible}
-                    onCancel={handleCreateModalCancel}
-                    onSubmit={handleCreateOrder}
-                    customers={customers}
-                    products={products}
-                    form={createForm}
-                />
-
-                {/* Order Details Drawer */}
-                <OrderDetailsDrawer
-                    visible={detailsDrawerVisible}
-                    onClose={() => setDetailsDrawerVisible(false)}
-                    selectedOrder={selectedOrder}
-                    orderDetails={orderDetails}
-                    detailsLoading={detailsLoading}
-                    onGenerateInvoice={generateInvoice}
-                />
             </div>
+
+            <CreateOrderModal
+                visible={createModalVisible}
+                onCancel={handleCreateModalCancel}
+                onSubmit={handleCreateOrder}
+                customers={customers}
+                products={products}
+                form={createForm}
+            />
+
+            <OrderDetailsDrawer
+                visible={detailsDrawerVisible}
+                onClose={() => setDetailsDrawerVisible(false)}
+                selectedOrder={selectedOrder}
+                orderDetails={orderDetails}
+                detailsLoading={detailsLoading}
+                onGenerateInvoice={generateInvoice}
+            />
         </div>
     );
 };

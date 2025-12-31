@@ -19,7 +19,7 @@ const OrderFilters = ({
     const totalRange = filters.total_range || {};
 
     return (
-        <Card className="mb-6 border-0 shadow-sm rounded-lg">
+        <Card className="mb-6 border-2 rounded-lg">
             <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <Input

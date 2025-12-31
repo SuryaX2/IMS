@@ -1,94 +1,118 @@
 import React from "react";
 import { Form, Row, Col, Select, InputNumber, Button } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import {
+    DeleteOutlined,
+    ShoppingOutlined,
+    NumberOutlined,
+    DollarOutlined,
+} from "@ant-design/icons";
 
 const { Option } = Select;
 
 const OrderFormItems = ({ products, onRemove, name, restField }) => {
     return (
-        <div className="border border-gray-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4 bg-gray-50">
-            <Row gutter={[8, 8]} className="sm:gutter-16">
-                <Col xs={24} sm={12} md={8}>
-                    <Form.Item
-                        {...restField}
-                        name={[name, "product_id"]}
-                        label="Product"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Please select a product",
-                            },
-                        ]}
-                    >
-                        <Select
-                            placeholder="Select Product"
-                            showSearch
-                            optionFilterProp="children"
-                            size="large"
-                            className="sm:size-default"
+        <div className="relative bg-white border-2 border-gray-200 rounded-2xl p-5 mb-4">
+            <Button
+                type="text"
+                danger
+                onClick={onRemove}
+                className="absolute top-3 right-3 flex items-center justify-center h-8 w-8 rounded-lg hover:bg-red-50 z-10"
+                icon={<DeleteOutlined className="text-sm" />}
+            />
+
+            <div className="pr-10">
+                <Row gutter={[16, 16]}>
+                    <Col xs={24} sm={24} md={24} lg={12}>
+                        <Form.Item
+                            {...restField}
+                            name={[name, "product_id"]}
+                            label={
+                                <span className="text-sm font-medium text-gray-700">
+                                    Product
+                                </span>
+                            }
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please select a product",
+                                },
+                            ]}
+                            className="mb-0"
                         >
-                            {products.map((product) => (
-                                <Option key={product._id} value={product._id}>
-                                    {product.product_name}
-                                </Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
-                </Col>
-                <Col xs={12} sm={6} md={6}>
-                    <Form.Item
-                        {...restField}
-                        name={[name, "quantity"]}
-                        label="Quantity"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Please enter quantity",
-                            },
-                        ]}
-                    >
-                        <InputNumber
-                            placeholder="Qty"
-                            min={1}
-                            className="w-full"
-                            size="large"
-                        />
-                    </Form.Item>
-                </Col>
-                <Col xs={12} sm={6} md={6}>
-                    <Form.Item
-                        {...restField}
-                        name={[name, "unitcost"]}
-                        label="Unit Cost"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Please enter unit cost",
-                            },
-                        ]}
-                    >
-                        <InputNumber
-                            placeholder="Cost"
-                            min={0}
-                            step={0.01}
-                            className="w-full"
-                            size="large"
-                        />
-                    </Form.Item>
-                </Col>
-                <Col xs={24} sm={12} md={4} className="flex items-end">
-                    <Button
-                        type="text"
-                        danger
-                        onClick={onRemove}
-                        className="mb-3 sm:mb-6 w-full sm:w-auto flex items-center justify-center"
-                        icon={<DeleteOutlined />}
-                        size="large"
-                    >
-                        <span className="sm:hidden ml-1">Remove</span>
-                    </Button>
-                </Col>
-            </Row>
+                            <Select
+                                placeholder="Select a product"
+                                showSearch
+                                optionFilterProp="children"
+                                size="large"
+                                className="w-full"
+                            >
+                                {products.map((product) => (
+                                    <Option
+                                        key={product._id}
+                                        value={product._id}
+                                    >
+                                        {product.product_name}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={12} sm={12} md={12} lg={6}>
+                        <Form.Item
+                            {...restField}
+                            name={[name, "quantity"]}
+                            label={
+                                <span className="text-sm font-medium text-gray-700">
+                                    Quantity
+                                </span>
+                            }
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter quantity",
+                                },
+                            ]}
+                            className="mb-0"
+                        >
+                            <InputNumber
+                                placeholder="0"
+                                min={1}
+                                className="w-full"
+                                size="large"
+                            />
+                        </Form.Item>
+                    </Col>
+
+                    <Col xs={12} sm={12} md={12} lg={6}>
+                        <Form.Item
+                            {...restField}
+                            name={[name, "unitcost"]}
+                            label={
+                                <span className="text-sm font-medium text-gray-700">
+                                    Unit Cost
+                                </span>
+                            }
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please enter unit cost",
+                                },
+                            ]}
+                            className="mb-0"
+                        >
+                            <InputNumber
+                                placeholder="0.00"
+                                min={0}
+                                step={0.01}
+                                className="w-full"
+                                size="large"
+                                prefix="₹"
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </div>
         </div>
     );
 };

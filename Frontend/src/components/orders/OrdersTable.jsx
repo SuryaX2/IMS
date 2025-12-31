@@ -137,7 +137,7 @@ const OrdersTable = ({
     ];
 
     const MobileOrderCard = ({ order }) => (
-        <Card className="mb-3 shadow-sm rounded-xl border-0 hover:shadow-md transition-all duration-200">
+        <Card className="mb-3 shadow-sm rounded-xl border-2 hover:shadow-md transition-all duration-200">
             <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -289,7 +289,7 @@ const OrdersTable = ({
             </div>
 
             <div className="hidden lg:block">
-                <Card className="border-0 shadow-sm rounded-lg overflow-hidden">
+                <Card className="border-0 shadow-sm rounded-lg overflow-hidden ">
                     <Table
                         columns={columns}
                         dataSource={orders}
