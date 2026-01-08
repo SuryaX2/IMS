@@ -5,74 +5,30 @@ import errorHandler from "./middleware/error.middleware.js";
 
 const app = express();
 
-// CORS configuration
-const corsOptions = {
-    origin: function (origin, callback) {
-        // Allow requests with no origin (mobile apps, Postman, etc.)
-        if (!origin) return callback(null, true);
+const allowedOrigins = [
+    "https://inventorypro-ims.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:5173",
+];
 
-        const allowedOrigins = [
-            process.env.CORS_ORIGIN || "https://inventorypro-ims.vercel.app",
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "https://inventorypro-ims.vercel.app",
-        ];
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            // Allow non-browser requests (Postman, mobile apps)
+            if (!origin) return callback(null, true);
 
-        if (allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.log("Blocked origin:", origin);
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: [
-        "Content-Type",
-        "Authorization",
-        "x-requested-with",
-        "Access-Control-Allow-Origin",
-        "Origin",
-        "Accept",
-    ],
-    credentials: true,
-    optionsSuccessStatus: 200,
-    preflightContinue: false,
-};
-
-app.use(cors(corsOptions));
-
-// Handle preflight requests explicitly
-app.options("*", cors(corsOptions));
-
-// Enhanced CORS headers middleware
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    const allowedOrigins = [
-        process.env.CORS_ORIGIN || "https://inventorypro-ims.vercel.app",
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "https://inventorypro-ims.vercel.app",
-    ];
-
-    if (allowedOrigins.includes(origin)) {
-        res.header("Access-Control-Allow-Origin", origin);
-    }
-
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header(
-        "Access-Control-Allow-Methods",
-        "GET,PUT,POST,DELETE,PATCH,OPTIONS"
-    );
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Content-Type, Authorization, Content-Length, X-Requested-With, Origin, Accept"
-    );
-
-    if (req.method === "OPTIONS") {
-        return res.sendStatus(200);
-    }
-    next();
-});
+            if (allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                console.log("Blocked by CORS:", origin);
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
+);
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
