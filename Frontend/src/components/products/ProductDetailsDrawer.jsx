@@ -96,14 +96,11 @@ const ProductDetailsDrawer = ({
                 <div className="bg-white rounded-3xl p-5 border-2 border-slate-400/50">
                     <div className="flex gap-5">
                         <div className="flex-shrink-0">
-                            <div className="w-28 h-28 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+                            <div className="w-28 h-full rounded-lg overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center">
                                 <Image
                                     src={product.product_image}
                                     alt={product.product_name}
                                     className="w-full h-full object-cover"
-                                    style={{
-                                        objectFit: "cover",
-                                    }}
                                     fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6U"
                                     preview={{
                                         mask: (
