@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import { Product } from "./product.model.js";
-import { Order } from "./order.model.js";
 
 const orderDetailSchema = mongoose.Schema(
     {
@@ -31,44 +29,26 @@ const orderDetailSchema = mongoose.Schema(
     { timestamps: true }
 );
 
-// Reduce stock product method
-orderDetailSchema.methods.reduceStockProduct = async function () {
-    try {
-        await Product.updateStock(this.product_id, this.quantity, false);
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
+orderDetailSchema.statics.bulkCreateDetails = async function (
+    details,
+    session
+) {
+    const prepared = details.map((d) => ({
+        order_id: d.order_id,
+        product_id: d.product_id,
+        quantity: d.quantity,
+        unitcost: d.unitcost,
+        total: d.quantity * d.unitcost,
+    }));
 
-// CRUD methods
-orderDetailSchema.statics.createDetail = async function (detailData) {
-    try {
-        // Calculate total if not provided
-        if (!detailData.total) {
-            detailData.total = detailData.quantity * detailData.unitcost;
-        }
-
-        const detail = await this.create(detailData);
-
-        // Reduce from stock when order detail is created
-        await detail.reduceStockProduct();
-
-        return detail;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+    return this.insertMany(prepared, session ? { session } : {});
 };
 
 orderDetailSchema.statics.getDetailsByOrderId = async function (orderId) {
-    try {
-        const details = await this.find({ order_id: orderId }).populate(
-            "product_id",
-            "product_name product_code"
-        );
-        return details;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+    return this.find({ order_id: orderId }).populate(
+        "product_id",
+        "product_name product_code"
+    );
 };
 
 export const OrderDetail = mongoose.model("OrderDetail", orderDetailSchema);

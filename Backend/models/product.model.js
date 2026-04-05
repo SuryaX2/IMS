@@ -1,7 +1,4 @@
-// models/product.model.js
 import mongoose from "mongoose";
-import { Category } from "./category.model.js";
-import { Unit } from "./unit.model.js";
 
 const productSchema = mongoose.Schema(
     {
@@ -38,6 +35,7 @@ const productSchema = mongoose.Schema(
         stock: {
             type: Number,
             default: 0,
+            min: 0,
         },
         product_image: {
             type: String,
@@ -57,168 +55,171 @@ const productSchema = mongoose.Schema(
     { timestamps: true }
 );
 
-// CRUD methods
-productSchema.statics.createProduct = async function (productData) {
-    try {
-        const product = await this.create(productData);
-        return product;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+productSchema.statics.createProduct = async function (productData, session) {
+    const [product] = await this.create(
+        [productData],
+        session ? { session } : {}
+    );
+    return product;
 };
 
 productSchema.statics.getAllProducts = async function () {
-    try {
-        const products = await this.find({})
-            .populate("category_id", "category_name")
-            .populate("unit_id", "unit_name");
-        return products;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+    return this.find({})
+        .populate("category_id", "category_name")
+        .populate("unit_id", "unit_name");
 };
 
-// Get products by user
 productSchema.statics.getProductsByUser = async function (userId) {
-    try {
-        const products = await this.find({ created_by: userId })
-            .populate("category_id", "category_name")
-            .populate("unit_id", "unit_name");
-        return products;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+    return this.find({ created_by: userId })
+        .populate("category_id", "category_name")
+        .populate("unit_id", "unit_name");
 };
 
-productSchema.statics.updateStock = async function (
+productSchema.statics.deductStock = async function (
     productId,
     quantity,
-    isAddition = true
+    session
 ) {
-    try {
-        const product = await this.findById(productId);
+    return this.findOneAndUpdate(
+        {
+            _id: productId,
+            stock: { $gte: quantity },
+        },
+        { $inc: { stock: -quantity } },
+        { new: true, session: session || null }
+    );
+};
+
+productSchema.statics.restoreStock = async function (
+    productId,
+    quantity,
+    session
+) {
+    return this.findOneAndUpdate(
+        { _id: productId },
+        { $inc: { stock: quantity } },
+        { new: true, session: session || null }
+    );
+};
+
+productSchema.statics.findInsufficientStock = async function (items) {
+    const productIds = items.map((i) => i.product_id);
+
+    const products = await this.find({ _id: { $in: productIds } })
+        .select("_id product_name product_code stock")
+        .lean();
+
+    const productMap = new Map(products.map((p) => [p._id.toString(), p]));
+
+    const insufficient = [];
+
+    for (const item of items) {
+        const product = productMap.get(item.product_id.toString());
+
         if (!product) {
-            throw new Error("Product not found");
+            insufficient.push({
+                product_id: item.product_id,
+                product_name: "Unknown",
+                requested: item.quantity,
+                available: 0,
+                reason: "not_found",
+            });
+            continue;
         }
 
-        if (isAddition) {
-            product.stock += quantity;
-        } else {
-            // Check if there's enough stock before reducing
-            if (product.stock < quantity) {
-                throw new Error("Not enough stock available");
-            }
-            product.stock -= quantity;
+        if (product.stock < item.quantity) {
+            insufficient.push({
+                product_id: product._id,
+                product_name: product.product_name,
+                product_code: product.product_code,
+                requested: item.quantity,
+                available: product.stock,
+                reason:
+                    product.stock === 0 ? "out_of_stock" : "insufficient_stock",
+            });
         }
-
-        await product.save();
-        return product;
-    } catch (error) {
-        throw new Error(error.message);
     }
+
+    return insufficient;
 };
 
-// Get products with categories and units
 productSchema.statics.getProductsWithDetails = async function () {
-    try {
-        const products = await this.aggregate([
-            {
-                $lookup: {
-                    from: "categories",
-                    localField: "category_id",
-                    foreignField: "_id",
-                    as: "category",
-                },
+    return this.aggregate([
+        {
+            $lookup: {
+                from: "categories",
+                localField: "category_id",
+                foreignField: "_id",
+                as: "category",
             },
-            {
-                $lookup: {
-                    from: "units",
-                    localField: "unit_id",
-                    foreignField: "_id",
-                    as: "unit",
-                },
+        },
+        {
+            $lookup: {
+                from: "units",
+                localField: "unit_id",
+                foreignField: "_id",
+                as: "unit",
             },
-            {
-                $unwind: "$category",
+        },
+        { $unwind: "$category" },
+        { $unwind: "$unit" },
+        {
+            $project: {
+                _id: 1,
+                product_name: 1,
+                product_code: 1,
+                buying_price: 1,
+                selling_price: 1,
+                stock: 1,
+                product_image: 1,
+                category_name: "$category.category_name",
+                unit_name: "$unit.unit_name",
+                created_by: 1,
+                createdAt: 1,
+                updatedAt: 1,
             },
-            {
-                $unwind: "$unit",
-            },
-            {
-                $project: {
-                    _id: 1,
-                    product_name: 1,
-                    product_code: 1,
-                    buying_price: 1,
-                    selling_price: 1,
-                    stock: 1,
-                    product_image: 1,
-                    category_name: "$category.category_name",
-                    unit_name: "$unit.unit_name",
-                    created_by: 1,
-                    createdAt: 1,
-                    updatedAt: 1,
-                },
-            },
-        ]);
-
-        return products;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+        },
+    ]);
 };
 
-// Get products with details by user
 productSchema.statics.getProductsWithDetailsByUser = async function (userId) {
-    try {
-        const products = await this.aggregate([
-            {
-                $match: { created_by: new mongoose.Types.ObjectId(userId) },
+    return this.aggregate([
+        { $match: { created_by: new mongoose.Types.ObjectId(userId) } },
+        {
+            $lookup: {
+                from: "categories",
+                localField: "category_id",
+                foreignField: "_id",
+                as: "category",
             },
-            {
-                $lookup: {
-                    from: "categories",
-                    localField: "category_id",
-                    foreignField: "_id",
-                    as: "category",
-                },
+        },
+        {
+            $lookup: {
+                from: "units",
+                localField: "unit_id",
+                foreignField: "_id",
+                as: "unit",
             },
-            {
-                $lookup: {
-                    from: "units",
-                    localField: "unit_id",
-                    foreignField: "_id",
-                    as: "unit",
-                },
+        },
+        { $unwind: "$category" },
+        { $unwind: "$unit" },
+        {
+            $project: {
+                _id: 1,
+                product_name: 1,
+                product_code: 1,
+                buying_price: 1,
+                selling_price: 1,
+                stock: 1,
+                product_image: 1,
+                category_name: "$category.category_name",
+                unit_name: "$unit.unit_name",
+                created_by: 1,
+                createdAt: 1,
+                updatedAt: 1,
             },
-            {
-                $unwind: "$category",
-            },
-            {
-                $unwind: "$unit",
-            },
-            {
-                $project: {
-                    _id: 1,
-                    product_name: 1,
-                    product_code: 1,
-                    buying_price: 1,
-                    selling_price: 1,
-                    stock: 1,
-                    product_image: 1,
-                    category_name: "$category.category_name",
-                    unit_name: "$unit.unit_name",
-                    created_by: 1,
-                    createdAt: 1,
-                    updatedAt: 1,
-                },
-            },
-        ]);
-
-        return products;
-    } catch (error) {
-        throw new Error(error.message);
-    }
+        },
+    ]);
 };
 
 export const Product = mongoose.model("Product", productSchema);
