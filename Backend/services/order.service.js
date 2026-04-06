@@ -4,74 +4,66 @@ import { OrderDetail } from "../models/order-detail.model.js";
 import { Product } from "../models/product.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
+const generateInvoiceNo = () => {
+    const ts = Date.now().toString(36).toUpperCase();
+    const rand = Math.random().toString(36).substring(2, 5).toUpperCase();
+    return `${ts}${rand}`.substring(0, 10);
+};
+
 class OrderService {
     async createOrder(orderData, userId) {
-        const {
-            customer_id,
-            sub_total,
-            gst,
-            total,
-            invoice_no,
-            order_status,
-            orderItems,
-        } = orderData;
+        const { customer_id, sub_total, gst, total, order_status, orderItems } =
+            orderData;
 
         if (
             !customer_id ||
-            !invoice_no ||
             !Array.isArray(orderItems) ||
             orderItems.length === 0
         ) {
             throw new ApiError(400, "Invalid order data");
         }
 
-        const existing = await Order.findOne({ invoice_no }).lean();
-        if (existing) {
-            throw new ApiError(409, "Invoice number already exists");
+        let invoice_no;
+        let attempts = 0;
+        do {
+            invoice_no = generateInvoiceNo();
+            const existing = await Order.findOne({ invoice_no }).lean();
+            if (!existing) break;
+            attempts++;
+        } while (attempts < 5);
+
+        if (attempts >= 5) {
+            throw new ApiError(
+                500,
+                "Failed to generate a unique invoice number. Please try again."
+            );
         }
 
-        const insufficientItems =
-            await Product.findInsufficientStock(orderItems);
-        if (insufficientItems.length > 0) {
-            throw new ApiError(
-                422,
-                "Insufficient stock for one or more products",
-                insufficientItems
-            );
+        const initialStatus = order_status || "pending";
+        const shouldDeductStock = initialStatus === "completed";
+
+        if (shouldDeductStock) {
+            const insufficientItems =
+                await Product.findInsufficientStock(orderItems);
+            if (insufficientItems.length > 0) {
+                throw new ApiError(
+                    422,
+                    "Insufficient stock for one or more products",
+                    insufficientItems
+                );
+            }
         }
 
         const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
-            const stockDeductions = [];
-
-            for (const item of orderItems) {
-                const updated = await Product.deductStock(
-                    item.product_id,
-                    item.quantity,
-                    session
-                );
-
-                if (!updated) {
-                    throw new ApiError(
-                        422,
-                        `Insufficient stock for product ID: ${item.product_id}. Please refresh and try again.`
-                    );
-                }
-
-                stockDeductions.push({
-                    product_id: item.product_id,
-                    quantity: item.quantity,
-                });
-            }
-
             const [order] = await Order.create(
                 [
                     {
                         customer_id,
                         order_date: new Date(),
-                        order_status: order_status || "pending",
+                        order_status: initialStatus,
                         total_products: orderItems.length,
                         sub_total,
                         gst,
@@ -94,6 +86,22 @@ class OrderService {
                 })),
                 session
             );
+
+            if (shouldDeductStock) {
+                for (const item of orderItems) {
+                    const updated = await Product.deductStock(
+                        item.product_id,
+                        item.quantity,
+                        session
+                    );
+                    if (!updated) {
+                        throw new ApiError(
+                            422,
+                            `Insufficient stock for product ID: ${item.product_id}. Please refresh and try again.`
+                        );
+                    }
+                }
+            }
 
             await session.commitTransaction();
             return order;
@@ -136,21 +144,42 @@ class OrderService {
             );
         }
 
-        if (newStatus === "cancelled") {
+        if (newStatus === "completed") {
+            const details = await OrderDetail.find({
+                order_id: orderId,
+            }).lean();
+
+            const items = details.map((d) => ({
+                product_id: d.product_id,
+                quantity: d.quantity,
+            }));
+
+            const insufficientItems =
+                await Product.findInsufficientStock(items);
+            if (insufficientItems.length > 0) {
+                throw new ApiError(
+                    422,
+                    "Insufficient stock for one or more products",
+                    insufficientItems
+                );
+            }
+
             const session = await mongoose.startSession();
             session.startTransaction();
 
             try {
-                const details = await OrderDetail.find({
-                    order_id: orderId,
-                }).lean();
-
                 for (const detail of details) {
-                    await Product.restoreStock(
+                    const updated = await Product.deductStock(
                         detail.product_id,
                         detail.quantity,
                         session
                     );
+                    if (!updated) {
+                        throw new ApiError(
+                            422,
+                            `Insufficient stock for product ID: ${detail.product_id}. Please refresh and try again.`
+                        );
+                    }
                 }
 
                 const updated = await Order.findByIdAndUpdate(

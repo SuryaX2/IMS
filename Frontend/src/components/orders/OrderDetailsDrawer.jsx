@@ -20,6 +20,8 @@ const OrderDetailsDrawer = ({
 }) => {
     if (!selectedOrder) return null;
 
+    const isCancelled = selectedOrder.order_status === "cancelled";
+
     const columns = [
         {
             title: "Product",
@@ -120,7 +122,6 @@ const OrderDetailsDrawer = ({
                             {selectedOrder.customer_id?.name || "N/A"}
                         </p>
                     </div>
-
                     <div>
                         <div className="flex items-center space-x-2 mb-2">
                             <CalendarOutlined className="text-gray-400" />
@@ -218,22 +219,24 @@ const OrderDetailsDrawer = ({
                     )}
                 </div>
 
-                <div className="pt-4">
-                    <Button
-                        type="primary"
-                        icon={<FilePdfOutlined />}
-                        onClick={() =>
-                            onGenerateInvoice(
-                                selectedOrder._id,
-                                selectedOrder.invoice_no
-                            )
-                        }
-                        className="w-full"
-                        size="large"
-                    >
-                        Download Invoice PDF
-                    </Button>
-                </div>
+                {!isCancelled && (
+                    <div className="pt-4">
+                        <Button
+                            type="primary"
+                            icon={<FilePdfOutlined />}
+                            onClick={() =>
+                                onGenerateInvoice(
+                                    selectedOrder._id,
+                                    selectedOrder.invoice_no
+                                )
+                            }
+                            className="w-full"
+                            size="large"
+                        >
+                            Download Invoice PDF
+                        </Button>
+                    </div>
+                )}
             </div>
         </Drawer>
     );

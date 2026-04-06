@@ -1,4 +1,4 @@
-import { Modal, Form, Row, Col, Select, Input, Button, Divider } from "antd";
+import { Modal, Form, Row, Col, Select, Button, Divider } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import OrderFormItems from "./OrderFormItems";
 
@@ -73,43 +73,24 @@ const CreateOrderModal = ({
                         </Col>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                                name="invoice_no"
+                                name="order_status"
                                 label={
                                     <span className="font-medium text-gray-700">
-                                        Invoice Number
+                                        Order Status
                                     </span>
                                 }
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "Please enter invoice number",
-                                    },
-                                ]}
+                                initialValue="pending"
                             >
-                                <Input
-                                    placeholder="INV-XXXX"
-                                    maxLength={10}
-                                    size="large"
-                                />
+                                <Select size="large">
+                                    <Option value="pending">Pending</Option>
+                                    <Option value="processing">
+                                        Processing
+                                    </Option>
+                                    <Option value="completed">Completed</Option>
+                                </Select>
                             </Form.Item>
                         </Col>
                     </Row>
-
-                    <Form.Item
-                        name="order_status"
-                        label={
-                            <span className="font-medium text-gray-700">
-                                Order Status
-                            </span>
-                        }
-                        initialValue="pending"
-                    >
-                        <Select size="large">
-                            <Option value="pending">Pending</Option>
-                            <Option value="processing">Processing</Option>
-                            <Option value="completed">Completed</Option>
-                        </Select>
-                    </Form.Item>
                 </div>
 
                 <Divider className="my-6" />
@@ -172,23 +153,19 @@ const CreateOrderModal = ({
                     border-bottom: 1px solid #f0f0f0;
                     padding: 20px 24px;
                 }
-
                 .create-order-modal :global(.ant-modal-body) {
                     padding: 24px;
                     max-height: calc(100vh - 200px);
                     overflow-y: auto;
                 }
-
                 .create-order-modal :global(.ant-form-item-label > label) {
                     font-size: 14px;
                 }
-
                 @media (max-width: 640px) {
                     .create-order-modal :global(.ant-modal) {
                         max-width: calc(100vw - 32px);
                         margin: 16px;
                     }
-
                     .create-order-modal :global(.ant-modal-body) {
                         padding: 16px;
                         max-height: calc(100vh - 150px);

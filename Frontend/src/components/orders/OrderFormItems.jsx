@@ -1,15 +1,22 @@
 import React from "react";
 import { Form, Row, Col, Select, InputNumber, Button } from "antd";
-import {
-    DeleteOutlined,
-    ShoppingOutlined,
-    NumberOutlined,
-    DollarOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
 const OrderFormItems = ({ products, onRemove, name, restField }) => {
+    const form = Form.useFormInstance();
+
+    const handleProductChange = (productId) => {
+        const selected = products.find((p) => p._id === productId);
+        if (selected) {
+            form.setFieldValue(
+                ["orderItems", name, "unitcost"],
+                selected.selling_price
+            );
+        }
+    };
+
     return (
         <div className="relative bg-white border-2 border-gray-200 rounded-2xl p-5 mb-4">
             <Button
@@ -42,16 +49,23 @@ const OrderFormItems = ({ products, onRemove, name, restField }) => {
                             <Select
                                 placeholder="Select a product"
                                 showSearch
-                                optionFilterProp="children"
+                                optionFilterProp="label"
                                 size="large"
                                 className="w-full"
+                                onChange={handleProductChange}
                             >
                                 {products.map((product) => (
                                     <Option
                                         key={product._id}
                                         value={product._id}
+                                        label={product.product_name}
                                     >
-                                        {product.product_name}
+                                        <div className="flex items-center justify-between">
+                                            <span>{product.product_name}</span>
+                                            <span className="text-xs text-gray-400 ml-2">
+                                                Stock: {product.stock}
+                                            </span>
+                                        </div>
                                     </Option>
                                 ))}
                             </Select>
@@ -90,19 +104,19 @@ const OrderFormItems = ({ products, onRemove, name, restField }) => {
                             name={[name, "unitcost"]}
                             label={
                                 <span className="text-sm font-medium text-gray-700">
-                                    Unit Cost
+                                    Unit Price
                                 </span>
                             }
                             rules={[
                                 {
                                     required: true,
-                                    message: "Please enter unit cost",
+                                    message: "Please enter unit price",
                                 },
                             ]}
                             className="mb-0"
                         >
                             <InputNumber
-                                placeholder="0.00"
+                                placeholder="Selling Price"
                                 min={0}
                                 step={0.01}
                                 className="w-full"

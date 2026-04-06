@@ -1,5 +1,3 @@
-import { CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
-
 export const getStatusColor = (status) => {
     const colors = {
         pending: "orange",
@@ -15,29 +13,28 @@ export const calculateOrderTotals = (orderItems) => {
         (sum, item) => sum + item.quantity * item.unitcost,
         0
     );
-    const gst = subTotal * 0.18; // 18% GST
+    const gst = subTotal * 0.18;
     const total = subTotal + gst;
-
     return { subTotal, gst, total };
 };
 
 export const calculateStats = (orders, pagination) => {
-    const totalOrders = pagination.total;
-    const pendingOrders = orders.filter(
-        (order) => order.order_status === "pending"
-    ).length;
-    const completedOrders = orders.filter(
-        (order) => order.order_status === "completed"
-    ).length;
-    const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+    const nonCancelledOrders = orders.filter(
+        (order) => order.order_status !== "cancelled"
+    );
 
     return {
-        total: totalOrders,
-        pending: pendingOrders,
-        completed: completedOrders,
-        revenue: totalRevenue,
+        total: pagination.total,
+        pending: orders.filter((o) => o.order_status === "pending").length,
+        completed: orders.filter((o) => o.order_status === "completed").length,
+        revenue: nonCancelledOrders.reduce(
+            (sum, order) => sum + order.total,
+            0
+        ),
     };
 };
+
+export const TERMINAL_STATUSES = ["completed", "cancelled"];
 
 export const ORDER_STATUSES = [
     { value: "pending", label: "Pending" },

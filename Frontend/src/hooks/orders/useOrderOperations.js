@@ -15,7 +15,9 @@ export const useOrderOperations = (refreshOrders) => {
             toast.success("Order status updated successfully");
             refreshOrders();
         } catch (error) {
-            toast.error("Failed to update order status");
+            toast.error(
+                error.response?.data?.message || "Failed to update order status"
+            );
             console.error("Error updating order status:", error);
         }
     };
@@ -51,7 +53,6 @@ export const useOrderOperations = (refreshOrders) => {
 
             const orderData = {
                 customer_id: values.customer_id,
-                invoice_no: values.invoice_no,
                 order_status: values.order_status || "pending",
                 orderItems: values.orderItems.map((item) => ({
                     product_id: item.product_id,

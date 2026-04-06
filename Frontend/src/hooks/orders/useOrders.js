@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { toast } from "react-hot-toast";
 import { api } from "../../api/api";
 import { calculateStats } from "../../utils/orderHelpers";
+import AuthContext from "../../context/AuthContext";
 
 export const useOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -26,6 +27,8 @@ export const useOrders = () => {
         completed: 0,
         revenue: 0,
     });
+
+    const { user } = useContext(AuthContext);
 
     const fetchOrders = async (
         page = 1,
@@ -67,7 +70,6 @@ export const useOrders = () => {
                 pageSize: paginationData.limit,
                 total: paginationData.total,
             });
-
             setStats(calculateStats(ordersData, paginationData));
         } catch (error) {
             toast.error("Failed to fetch orders");
@@ -79,7 +81,9 @@ export const useOrders = () => {
 
     const fetchCustomers = async () => {
         try {
-            const response = await api.get("/customers");
+            const isAdmin = user?.role === "admin";
+            const endpoint = isAdmin ? "/customers/all" : "/customers";
+            const response = await api.get(endpoint);
             setCustomers(response.data.data);
         } catch (error) {
             console.error("Error fetching customers:", error);

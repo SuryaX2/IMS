@@ -2,7 +2,11 @@ import React from "react";
 import { Table, Button, Select, Tag, Space, Tooltip, Card } from "antd";
 import { EyeOutlined, FilePdfOutlined, UserOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { getStatusColor, ORDER_STATUSES } from "../../utils/orderHelpers";
+import {
+    getStatusColor,
+    ORDER_STATUSES,
+    TERMINAL_STATUSES,
+} from "../../utils/orderHelpers";
 import { getStatusIcon } from "../../data";
 
 const { Option } = Select;
@@ -87,7 +91,7 @@ const OrdersTable = ({
             align: "right",
             render: (amount) => (
                 <span className="font-semibold text-green-600 text-base">
-                    ${amount.toFixed(2)}
+                    ₹{amount.toFixed(2)}
                 </span>
             ),
         },
@@ -96,125 +100,157 @@ const OrdersTable = ({
             key: "actions",
             width: 200,
             align: "center",
-            render: (_, record) => (
-                <Space size="small" className="flex justify-center">
-                    <Tooltip title="View Details">
-                        <Button
-                            type="text"
-                            icon={<EyeOutlined />}
-                            onClick={() => onViewDetails(record)}
-                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                        />
-                    </Tooltip>
+            render: (_, record) => {
+                const isTerminal = TERMINAL_STATUSES.includes(
+                    record.order_status
+                );
+                return (
+                    <Space size="small" className="flex justify-center">
+                        <Tooltip title="View Details">
+                            <Button
+                                type="text"
+                                icon={<EyeOutlined />}
+                                onClick={() => onViewDetails(record)}
+                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                            />
+                        </Tooltip>
 
-                    <Select
-                        value={record.order_status}
-                        size="small"
-                        style={{ width: 100 }}
-                        onChange={(value) => onUpdateStatus(record._id, value)}
-                        className="rounded"
-                    >
-                        {ORDER_STATUSES.map((status) => (
-                            <Option key={status.value} value={status.value}>
-                                {status.label}
-                            </Option>
-                        ))}
-                    </Select>
-
-                    <Tooltip title="Download Invoice">
-                        <Button
-                            type="text"
-                            icon={<FilePdfOutlined />}
-                            onClick={() =>
-                                onGenerateInvoice(record._id, record.invoice_no)
+                        <Tooltip
+                            title={
+                                isTerminal
+                                    ? "Status is final and cannot be changed"
+                                    : ""
                             }
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        />
-                    </Tooltip>
-                </Space>
-            ),
+                        >
+                            <Select
+                                value={record.order_status}
+                                size="small"
+                                style={{ width: 110 }}
+                                onChange={(value) =>
+                                    onUpdateStatus(record._id, value)
+                                }
+                                disabled={isTerminal}
+                                className="rounded"
+                            >
+                                {ORDER_STATUSES.map((status) => (
+                                    <Option
+                                        key={status.value}
+                                        value={status.value}
+                                    >
+                                        {status.label}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </Tooltip>
+
+                        <Tooltip title="Download Invoice">
+                            <Button
+                                type="text"
+                                icon={<FilePdfOutlined />}
+                                onClick={() =>
+                                    onGenerateInvoice(
+                                        record._id,
+                                        record.invoice_no
+                                    )
+                                }
+                                className={`${record.order_status === "cancelled" ? "invisible" : "text-red-600 hover:text-red-700 hover:bg-red-50"}`}
+                            />
+                        </Tooltip>
+                    </Space>
+                );
+            },
         },
     ];
 
-    const MobileOrderCard = ({ order }) => (
-        <Card className="mb-3 shadow-sm rounded-xl border-2 hover:shadow-md transition-all duration-200">
-            <div className="flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm">
-                            <UserOutlined className="text-white text-base" />
+    const MobileOrderCard = ({ order }) => {
+        const isTerminal = TERMINAL_STATUSES.includes(order.order_status);
+        return (
+            <Card className="mb-3 shadow-sm rounded-xl border-2 hover:shadow-md transition-all duration-200">
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <UserOutlined className="text-white text-base" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-gray-900 truncate">
+                                    {order.customer_id?.name || "N/A"}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                    #{order.invoice_no}
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">
-                                {order.customer_id?.name || "N/A"}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-0.5">
-                                #{order.invoice_no}
-                            </p>
+                        <Tag
+                            icon={getStatusIcon(order.order_status)}
+                            color={getStatusColor(order.order_status)}
+                            className="font-medium px-2.5 py-0.5 text-xs rounded-md flex-shrink-0"
+                        >
+                            {order.order_status.toUpperCase()}
+                        </Tag>
+                    </div>
+
+                    <div className="flex items-center justify-between py-2.5 px-3 bg-gray-50 rounded-lg -mx-1">
+                        <div className="flex flex-col">
+                            <span className="text-xs text-gray-500 mb-0.5">
+                                Order Date
+                            </span>
+                            <span className="text-sm font-medium text-gray-900">
+                                {dayjs(order.order_date).format("MMM DD, YYYY")}
+                            </span>
+                        </div>
+                        <div className="h-8 w-px bg-gray-200"></div>
+                        <div className="flex flex-col items-center">
+                            <span className="text-xs text-gray-500 mb-0.5">
+                                Items
+                            </span>
+                            <span className="text-sm font-semibold text-gray-900">
+                                {order.total_products}
+                            </span>
+                        </div>
+                        <div className="h-8 w-px bg-gray-200"></div>
+                        <div className="flex flex-col items-end">
+                            <span className="text-xs text-gray-500 mb-0.5">
+                                Total
+                            </span>
+                            <span className="text-base font-bold text-green-600">
+                                ₹{order.total.toFixed(2)}
+                            </span>
                         </div>
                     </div>
-                    <Tag
-                        icon={getStatusIcon(order.order_status)}
-                        color={getStatusColor(order.order_status)}
-                        className="font-medium px-2.5 py-0.5 text-xs rounded-md flex-shrink-0"
-                    >
-                        {order.order_status.toUpperCase()}
-                    </Tag>
-                </div>
 
-                <div className="flex items-center justify-between py-2.5 px-3 bg-gray-50 rounded-lg -mx-1">
-                    <div className="flex flex-col">
-                        <span className="text-xs text-gray-500 mb-0.5">
-                            Order Date
-                        </span>
-                        <span className="text-sm font-medium text-gray-900">
-                            {dayjs(order.order_date).format("MMM DD, YYYY")}
-                        </span>
-                    </div>
-                    <div className="h-8 w-px bg-gray-200"></div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-xs text-gray-500 mb-0.5">
-                            Items
-                        </span>
-                        <span className="text-sm font-semibold text-gray-900">
-                            {order.total_products}
-                        </span>
-                    </div>
-                    <div className="h-8 w-px bg-gray-200"></div>
-                    <div className="flex flex-col items-end">
-                        <span className="text-xs text-gray-500 mb-0.5">
-                            Total
-                        </span>
-                        <span className="text-base font-bold text-green-600">
-                            ${order.total.toFixed(2)}
-                        </span>
+                    <div className="flex gap-2 pt-1">
+                        <Button
+                            type="primary"
+                            icon={<EyeOutlined />}
+                            onClick={() => onViewDetails(order)}
+                            className="flex-1 h-9 font-medium"
+                            size="middle"
+                        >
+                            View Details
+                        </Button>
+                        <Button
+                            icon={<FilePdfOutlined />}
+                            onClick={() =>
+                                onGenerateInvoice(order._id, order.invoice_no)
+                            }
+                            className={`${
+                                order.order_status === "cancelled"
+                                    ? "invisible"
+                                    : "flex-1 h-9 font-medium border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                            }`}
+                            size="middle"
+                            disabled={
+                                isTerminal && order.order_status !== "completed"
+                            }
+                        >
+                            Invoice
+                        </Button>
                     </div>
                 </div>
-
-                <div className="flex gap-2 pt-1">
-                    <Button
-                        type="primary"
-                        icon={<EyeOutlined />}
-                        onClick={() => onViewDetails(order)}
-                        className="flex-1 h-9 font-medium"
-                        size="middle"
-                    >
-                        View Details
-                    </Button>
-                    <Button
-                        icon={<FilePdfOutlined />}
-                        onClick={() =>
-                            onGenerateInvoice(order._id, order.invoice_no)
-                        }
-                        className="flex-1 h-9 font-medium border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-                        size="middle"
-                    >
-                        Invoice
-                    </Button>
-                </div>
-            </div>
-        </Card>
-    );
+            </Card>
+        );
+    };
 
     return (
         <>
@@ -289,7 +325,7 @@ const OrdersTable = ({
             </div>
 
             <div className="hidden lg:block">
-                <Card className="border-0 shadow-sm rounded-lg overflow-hidden ">
+                <Card className="border-0 shadow-sm rounded-lg overflow-hidden">
                     <Table
                         columns={columns}
                         dataSource={orders}
@@ -316,7 +352,6 @@ const OrdersTable = ({
                 .orders-table :global(.ant-table) {
                     font-size: 14px;
                 }
-
                 .orders-table :global(.ant-table-thead > tr > th) {
                     background-color: #f9fafb;
                     border-bottom: 2px solid #e5e7eb;
@@ -324,20 +359,16 @@ const OrdersTable = ({
                     color: #374151;
                     padding: 14px 16px;
                 }
-
                 .orders-table :global(.ant-table-tbody > tr > td) {
                     border-bottom: 1px solid #f3f4f6;
                     padding: 16px;
                 }
-
                 .orders-table :global(.ant-table-tbody > tr:hover > td) {
                     background-color: #f9fafb;
                 }
-
                 .orders-table :global(.ant-table-tbody > tr) {
                     transition: background-color 0.2s ease;
                 }
-
                 .orders-table :global(.ant-pagination) {
                     margin-top: 20px;
                 }
