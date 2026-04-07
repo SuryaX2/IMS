@@ -91,14 +91,27 @@ purchaseDetailSchema.statics.processAllReturns = async function (
     let totalRefundAmount = 0;
 
     for (const detail of details) {
+        if (detail.return_processed) {
+            returnResults.push({
+                product_id: detail.product_id._id,
+                purchased_quantity: detail.quantity,
+                returned_quantity: detail.returned_quantity,
+                refund_amount: detail.refund_amount,
+                fully_returned: detail.returned_quantity === detail.quantity,
+                skipped: true,
+            });
+            totalRefundAmount += detail.refund_amount;
+            continue;
+        }
+
         const product = detail.product_id;
         const returnableQuantity = Math.min(detail.quantity, product.stock);
 
         if (returnableQuantity > 0) {
-            await Product.restoreStock(
-                product._id,
-                -returnableQuantity,
-                session
+            await Product.findOneAndUpdate(
+                { _id: product._id },
+                { $inc: { stock: -returnableQuantity } },
+                { new: true, session }
             );
         }
 

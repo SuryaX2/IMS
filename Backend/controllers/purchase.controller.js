@@ -1,6 +1,5 @@
 import { Purchase } from "../models/purchase.model.js";
 import { PurchaseDetail } from "../models/purchase-detail.model.js";
-import { Product } from "../models/product.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -140,12 +139,9 @@ const getReturnPreview = asyncHandler(async (req, res, next) => {
             return next(new ApiError(400, "Purchase is already returned"));
         }
 
-        if (!["completed", "approved"].includes(purchase.purchase_status)) {
+        if (purchase.purchase_status !== "completed") {
             return next(
-                new ApiError(
-                    400,
-                    "Only completed/approved purchases can be returned"
-                )
+                new ApiError(400, "Only completed purchases can be returned")
             );
         }
 

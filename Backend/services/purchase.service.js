@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Purchase } from "../models/purchase.model.js";
 import { PurchaseDetail } from "../models/purchase-detail.model.js";
 import { Product } from "../models/product.model.js";
+import { Supplier } from "../models/supplier.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
 class PurchaseService {
@@ -18,14 +19,56 @@ class PurchaseService {
             throw new ApiError(400, "Invalid purchase data");
         }
 
+        const supplier = await Supplier.findById(supplier_id).lean();
+        if (!supplier) {
+            throw new ApiError(404, "Supplier not found");
+        }
+
+        const productIds = details.map((d) => d.product_id?.toString());
+        const uniqueProductIds = [...new Set(productIds)];
+        if (uniqueProductIds.length !== productIds.length) {
+            throw new ApiError(400, "Duplicate products in purchase details");
+        }
+
+        const products = await Product.find({
+            _id: { $in: uniqueProductIds },
+        })
+            .select("_id")
+            .lean();
+
+        if (products.length !== uniqueProductIds.length) {
+            throw new ApiError(400, "One or more products not found");
+        }
+
+        for (const d of details) {
+            if (!d.quantity || d.quantity < 1) {
+                throw new ApiError(
+                    400,
+                    "Quantity must be at least 1 for all items"
+                );
+            }
+            if (d.unitcost === undefined || d.unitcost < 0) {
+                throw new ApiError(
+                    400,
+                    "Unit cost must be non-negative for all items"
+                );
+            }
+        }
+
         const existing = await Purchase.findOne({ purchase_no }).lean();
         if (existing) {
             throw new ApiError(409, "Purchase number already exists");
         }
 
         const initialStatus = purchase_status || "pending";
-        const shouldAddStock =
-            initialStatus === "completed" || initialStatus === "approved";
+        if (!["pending", "completed"].includes(initialStatus)) {
+            throw new ApiError(
+                400,
+                `Invalid purchase status: ${initialStatus}`
+            );
+        }
+
+        const shouldAddStock = initialStatus === "completed";
 
         const session = await mongoose.startSession();
         session.startTransaction();
@@ -88,9 +131,8 @@ class PurchaseService {
         }
 
         const validTransitions = {
-            pending: ["completed", "approved"],
+            pending: ["completed"],
             completed: ["returned"],
-            approved: ["returned"],
             returned: [],
         };
 
@@ -112,7 +154,7 @@ class PurchaseService {
                     purchaseId,
                     session
                 );
-            } else if (newStatus === "completed" || newStatus === "approved") {
+            } else if (newStatus === "completed") {
                 const purchaseDetails = await PurchaseDetail.find({
                     purchase_id: purchaseId,
                 }).lean();
