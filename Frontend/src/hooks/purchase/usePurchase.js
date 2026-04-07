@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { message } from "antd";
 import toast from "react-hot-toast";
 import { api } from "../../api/api.js";
 import { calculateStats } from "../../utils/purchaseUtils.js";
+import AuthContext from "../../context/AuthContext.jsx";
 
 export const usePurchase = () => {
     const [purchases, setPurchases] = useState([]);
@@ -17,6 +18,8 @@ export const usePurchase = () => {
         returned: 0,
         total: 0,
     });
+
+    const { user } = useContext(AuthContext);
 
     // Fetch all purchases
     const fetchPurchases = async () => {
@@ -39,8 +42,13 @@ export const usePurchase = () => {
 
     // Fetch suppliers
     const fetchSuppliers = async () => {
+        let response;
         try {
-            const response = await api.get("/suppliers");
+            if (user.role === "admin") {
+                response = await api.get("/suppliers/admin/all");
+            } else {
+                response = await api.get("/suppliers");
+            }
             if (response.data.success) {
                 setSuppliers(response.data.data);
             }

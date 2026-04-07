@@ -11,6 +11,7 @@ import {
     Space,
     InputNumber,
     Card,
+    Tag,
 } from "antd";
 import {
     PlusOutlined,
@@ -29,6 +30,30 @@ const PurchaseForm = ({
     form,
     initialValues,
 }) => {
+    // Build a lookup map for quick access to product details
+    const productMap = React.useMemo(() => {
+        const map = {};
+        products.forEach((p) => {
+            map[p._id] = p;
+        });
+        return map;
+    }, [products]);
+
+    const handleProductChange = (productId, fieldName) => {
+        const product = productMap[productId];
+        if (!product) return;
+
+        // Auto-fill the unit cost with the product's buying price
+        const details = form.getFieldValue("details");
+        if (!details) return;
+        details[fieldName] = {
+            ...details[fieldName],
+            product_id: productId,
+            unitcost: product.buying_price,
+        };
+        form.setFieldsValue({ details });
+    };
+
     const handleSubmit = (values) => {
         const purchaseData = {
             supplier_id: values.supplier_id,
@@ -135,7 +160,6 @@ const PurchaseForm = ({
                                 >
                                     <Option value="pending">Pending</Option>
                                     <Option value="completed">Completed</Option>
-                                    <Option value="approved">Approved</Option>
                                 </Select>
                             </Form.Item>
                         </Col>
@@ -151,109 +175,143 @@ const PurchaseForm = ({
                 <Form.List name="details">
                     {(fields, { add, remove }) => (
                         <>
-                            {fields.map(({ key, name, ...restField }) => (
-                                <Card
-                                    key={key}
-                                    className="mb-4 border border-gray-200 shadow-sm"
-                                >
-                                    <Row gutter={[16, 16]} align="middle">
-                                        <Col xs={24} sm={8}>
-                                            <Form.Item
-                                                {...restField}
-                                                name={[name, "product_id"]}
-                                                label="Product"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            "Select product",
-                                                    },
-                                                ]}
-                                            >
-                                                <Select
-                                                    placeholder="Select product"
-                                                    showSearch
-                                                    optionFilterProp="children"
-                                                    className="rounded-lg"
+                            {fields.map(({ key, name, ...restField }) => {
+                                // Watch the selected product for this row to show stock info
+                                const selectedProductId = form.getFieldValue([
+                                    "details",
+                                    name,
+                                    "product_id",
+                                ]);
+                                const selectedProduct =
+                                    productMap[selectedProductId];
+
+                                return (
+                                    <Card
+                                        key={key}
+                                        className="mb-4 border border-gray-200 shadow-sm"
+                                    >
+                                        <Row gutter={[16, 16]} align="middle">
+                                            <Col xs={24} sm={8}>
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, "product_id"]}
+                                                    label="Product"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message:
+                                                                "Select product",
+                                                        },
+                                                    ]}
                                                 >
-                                                    {products.map((product) => (
-                                                        <Option
-                                                            key={product._id}
-                                                            value={product._id}
-                                                        >
-                                                            {
-                                                                product.product_name
-                                                            }{" "}
-                                                            (
-                                                            {
-                                                                product.product_code
-                                                            }
+                                                    <Select
+                                                        placeholder="Select product"
+                                                        showSearch
+                                                        optionFilterProp="label"
+                                                        className="rounded-lg"
+                                                        onChange={(val) =>
+                                                            handleProductChange(
+                                                                val,
+                                                                name
                                                             )
-                                                        </Option>
-                                                    ))}
-                                                </Select>
-                                            </Form.Item>
-                                        </Col>
-                                        <Col xs={24} sm={6}>
-                                            <Form.Item
-                                                {...restField}
-                                                name={[name, "quantity"]}
-                                                label="Quantity"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            "Enter quantity",
-                                                    },
-                                                ]}
-                                            >
-                                                <InputNumber
-                                                    placeholder="Quantity"
-                                                    min={1}
-                                                    style={{ width: "100%" }}
-                                                    className="rounded-lg"
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col xs={24} sm={7}>
-                                            <Form.Item
-                                                {...restField}
-                                                name={[name, "unitcost"]}
-                                                label="Unit Cost"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            "Enter unit cost",
-                                                    },
-                                                ]}
-                                            >
-                                                <InputNumber
-                                                    placeholder="Unit Cost"
-                                                    min={0}
-                                                    precision={2}
-                                                    style={{ width: "100%" }}
-                                                    prefix="₹"
-                                                    className="rounded-lg"
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col xs={24} sm={3}>
-                                            <Form.Item label=" ">
-                                                <Button
-                                                    type="default"
-                                                    onClick={() => remove(name)}
-                                                    icon={
-                                                        <MinusCircleOutlined />
-                                                    }
-                                                    danger
-                                                    className="w-full"
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
-                                </Card>
-                            ))}
+                                                        }
+                                                        options={products.map(
+                                                            (product) => ({
+                                                                value: product._id,
+                                                                label: `${product.product_name} (${product.product_code})`,
+                                                            })
+                                                        )}
+                                                    />
+                                                </Form.Item>
+                                                {/* Show current stock below the select */}
+                                                {selectedProduct && (
+                                                    <div className="mt-1 mb-2">
+                                                        <Tag
+                                                            color={
+                                                                selectedProduct.stock ===
+                                                                0
+                                                                    ? "red"
+                                                                    : selectedProduct.stock <
+                                                                        10
+                                                                      ? "orange"
+                                                                      : "green"
+                                                            }
+                                                        >
+                                                            Current Stock:{" "}
+                                                            {
+                                                                selectedProduct.stock
+                                                            }
+                                                        </Tag>
+                                                    </div>
+                                                )}
+                                            </Col>
+                                            <Col xs={24} sm={6}>
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, "quantity"]}
+                                                    label="Quantity"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message:
+                                                                "Enter quantity",
+                                                        },
+                                                    ]}
+                                                >
+                                                    <InputNumber
+                                                        placeholder="Quantity"
+                                                        min={1}
+                                                        style={{
+                                                            width: "100%",
+                                                        }}
+                                                        className="rounded-lg"
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col xs={24} sm={7}>
+                                                <Form.Item
+                                                    {...restField}
+                                                    name={[name, "unitcost"]}
+                                                    label="Unit Cost"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message:
+                                                                "Enter unit cost",
+                                                        },
+                                                    ]}
+                                                >
+                                                    <InputNumber
+                                                        placeholder="Unit Cost"
+                                                        min={0}
+                                                        precision={2}
+                                                        style={{
+                                                            width: "100%",
+                                                        }}
+                                                        prefix="₹"
+                                                        className="rounded-lg"
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col xs={24} sm={3}>
+                                                <Form.Item label=" ">
+                                                    <Button
+                                                        type="default"
+                                                        onClick={() =>
+                                                            remove(name)
+                                                        }
+                                                        icon={
+                                                            <MinusCircleOutlined />
+                                                        }
+                                                        danger
+                                                        className="w-full"
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                    </Card>
+                                );
+                            })}
                             <Form.Item>
                                 <Button
                                     type="dashed"

@@ -94,8 +94,8 @@ const PurchaseTable = ({
                         </Tooltip>
                     )}
 
-                    {(record.purchase_status === "completed" ||
-                        record.purchase_status === "approved") && (
+                    {/* Only "completed" purchases can be returned — approved removed */}
+                    {record.purchase_status === "completed" && (
                         <>
                             <Tooltip title="Preview Return">
                                 <Button

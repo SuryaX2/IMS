@@ -1,10 +1,3 @@
-import {
-    CheckCircleOutlined,
-    ClockCircleOutlined,
-    UndoOutlined,
-} from "@ant-design/icons";
-
-// Generate unique purchase number
 export const generatePurchaseNo = () => {
     const date = new Date();
     const year = date.getFullYear().toString().slice(-2);
@@ -16,13 +9,11 @@ export const generatePurchaseNo = () => {
     return `P${year}${month}${day}${random}`;
 };
 
-// Get status tag color
 export const getStatusColor = (status) => {
     switch (status) {
         case "pending":
             return "orange";
         case "completed":
-        case "approved":
             return "green";
         case "returned":
             return "red";
@@ -31,22 +22,6 @@ export const getStatusColor = (status) => {
     }
 };
 
-// Get status icon
-// export const getStatusIcon = (status) => {
-//     switch (status) {
-//         case "pending":
-//             return <ClockCircleOutlined />;
-//         case "completed":
-//         case "approved":
-//             return <CheckCircleOutlined />;
-//         case "returned":
-//             return <UndoOutlined />;
-//         default:
-//             return null;
-//     }
-// };
-
-// Calculate stats
 export const calculateStats = (purchaseData) => {
     const pending = purchaseData.filter(
         (p) => p.purchase_status === "pending"

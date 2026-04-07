@@ -140,7 +140,6 @@ export const getStatusIconPurchase = (status) => {
         case "pending":
             return <ClockCircleOutlined />;
         case "completed":
-        case "approved":
             return <CheckCircleOutlined />;
         case "returned":
             return <UndoOutlined />;
