@@ -6,15 +6,17 @@ import {
     deleteProduct,
     getAllProductsAdmin,
 } from "../controllers/product.controller.js";
+import { bulkUploadProducts } from "../controllers/product.bulk.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { isAdmin } from "../middleware/admin.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
 
 const router = Router();
 
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
+router.use(verifyJWT);
 
-// Regular user routes
+router.route("/bulk-upload").post(upload.single("file"), bulkUploadProducts);
+
 router
     .route("/")
     .post(upload.single("product_image"), createProduct)
@@ -25,7 +27,7 @@ router
     .patch(upload.single("product_image"), updateProduct)
     .delete(deleteProduct);
 
-// Admin routes
+// Admin route
 router.route("/all").get(isAdmin, getAllProductsAdmin);
 
 export default router;

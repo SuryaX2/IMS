@@ -55,6 +55,8 @@ const productSchema = mongoose.Schema(
     { timestamps: true }
 );
 
+productSchema.index({ product_code: 1, created_by: 1 }, { unique: true });
+
 productSchema.statics.createProduct = async function (productData, session) {
     const [product] = await this.create(
         [productData],
@@ -81,10 +83,7 @@ productSchema.statics.deductStock = async function (
     session
 ) {
     return this.findOneAndUpdate(
-        {
-            _id: productId,
-            stock: { $gte: quantity },
-        },
+        { _id: productId, stock: { $gte: quantity } },
         { $inc: { stock: -quantity } },
         { new: true, session: session || null }
     );
@@ -104,13 +103,11 @@ productSchema.statics.restoreStock = async function (
 
 productSchema.statics.findInsufficientStock = async function (items) {
     const productIds = items.map((i) => i.product_id);
-
     const products = await this.find({ _id: { $in: productIds } })
         .select("_id product_name product_code stock")
         .lean();
 
     const productMap = new Map(products.map((p) => [p._id.toString(), p]));
-
     const insufficient = [];
 
     for (const item of items) {
