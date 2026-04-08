@@ -73,6 +73,40 @@ const getUserCategories = asyncHandler(async (req, res, next) => {
     }
 });
 
+const getAvailableCategories = asyncHandler(async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+
+        const [userCategories, adminCategories] = await Promise.all([
+            Category.getCategoriesByUser(userId),
+            Category.getAdminCategories(),
+        ]);
+
+        const seen = new Set();
+        const merged = [];
+
+        for (const cat of [...userCategories, ...adminCategories]) {
+            const id = cat._id.toString();
+            if (!seen.has(id)) {
+                seen.add(id);
+                merged.push(cat);
+            }
+        }
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    merged,
+                    "Available categories fetched successfully"
+                )
+            );
+    } catch (error) {
+        return next(new ApiError(500, error.message));
+    }
+});
+
 const updateCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const { category_name } = req.body;
@@ -82,14 +116,12 @@ const updateCategory = asyncHandler(async (req, res, next) => {
     }
 
     try {
-        // Find the category first to check permissions
         const category = await Category.findById(id);
 
         if (!category) {
             return next(new ApiError(404, "Category not found"));
         }
 
-        // Check if the user is the creator (admin check happens in middleware)
         if (
             !req.user.role === "admin" &&
             !category.created_by.equals(req.user._id)
@@ -102,7 +134,6 @@ const updateCategory = asyncHandler(async (req, res, next) => {
             );
         }
 
-        // Update the category
         const updatedCategory = await Category.findByIdAndUpdate(
             id,
             {
@@ -130,14 +161,12 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        // Find the category first to check permissions
         const category = await Category.findById(id);
 
         if (!category) {
             return next(new ApiError(404, "Category not found"));
         }
 
-        // Check if the user is the creator (admin check happens in middleware)
         if (
             !req.user.role === "admin" &&
             !category.created_by.equals(req.user._id)
@@ -150,7 +179,6 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
             );
         }
 
-        // Delete the category
         await Category.findByIdAndDelete(id);
 
         return res
@@ -165,6 +193,7 @@ export {
     createCategory,
     getAllCategories,
     getUserCategories,
+    getAvailableCategories,
     updateCategory,
     deleteCategory,
 };
