@@ -8,7 +8,7 @@ export const useCategories = () => {
     const fetchCategories = async () => {
         try {
             setLoading(true);
-            const response = await api.get("/categories/user");
+            const response = await api.get("/categories/available");
             if (response.data.success) {
                 setCategories(response.data.data);
             }
@@ -19,9 +19,23 @@ export const useCategories = () => {
         }
     };
 
+    const fetchUserCategories = async () => {
+        try {
+            setLoading(true);
+            const response = await api.get("/categories/user");
+            if (response.data.success) {
+                setCategories(response.data.data);
+            }
+        } catch (err) {
+            console.error("User categories fetch error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchCategories();
     }, []);
 
-    return { categories, loading, fetchCategories };
+    return { categories, loading, fetchCategories, fetchUserCategories };
 };

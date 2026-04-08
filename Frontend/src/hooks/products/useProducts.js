@@ -110,6 +110,26 @@ export const useProducts = () => {
         }
     };
 
+    const bulkCreateProducts = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await api.post("/products/bulk-upload", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            return { success: true, data: response.data.data };
+        } catch (err) {
+            const errorMessage =
+                err.response?.data?.message || "Bulk upload failed";
+            return {
+                success: false,
+                error: errorMessage,
+                data: err.response?.data?.data,
+            };
+        }
+    };
+
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -122,5 +142,6 @@ export const useProducts = () => {
         createProduct,
         updateProduct,
         deleteProduct,
+        bulkCreateProducts,
     };
 };

@@ -1,20 +1,18 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { Layout, Card, Button, Form, message } from "antd";
 import { PlusOutlined, ProductOutlined } from "@ant-design/icons";
 
-// Components
 import ProductSearchBar from "../components/products/ProductSearchBar";
 import ProductsTable from "../components/products/ProductsTable";
 import ProductModal from "../components/products/ProductModal";
 import ProductFilters from "../components/products/ProductFilters";
 import ProductDetailsDrawer from "../components/products/ProductDetailsDrawer";
+import BulkUploadModal from "../components/products/BulkUploadModal";
 
-// Hooks
 import { useProducts } from "../hooks/products/useProducts";
 import { useCategories } from "../hooks/products/useCategories";
 import { useUnits } from "../hooks/products/useUnits";
 
-// Utils
 import {
     prepareProductFormData,
     validateProductData,
@@ -23,7 +21,6 @@ import {
 const { Content } = Layout;
 
 const Products = () => {
-    // Hooks
     const {
         products,
         loading,
@@ -35,30 +32,29 @@ const Products = () => {
     const { categories } = useCategories();
     const { units } = useUnits();
 
-    // Form
     const [form] = Form.useForm();
 
-    // State
     const [searchText, setSearchText] = useState("");
     const [categoryFilter, setCategoryFilter] = useState(null);
     const [stockFilter, setStockFilter] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isFiltersVisible, setIsFiltersVisible] = useState(false);
     const [isDetailsVisible, setIsDetailsVisible] = useState(false);
+    const [isBulkUploadVisible, setIsBulkUploadVisible] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [imageFile, setImageFile] = useState(null);
     const [imageUrl, setImageUrl] = useState("");
 
-    // Handlers
+    const isSubmittingRef = useRef(false);
+
     const handleSearch = useCallback(() => {
-        const filters = {
+        fetchProducts({
             search: searchText,
             category: categoryFilter,
-            stockFilter: stockFilter,
-        };
-        fetchProducts(filters);
+            stockFilter,
+        });
     }, [searchText, categoryFilter, stockFilter, fetchProducts]);
 
     const handleReset = useCallback(() => {
@@ -101,8 +97,6 @@ const Products = () => {
         if (fileList.length > 0) {
             const file = fileList[0].originFileObj;
             setImageFile(file);
-
-            // Create preview URL
             const reader = new FileReader();
             reader.onload = (e) => setImageUrl(e.target.result);
             reader.readAsDataURL(file);
@@ -113,10 +107,12 @@ const Products = () => {
     };
 
     const handleSaveProduct = async () => {
+        if (isSubmittingRef.current) return;
+        isSubmittingRef.current = true;
+
         try {
             const values = await form.validateFields();
 
-            // Validate product data
             const validation = validateProductData(values);
             if (!validation.isValid) {
                 Object.keys(validation.errors).forEach((key) => {
@@ -126,16 +122,11 @@ const Products = () => {
             }
 
             setModalLoading(true);
-
-            // Prepare form data
             const formData = prepareProductFormData(values, imageFile);
 
-            let result;
-            if (editingProduct) {
-                result = await updateProduct(editingProduct._id, formData);
-            } else {
-                result = await createProduct(formData);
-            }
+            const result = editingProduct
+                ? await updateProduct(editingProduct._id, formData)
+                : await createProduct(formData);
 
             if (result.success) {
                 setIsModalVisible(false);
@@ -149,6 +140,8 @@ const Products = () => {
             message.error("Please check all required fields");
         } finally {
             setModalLoading(false);
+            // FIX 4: Always release the lock, even on error.
+            isSubmittingRef.current = false;
         }
     };
 
@@ -171,22 +164,33 @@ const Products = () => {
         handleReset();
     };
 
+    const handleBulkUploadComplete = () => {
+        setIsBulkUploadVisible(false);
+        fetchProducts();
+    };
+
     return (
         <Layout>
             <Content className="p-2 sm:p-4 lg:p-6 bg-white">
                 <div className="max-w-full lg:max-w-7xl mx-auto">
-                    {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-4">
                         <div className="flex-1 min-w-0">
                             <h1 className="truncate mb-1 text-4xl font-bold flex items-center gap-2">
                                 Products
                                 <ProductOutlined className="text-blue-600 inline-block ml-2" />
                             </h1>
-                            <p className="text-gray-500 text-base md:text-sm  hidden sm:block">
+                            <p className="text-gray-500 text-base md:text-sm hidden sm:block">
                                 Manage your product inventory
                             </p>
                         </div>
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 flex gap-2">
+                            <Button
+                                onClick={() => setIsBulkUploadVisible(true)}
+                                size="large"
+                                className="w-full sm:w-auto"
+                            >
+                                Bulk Upload
+                            </Button>
                             <Button
                                 type="primary"
                                 icon={<PlusOutlined />}
@@ -203,7 +207,6 @@ const Products = () => {
                         </div>
                     </div>
 
-                    {/* Search Bar - Responsive */}
                     <div className="mb-4 sm:mb-6">
                         <ProductSearchBar
                             searchText={searchText}
@@ -214,7 +217,6 @@ const Products = () => {
                         />
                     </div>
 
-                    {/* Products Table - Responsive Card */}
                     <Card
                         className="overflow-hidden"
                         bodyStyle={{
@@ -234,7 +236,6 @@ const Products = () => {
                         </div>
                     </Card>
 
-                    {/* Product Modal - Responsive */}
                     <ProductModal
                         visible={isModalVisible}
                         title={
@@ -248,6 +249,7 @@ const Products = () => {
                         imageUrl={imageUrl}
                         onSave={handleSaveProduct}
                         onCancel={() => {
+                            if (isSubmittingRef.current) return;
                             setIsModalVisible(false);
                             setEditingProduct(null);
                             setImageFile(null);
@@ -259,7 +261,6 @@ const Products = () => {
                         centered={window.innerWidth < 768}
                     />
 
-                    {/* Filters Drawer - Already responsive as it's a drawer */}
                     <ProductFilters
                         visible={isFiltersVisible}
                         categories={categories}
@@ -275,7 +276,6 @@ const Products = () => {
                         width={window.innerWidth < 768 ? "100%" : "400px"}
                     />
 
-                    {/* Product Details Drawer - Responsive */}
                     <ProductDetailsDrawer
                         visible={isDetailsVisible}
                         product={selectedProduct}
@@ -286,6 +286,14 @@ const Products = () => {
                         placement={window.innerWidth < 768 ? "bottom" : "right"}
                         height={window.innerWidth < 768 ? "80vh" : undefined}
                         width={window.innerWidth < 768 ? "100%" : "500px"}
+                    />
+
+                    <BulkUploadModal
+                        visible={isBulkUploadVisible}
+                        categories={categories}
+                        units={units}
+                        onClose={() => setIsBulkUploadVisible(false)}
+                        onComplete={handleBulkUploadComplete}
                     />
                 </div>
             </Content>

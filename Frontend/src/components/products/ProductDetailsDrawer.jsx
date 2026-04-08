@@ -58,11 +58,12 @@ const ProductDetailsDrawer = ({
     const profitMargin = (
         product.selling_price - product.buying_price
     )?.toFixed(2);
+
     const profitPercentage =
-        product.buying_price > 0
+        product.selling_price > 0
             ? (
                   ((product.selling_price - product.buying_price) /
-                      product.buying_price) *
+                      product.selling_price) *
                   100
               ).toFixed(1)
             : 0;
@@ -175,6 +176,7 @@ const ProductDetailsDrawer = ({
                             <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center mb-2">
                                 <PercentageOutlined className="text-purple-600 text-lg" />
                             </div>
+                            {/* FIX 3: Label updated to clarify this is gross margin */}
                             <Text className="text-xs text-gray-500 mb-1 font-bold">
                                 Margin
                             </Text>
