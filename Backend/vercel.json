@@ -20,6 +20,12 @@
       "dest": "/index.js"
     }
   ],
+  "crons": [
+    {
+      "path": "/api/v1/scheduler/trigger-alerts",
+      "schedule": "0 9 * * 1"
+    }
+  ],
   "env": {
     "NODE_ENV": "production"
   }

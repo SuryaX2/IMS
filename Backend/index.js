@@ -20,7 +20,7 @@ app.get("/api/v1/test", (req, res) => {
     res.json({
         message: "API routes are working!",
         endpoint: "/api/v1/test",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     });
 });
 
@@ -30,10 +30,10 @@ connectDB()
             console.log(
                 `✅ Server listening on http://localhost:${process.env.PORT}/`
             );
-
-            // Start the low stock alert scheduler after server starts
             console.log("🚀 Starting low stock alert scheduler...");
-            lowStockScheduler.start();
+            if (process.env.NODE_ENV !== "production") {
+                lowStockScheduler.start();
+            }
         });
     })
     .catch((err) => {
