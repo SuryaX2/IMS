@@ -4,6 +4,7 @@ import { Unit } from "../models/unit.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import fs from "fs";
 
 const parseCSV = (csvText) => {
     const lines = csvText
@@ -76,7 +77,7 @@ export const bulkUploadProducts = asyncHandler(async (req, res, next) => {
 
     const csvText = req.file.buffer
         ? req.file.buffer.toString("utf-8")
-        : require("fs").readFileSync(req.file.path, "utf-8");
+        : fs.readFileSync(req.file.path, "utf-8");
 
     const { headers, rows } = parseCSV(csvText);
 
